@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "962677109525",
+    "project_id": "yeneta-tutor",
+    "storage_bucket": "yeneta-tutor.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:962677109525:android:33dbffa6b8af0ed37daf1c",
+        "android_client_info": {
+          "package_name": "com.example.yeneta_tutor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRDzkSt0bkQbS3VyulA4PCMTl2epbV1dM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
