@@ -1,8 +1,11 @@
 // screens/tutor_signup.dart
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/signup_controller.dart';
 import 'package:yeneta_tutor/models/tutor_model.dart';
+import 'package:yeneta_tutor/utils/colors.dart';
 
 class TutorSignup extends ConsumerStatefulWidget {
   @override
@@ -15,13 +18,15 @@ class _TutorSignupState extends ConsumerState<TutorSignup> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _qualificationsController = TextEditingController();
+  final TextEditingController _qualificationsController =
+      TextEditingController();
   final TextEditingController _experienceController = TextEditingController();
-  final TextEditingController _subjectsTaughtController = TextEditingController();
+  final TextEditingController _subjectsTaughtController =
+      TextEditingController();
   final TextEditingController _hourlyRateController = TextEditingController();
   final TextEditingController _availabilityController = TextEditingController();
 
-   int _currentPage = 0;
+  int _currentPage = 0;
 
   void _signupTutor() {
     if (_formKey.currentState!.validate()) {
@@ -35,10 +40,10 @@ class _TutorSignupState extends ConsumerState<TutorSignup> {
       );
 
       ref.read(signupControllerProvider).signupTutor(
-        tutor,
-        _emailController.text,
-        _passwordController.text,
-      );
+            tutor,
+            _emailController.text,
+            _passwordController.text,
+          );
     }
   }
 
@@ -65,7 +70,8 @@ class _TutorSignupState extends ConsumerState<TutorSignup> {
       });
     }
   }
-    InputDecoration _inputDecoration(String label) {
+
+  InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
       border: OutlineInputBorder(
@@ -83,16 +89,15 @@ class _TutorSignupState extends ConsumerState<TutorSignup> {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-
             child: Column(
               children: [
-                                // Log or instructions on top
+                // Log or instructions on top
                 Image.asset('images/logo.jpg', height: 200),
                 Text(
                   _currentPage == 0
                       ? "Step 1: Fill in your basic information"
                       : "Step 2: Provide additional details",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -101,10 +106,12 @@ class _TutorSignupState extends ConsumerState<TutorSignup> {
                 Form(
                   key: _formKey,
                   child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.7, // Adjust the height to fit within screen
+                    height: MediaQuery.of(context).size.height *
+                        0.7, // Adjust the height to fit within screen
                     child: PageView(
                       controller: _pageController,
-                      physics: NeverScrollableScrollPhysics(), // Disable swipe gestures
+                      physics:
+                          NeverScrollableScrollPhysics(), // Disable swipe gestures
                       children: [
                         // Page 1
                         Column(
@@ -135,8 +142,9 @@ class _TutorSignupState extends ConsumerState<TutorSignup> {
                               controller: _qualificationsController,
                               decoration: _inputDecoration('Qualifications'),
                               keyboardType: TextInputType.number,
-                              validator: (value) =>
-                                  value!.isEmpty ? 'Enter your Qulifications' : null,
+                              validator: (value) => value!.isEmpty
+                                  ? 'Enter your Qulifications'
+                                  : null,
                             ),
                           ],
                         ),
@@ -173,19 +181,49 @@ class _TutorSignupState extends ConsumerState<TutorSignup> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (_currentPage > 0) // Show 'Previous' only if not on the first page
-                      ElevatedButton(
+                    if (_currentPage >
+                        0) // Show 'Previous' only if not on the first page
+                      TextButton(
                         onPressed: _previousPage,
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: primaryColor,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                         child: Text('Previous'),
                       ),
+                    const SizedBox(width: 16),
                     if (_currentPage < 1) // Show 'Next' if not on the last page
-                      ElevatedButton(
+                      TextButton(
                         onPressed: _nextPage,
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: primaryColor,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                         child: Text('Next'),
                       ),
+                    const SizedBox(width: 16),
                     if (_currentPage == 1) // Show 'Sign Up' on the last page
-                      ElevatedButton(
+                      TextButton(
                         onPressed: _signupTutor,
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: primaryColor,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                         child: Text('Sign Up'),
                       ),
                   ],
@@ -198,12 +236,3 @@ class _TutorSignupState extends ConsumerState<TutorSignup> {
     );
   }
 }
-
-
-
-
-
-
-
-
- 
