@@ -44,4 +44,26 @@ class AuthRepository {
       'availability': tutor.availability,
     });
   }
+
+  Future<User?> login(String email, String password) async {
+    try {
+      UserCredential userCredential =
+          await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      print('Error during login: $e');
+      return null; // Return null in case of login failure
+    }
+  }
+
+  User? getCurrentUser() {
+    return _firebaseAuth.currentUser;
+  }
+
+  Future<void> logout() async {
+    await _firebaseAuth.signOut();
+  }
 }
