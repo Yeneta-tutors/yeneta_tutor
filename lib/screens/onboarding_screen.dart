@@ -5,7 +5,7 @@ import 'package:yeneta_tutor/utils/colors.dart';
 import 'package:yeneta_tutor/widgets/onboarding_indicator.dart';
 import 'package:yeneta_tutor/features/auth/screens/student_signup.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutor_signup.dart';
-
+import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
 class OnboardingScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -55,7 +55,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     const SizedBox(height: 20),
                     Text(
                       onboardingHeaders[index],
-                      style: const TextStyle(fontSize: 24, color: Colors.black, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 24,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 20),
                     Text(
@@ -82,7 +85,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.white,
                   backgroundColor: primaryColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -98,18 +102,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   const Text('I am', style: TextStyle(fontSize: 18)),
                   const SizedBox(height: 20),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Evenly space the buttons
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceEvenly, // Evenly space the buttons
                     children: [
                       Expanded(
                         child: TextButton(
                           onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => StudentSignup()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => StudentSignup()));
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.white,
                             backgroundColor: primaryColor,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -121,13 +129,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       Expanded(
                         child: TextButton(
                           onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => TutorSignup()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => TutorSignup()));
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.white,
                             backgroundColor: primaryColor,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -136,7 +147,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         ),
                       ),
                     ],
-                  ),
+                  ),                
                 ],
               ),
             ),
