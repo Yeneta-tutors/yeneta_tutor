@@ -2,6 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../controllers/login_controller.dart';
+import 'package:yeneta_tutor/features/student/screens/student_home.dart';
+import 'package:yeneta_tutor/widgets/button.dart';
+import 'package:yeneta_tutor/widgets/text_field.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   @override
@@ -33,64 +36,53 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final loginState = ref.watch(loginControllerProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Image.asset('images/logo.jpg', height: 150), // Add your logo here
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(Icons.email),
-                      border: OutlineInputBorder(),
+      appBar: AppBar(title: const Text('Login')),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Image.asset('images/logo.jpg', height: 150), // Add your logo here
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFieldInput(
+                      textEditingController: _emailController,
+                      hintText: 'Email',
+                      icon: Icons.email,
+                      textInputType: TextInputType.emailAddress,
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: Icon(Icons.lock),
-                      border: OutlineInputBorder(),
+                    const SizedBox(height: 16),
+                    TextFieldInput(
+                      textEditingController: _passwordController,
+                      hintText: 'Password',
+                      icon: Icons.lock,
+                      textInputType: TextInputType.text,
+                      isPass: true,
                     ),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  loginState.when(
-                    data: (user) {
-                      if (user != null) {
-                        return Text('Login successful, user: ${user.email}');
-                      }
-                      return ElevatedButton(
-                        onPressed: _login,
-                        child: const Text('Login'),
-                      );
-                    },
-                    loading: () => const CircularProgressIndicator(),
-                    error: (error, _) => Text('Error: $error'),
-                  ),
-                ],
+                    const SizedBox(height: 24),
+                    loginState.when(
+                      data: (user) {
+                        if (user != null) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StudentHomePage(),
+                            ),
+                          );
+                          return Text('Login successful, user: ${user.email}');
+                        }
+                        return MyButtons(onTap: _login, text: "Log In");
+                      },
+                      loading: () => const CircularProgressIndicator(),
+                      error: (error, _) => Text('Error: $error'),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

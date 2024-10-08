@@ -54,8 +54,8 @@ class AuthRepository {
       );
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
-      print('Error during login: $e');
-      return null; // Return null in case of login failure
+      
+      return null; 
     }
   }
 
