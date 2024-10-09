@@ -1,19 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:yeneta_tutor/utils/colors.dart';
 
-class TextFieldInput extends StatelessWidget {
+class TextFieldInput extends StatefulWidget {
   final TextEditingController textEditingController;
   final bool isPass;
   final String hintText;
   final IconData? icon;
   final TextInputType textInputType;
+
   const TextFieldInput({
-    super.key,
+    Key? key,
     required this.textEditingController,
     this.isPass = false,
     required this.hintText,
     this.icon,
     required this.textInputType,
-  });
+  }) : super(key: key);
+
+  @override
+  _TextFieldInputState createState() => _TextFieldInputState();
+}
+
+class _TextFieldInputState extends State<TextFieldInput> {
+  late bool isObscure;
+
+  @override
+  void initState() {
+    super.initState();
+    isObscure = widget.isPass; 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,19 +36,32 @@ class TextFieldInput extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: TextField(
         style: const TextStyle(fontSize: 20),
-        controller: textEditingController,
+        controller: widget.textEditingController,
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.black54),
-          hintText: hintText,
+          prefixIcon: Icon(widget.icon, color: Colors.black54),
+          suffixIcon: widget.isPass
+              ? IconButton(
+                  onPressed: () {
+                    setState(() {
+                      isObscure = !isObscure; 
+                    });
+                  },
+                  icon: Icon(
+                    isObscure ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.black54,
+                  ),
+                )
+              : null,
+          hintText: widget.hintText,
           hintStyle: const TextStyle(color: Colors.black45, fontSize: 18),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: BorderRadius.circular(15),
+            borderSide: const BorderSide(color: Colors.grey, width: 0.5),
+            borderRadius: BorderRadius.circular(10),
           ),
           border: InputBorder.none,
           focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: Colors.blue, width: 2),
-            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: primaryColor, width: 2),
+            borderRadius: BorderRadius.circular(10),
           ),
           filled: true,
           fillColor: const Color(0xFFedf0f8),
@@ -42,8 +70,8 @@ class TextFieldInput extends StatelessWidget {
             horizontal: 20,
           ),
         ),
-        keyboardType: textInputType,
-        obscureText: isPass,
+        keyboardType: widget.textInputType,
+        obscureText: isObscure,
       ),
     );
   }
