@@ -5,7 +5,7 @@ import 'package:yeneta_tutor/models/user_model.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 
 class StudentSignUpPage2 extends ConsumerStatefulWidget {
-    final String givenName;
+  final String givenName;
   final String fathersName;
   final String grandFathersName;
   final String selectedGender;
@@ -56,6 +56,9 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
             grandFatherName: widget.grandFathersName,
             phoneNumber: _phoneNumberController.text.trim(),
             gender: widget.selectedGender,
+            educationalQualification: '',
+            graduationDepartment: '',
+            subject: '',
             grade: _selectedGrade!,
             role: UserRole.student, // Assuming a fixed role for student
             profilePic: null, // Add profile picture if implemented
