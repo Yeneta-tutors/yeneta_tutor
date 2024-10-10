@@ -56,7 +56,7 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
             grade: "",
             gender: widget.selectedGender,
             educationalQualification:_selectedEducationalQualification,
-            graduationDepartment: _graduationDepartmentController,
+            graduationDepartment: _graduationDepartmentController.text.trim(),
             subject: _selectedSubject,
             role: UserRole.tutor,
             profilePic: null,
