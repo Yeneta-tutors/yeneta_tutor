@@ -29,6 +29,7 @@ class AuthRepository {
     required String grandFatherName,
     required String phoneNumber,
     required String gender,
+    required String grade,
     required UserRole role,
     required BuildContext context,
     File? profilePic,
@@ -53,6 +54,7 @@ class AuthRepository {
           grandFatherName: grandFatherName,
           phoneNumber: phoneNumber,
           gender: gender,
+          grade: grade,
           role: role,
           profileImage: '',
           createdAt: DateTime.now(),
@@ -73,18 +75,25 @@ class AuthRepository {
   }
 
   // Login with email and password
-  Future<void> login({
-    required String email,
-    required String password,
-    required BuildContext context,
-  }) async {
-    try {
-      await auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } catch (e) {}
+ Future<void> login({
+  required String email,
+  required String password,
+  required BuildContext context,
+}) async {
+  try {
+    await auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage()),  // Replace with your actual HomePage
+    );
+  } catch (e) {
+    showSnackBar(context, "Invalid email or password.");
   }
+}
 
   // Reset password
   Future<void> resetPassword({
@@ -140,5 +149,16 @@ class AuthRepository {
         .doc(uid)
         .snapshots()
         .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>));
+  }
+}
+
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text('Home Page'),
+      ),
+    );
   }
 }
