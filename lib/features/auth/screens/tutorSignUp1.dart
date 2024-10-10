@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:yeneta_tutor/features/auth/screens/studentSignUp2.dart';
+import 'package:yeneta_tutor/features/auth/screens/TutorSignUp2.dart';
+import 'package:yeneta_tutor/screens/onboardingScreen1.dart';
 
 
-class StudentSignUpPage1 extends StatefulWidget {
+
+class TutortSignUpPage1 extends StatefulWidget {
   @override
-  _StudentSignUpPageOneState createState() => _StudentSignUpPageOneState();
+  _TutorSignUpPageOneState createState() => _TutorSignUpPageOneState();
 }
 
-class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
+class _TutorSignUpPageOneState extends State<TutortSignUpPage1> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers for text fields
@@ -31,7 +33,7 @@ class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-                StudentSignUpPage2()), 
+                TutorSignUpPage2()), 
       );
     } else {
       if (_selectedGender == null) {
@@ -62,7 +64,7 @@ class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
             child: Column(
               children: [
                 Image.asset(
-                  'images/signup.png', 
+                  'images/signup.png', // Replace with your image
                   height: 150,
                 ),
                 const SizedBox(height: 20),
