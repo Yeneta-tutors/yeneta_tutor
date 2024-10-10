@@ -40,6 +40,16 @@ class AuthRepository {
   }) async {
     try {
       // Create a new user in Firebase Authentication
+      QuerySnapshot phoneCheck = await firestore
+          .collection('users')
+          .where('phoneNumber', isEqualTo: phoneNumber)
+          .get();
+
+      if (phoneCheck.docs.isNotEmpty) {
+        // If phone number is already in use, show an error message
+        showSnackBar(context, 'Phone number already in use.');
+        return;
+      }
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -81,25 +91,27 @@ class AuthRepository {
   }
 
   // Login with email and password
- Future<void> login({
-  required String email,
-  required String password,
-  required BuildContext context,
-}) async {
-  try {
-    await auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+  Future<void> login({
+    required String email,
+    required String password,
+    required BuildContext context,
+  }) async {
+    try {
+      await auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => HomePage()),  // Replace with your actual HomePage
-    );
-  } catch (e) {
-    showSnackBar(context, "Invalid email or password.");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                HomePage()), // Replace with your actual HomePage
+      );
+    } catch (e) {
+      showSnackBar(context, "Invalid email or password.");
+    }
   }
-}
 
   // Reset password
   Future<void> resetPassword({
