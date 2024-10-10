@@ -1,29 +1,71 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/models/user_model.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 
-class StudentSignUpPage2 extends StatefulWidget {
+class StudentSignUpPage2 extends ConsumerStatefulWidget {
+    final String givenName;
+  final String fathersName;
+  final String grandFathersName;
+  final String selectedGender;
+
+  const StudentSignUpPage2({
+    required this.givenName,
+    required this.fathersName,
+    required this.grandFathersName,
+    required this.selectedGender,
+  });
+
   @override
   _StudentSignUpPageTwoState createState() => _StudentSignUpPageTwoState();
 }
 
-class _StudentSignUpPageTwoState extends State<StudentSignUpPage2> {
+class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers for text fields
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   String? _selectedGrade;
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
+  // Variables from the first pageofile picture if implemented
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Retrieve data passed from the first sign-up page, if necessary
+  }
+
   // Function to validate and submit the form
   void _validateAndSubmit() {
     if (_formKey.currentState!.validate()) {
-      // Proceed with form submission or sending data to the database
-      // Example: sending to Firebase or your backend
-      print('Form submitted successfully');
+      // Perform sign-up using the AuthController
+    ref.read(authControllerProvider).signUpWithEmailAndPassword(
+            context: context,
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+            firstName: widget.givenName,
+            fatherName: widget.fathersName,
+            grandFatherName: widget.grandFathersName,
+            phoneNumber: _phoneNumberController.text.trim(),
+            gender: widget.selectedGender,
+            grade: _selectedGrade!,
+            role: UserRole.student, // Assuming a fixed role for student
+            profilePic: null, // Add profile picture if implemented
+        );
+    
+        // This ensures that you navigate only if the sign-up is successful.
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
     }
   }
 
@@ -51,7 +93,7 @@ class _StudentSignUpPageTwoState extends State<StudentSignUpPage2> {
                   height: 150,
                 ),
                 const SizedBox(height: 20),
-                
+
                 // Phone Number
                 TextFormField(
                   controller: _phoneNumberController,
@@ -70,9 +112,9 @@ class _StudentSignUpPageTwoState extends State<StudentSignUpPage2> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-        
+
                 // Email
                 TextFormField(
                   controller: _emailController,
@@ -84,15 +126,16 @@ class _StudentSignUpPageTwoState extends State<StudentSignUpPage2> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
-                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                        .hasMatch(value)) {
                       return 'Please enter a valid email';
                     }
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-        
+
                 // Grade Dropdown
                 DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
@@ -117,9 +160,9 @@ class _StudentSignUpPageTwoState extends State<StudentSignUpPage2> {
                     return null;
                   },
                 ),
-        
+
                 const SizedBox(height: 16),
-        
+
                 // Password
                 TextFormField(
                   controller: _passwordController,
@@ -129,7 +172,9 @@ class _StudentSignUpPageTwoState extends State<StudentSignUpPage2> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -147,9 +192,9 @@ class _StudentSignUpPageTwoState extends State<StudentSignUpPage2> {
                     return null;
                   },
                 ),
-        
+
                 const SizedBox(height: 16),
-        
+
                 // Confirm Password
                 TextFormField(
                   controller: _confirmPasswordController,
@@ -159,11 +204,14 @@ class _StudentSignUpPageTwoState extends State<StudentSignUpPage2> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        _isConfirmPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
-                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                          _isConfirmPasswordVisible =
+                              !_isConfirmPasswordVisible;
                         });
                       },
                     ),
@@ -177,35 +225,37 @@ class _StudentSignUpPageTwoState extends State<StudentSignUpPage2> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 20),
-        
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Back"),
-                    ),
-                    ElevatedButton(
-                      onPressed: _validateAndSubmit,
-                      child: const Text("Sign Up"),
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 10),
-                TextButton(
-                  onPressed: () {
-                    // Navigate to login page
-                  },
-                  child: const Text("Already have an account? Log in"),
+
+                // Submit Button
+                ElevatedButton(
+                  onPressed: _validateAndSubmit,
+                  child: const Text("Sign Up"),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Home Page"),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            // Perform any action you want here
+          },
+          child: const Text("Go to Profile"),
         ),
       ),
     );
