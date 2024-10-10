@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
 import 'package:yeneta_tutor/features/auth/screens/studentSignUp2.dart';
+
 
 
 class StudentSignUpPage1 extends StatefulWidget {
@@ -26,12 +29,21 @@ class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
   // Function to validate and proceed to next page
   void _validateAndProceed() {
     if (_formKey.currentState!.validate() && _selectedGender != null) {
+    String givenName = _givenNameController.text.trim();
+    String fathersName = _fathersNameController.text.trim();
+    String grandFathersName = _grandFathersNameController.text.trim();
+    
       // Proceed to the next page
       Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) =>
-                StudentSignUpPage2()), 
+                StudentSignUpPage2(
+                  givenName: givenName,
+                  fathersName: fathersName,
+                  grandFathersName: grandFathersName,
+                  selectedGender: _selectedGender!,
+                )), 
       );
     } else {
       if (_selectedGender == null) {
@@ -62,7 +74,7 @@ class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
             child: Column(
               children: [
                 Image.asset(
-                  'images/signup.png', // Replace with your image
+                  'images/signup.png', 
                   height: 150,
                 ),
                 const SizedBox(height: 20),
@@ -162,7 +174,12 @@ class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: () {
-                    // Navigate to login page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
                   },
                   child: const Text("Already have an account? Log in"),
                 ),
