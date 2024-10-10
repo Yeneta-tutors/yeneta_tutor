@@ -1,8 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 enum UserRole {
-  student, // 1
-  tutor, // 2
-  admin, // 3
+  student, // 0
+  tutor, // 1
+  admin, // 2
 }
 
 // models/user_model.dart
