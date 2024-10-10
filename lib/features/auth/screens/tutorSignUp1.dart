@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/features/auth/screens/TutorSignUp2.dart';
-import 'package:yeneta_tutor/screens/onboardingScreen1.dart';
-
-
+import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
 
 class TutortSignUpPage1 extends StatefulWidget {
   @override
@@ -28,13 +26,20 @@ class _TutorSignUpPageOneState extends State<TutortSignUpPage1> {
   // Function to validate and proceed to next page
   void _validateAndProceed() {
     if (_formKey.currentState!.validate() && _selectedGender != null) {
-      // Proceed to the next page
+      String givenName = _givenNameController.text.trim();
+      String fathersName = _fathersNameController.text.trim();
+      String grandFathersName = _grandFathersNameController.text.trim();
+
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                TutorSignUpPage2()), 
-      );
+            builder: (context) => TutorSignUpPage2(
+                  givenName: givenName,
+                  fathersName: fathersName,
+                  grandFathersName: grandFathersName,
+                  selectedGender: _selectedGender!,
+                )),
+);
     } else {
       if (_selectedGender == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -81,7 +86,7 @@ class _TutorSignUpPageOneState extends State<TutortSignUpPage1> {
                     } else if (!_alphabetRegex.hasMatch(value)) {
                       return 'Only letters are allowed';
                     }
-        
+
                     return null;
                   },
                 ),
@@ -116,14 +121,14 @@ class _TutorSignUpPageOneState extends State<TutortSignUpPage1> {
                     } else if (!_alphabetRegex.hasMatch(value)) {
                       return 'Only letters are allowed';
                     }
-        
+
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
-                    border: OutlineInputBorder(), 
+                    border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.person_outline),
                     labelText: 'Gender',
                   ),
@@ -164,7 +169,12 @@ class _TutorSignUpPageOneState extends State<TutortSignUpPage1> {
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: () {
-                    // Navigate to login page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
                   },
                   child: const Text("Already have an account? Log in"),
                 ),

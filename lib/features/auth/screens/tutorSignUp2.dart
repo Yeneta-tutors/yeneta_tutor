@@ -1,61 +1,72 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/models/user_model.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 
+class TutorSignUpPage2 extends ConsumerStatefulWidget {
+  final String givenName;
+  final String fathersName;
+  final String grandFathersName;
+  final String selectedGender;
 
-class TutorSignUpPage2 extends StatefulWidget {
+  // Constructor with the parameters
+  TutorSignUpPage2({
+    required this.givenName,
+    required this.fathersName,
+    required this.grandFathersName,
+    required this.selectedGender,
+  });
+
   @override
   _TutorSignUpPageTwoState createState() => _TutorSignUpPageTwoState();
 }
 
-class _TutorSignUpPageTwoState extends State<TutorSignUpPage2> {
+class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers for text fields
-  final TextEditingController _graduationDepartmentController = TextEditingController();
+  final TextEditingController _graduationDepartmentController =
+      TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
-    final TextEditingController _emailController = TextEditingController();
-      final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   // Variables to store user input
   String? _selectedEducationalQualification;
   String? _selectedSubject;
-   bool _isPasswordVisible = false;
+  bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
   // Regular expression for alphabetic validation
   final RegExp _alphabetRegex = RegExp(r'^[a-zA-Z]+$');
 
-  // Function to validate and proceed to next page
-  void _validateAndProceed() {
-    if (_formKey.currentState!.validate() &&
-        _selectedEducationalQualification != null &&
-        _selectedSubject != null) {
-      // Proceed to the next page
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TutorSignUpPage2(),
-        ),
-      );
-    } else {
-      if (_selectedEducationalQualification == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select your educational qualification')),
-        );
-      } else if (_selectedSubject == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a subject')),
-        );
-      }
-    }
-  }
-
 // Function to validate and submit the form
   void _validateAndSubmit() {
     if (_formKey.currentState!.validate()) {
-      // Proceed with form submission or sending data to the database
-      // Example: sending to Firebase or your backend
-      print('Form submitted successfully');
-    }
+      ref.read(authControllerProvider).signUpWithEmailAndPassword(
+            context: context,
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+            firstName: widget.givenName,
+            fatherName: widget.fathersName,
+            grandFatherName: widget.grandFathersName,
+            phoneNumber: _phoneNumberController.text.trim(),
+            grade: "",
+            gender: widget.selectedGender,
+            educationalQualification:_selectedEducationalQualification,
+            graduationDepartment: _graduationDepartmentController,
+            subject: _selectedSubject,
+            role: UserRole.tutor,
+            profilePic: null,
+          );
+
+          Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+    } 
   }
 
   @override
@@ -102,7 +113,7 @@ class _TutorSignUpPageTwoState extends State<TutorSignUpPage2> {
                     return null;
                   },
                 ),
-                 const SizedBox(height: 16),
+                const SizedBox(height: 16),
                 //email
                 TextFormField(
                   controller: _emailController,
@@ -115,15 +126,16 @@ class _TutorSignUpPageTwoState extends State<TutorSignUpPage2> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
-                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                        .hasMatch(value)) {
                       return 'Please enter a valid email';
                     }
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 16),
-               
+
                 DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -163,11 +175,11 @@ class _TutorSignUpPageTwoState extends State<TutorSignUpPage2> {
                     } else if (!_alphabetRegex.hasMatch(value)) {
                       return 'Only letters are allowed';
                     }
-        
+
                     return null;
                   },
                 ),
-                  const SizedBox(height: 16),
+                const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -211,7 +223,9 @@ class _TutorSignUpPageTwoState extends State<TutorSignUpPage2> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -230,7 +244,7 @@ class _TutorSignUpPageTwoState extends State<TutorSignUpPage2> {
                   },
                 ),
                 const SizedBox(height: 20),
-                 // Confirm Password
+                // Confirm Password
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: !_isConfirmPasswordVisible,
@@ -239,11 +253,14 @@ class _TutorSignUpPageTwoState extends State<TutorSignUpPage2> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        _isConfirmPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
-                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                          _isConfirmPasswordVisible =
+                              !_isConfirmPasswordVisible;
                         });
                       },
                     ),
@@ -267,7 +284,7 @@ class _TutorSignUpPageTwoState extends State<TutorSignUpPage2> {
                       },
                       child: const Text("Back"),
                     ),
-                   ElevatedButton(
+                    ElevatedButton(
                       onPressed: _validateAndSubmit,
                       child: const Text("Sign Up"),
                     ),
@@ -283,6 +300,31 @@ class _TutorSignUpPageTwoState extends State<TutorSignUpPage2> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Yeneta Tutors"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("Welcome to Yeneta Tutors"),
+            ElevatedButton(
+              onPressed: () {
+                // Sign out the user
+              },
+              child: const Text("Sign Out"),
+            ),
+          ],
         ),
       ),
     );
