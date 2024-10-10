@@ -65,10 +65,7 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
         );
     
         // This ensures that you navigate only if the sign-up is successful.
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
+
     }
   }
 

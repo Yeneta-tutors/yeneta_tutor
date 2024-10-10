@@ -20,7 +20,6 @@ class AuthRepository {
   });
 
   // Sign up with email and password
-  // Sign up with email and password
   Future<void> signUpWithEmailAndPassword({
     required String email,
     required String password,
@@ -39,17 +38,16 @@ class AuthRepository {
     required ProviderRef ref,
   }) async {
     try {
-      // Create a new user in Firebase Authentication
-      QuerySnapshot phoneCheck = await firestore
-          .collection('users')
-          .where('phoneNumber', isEqualTo: phoneNumber)
-          .get();
+    String formattedPhoneNumber = phoneNumber.replaceAll(RegExp(r'\D'), ''); 
+    QuerySnapshot phoneCheck = await firestore
+        .collection('users')
+        .where('phoneNumber', isEqualTo: formattedPhoneNumber)
+        .get();
+    if (phoneCheck.docs.isNotEmpty) {
+      showSnackBar(context, 'Phone number already in use.');
+      return;
+    }
 
-      if (phoneCheck.docs.isNotEmpty) {
-        // If phone number is already in use, show an error message
-        showSnackBar(context, 'Phone number already in use.');
-        return;
-      }
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -58,7 +56,14 @@ class AuthRepository {
       User? user = userCredential.user;
 
       if (user != null) {
-        // Create a user profile document in Firestore
+        DocumentSnapshot emailCheck =
+            await firestore.collection('users').doc(user.uid).get();
+
+        if (emailCheck.exists) {
+          await user.delete();
+          showSnackBar(context, 'Email already in use.');
+          return;
+        }
         UserModel newUser = UserModel(
           uid: user.uid,
           email: email,
@@ -81,12 +86,23 @@ class AuthRepository {
 
         // Upload profile picture if provided
         if (profilePic != null) {
-          // Use Firebase Storage to upload the profile picture
           // Implement profile picture upload here
         }
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        showSnackBar(context, 'Email already in use.');
+      } else {
+        showSnackBar(context, 'Error: ${e.message}');
       }
     } catch (e) {
-      showSnackBar(context, "Error in signup");
+      showSnackBar(context, 'Error during signup');
     }
   }
 
