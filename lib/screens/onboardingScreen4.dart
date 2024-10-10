@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorSignUp1.dart';
 import 'package:yeneta_tutor/screens/onboardingScreen3.dart';
 import 'package:yeneta_tutor/features/auth/screens/studentSignUp1.dart';
+import 'package:yeneta_tutor/widgets/snackbar.dart';
 
 class OnboardingScreen4 extends StatefulWidget {
   @override
@@ -19,13 +21,15 @@ class _OnboardingScreenThreeState extends State<OnboardingScreen4> {
     } else if (selectedRole == 'Tutor') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => TutorSignUpPage()),
+        MaterialPageRoute(builder: (context) => TutortSignUpPage1()),
       );
     } else {
       // Show a message to select a role
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a role')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Please select a role')),
+      // );
+
+      showSnackBar(context, 'Please select a role to proceed');
     }
   }
 
@@ -113,9 +117,9 @@ class _OnboardingScreenThreeState extends State<OnboardingScreen4> {
                     },
                     child: Text('Student'),
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
+                      foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                       backgroundColor: selectedRole == 'Student'
-                          ? Colors.blue
+                          ? const Color.fromARGB(255, 99, 104, 108)
                           : const Color.fromRGBO(9, 19, 58, 1),
                       minimumSize: Size(120, 50),
                     ),

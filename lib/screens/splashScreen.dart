@@ -14,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     // Set a timer for 2 seconds and then navigate to the next page
-    Timer(const Duration(seconds: 8), () {
+    Timer(const Duration(seconds: 6), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => OnboardingScreen1()),
