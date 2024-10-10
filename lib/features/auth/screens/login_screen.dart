@@ -1,8 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/screens/forgot_password.dart';
 import 'package:yeneta_tutor/widgets/text_field.dart';
 import 'package:yeneta_tutor/widgets/button.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
+import 'package:yeneta_tutor/widgets/snackbar.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   static const routeName = '/login';
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -10,7 +15,7 @@ class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -21,20 +26,21 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void login() {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
+void login() {
+  final email = _emailController.text.trim();
+  final password = _passwordController.text.trim();
 
-    // if (email.isNotEmpty && password.isNotEmpty) {
-    //   ref.read(authRepositoryProvider).login(
-    //         context: context,
-    //         email: email,
-    //         password: password,
-    //       );
-    // } else {
-    //   showSnackBar(context: context, content: "Please enter your email and password");
-    // }
+  if (email.isNotEmpty && password.isNotEmpty) {
+    ref.read(authControllerProvider).login(
+          context: context,
+          email: email,
+          password: password,
+        );
+  } else {
+    showSnackBar(context, "Please enter your email and password");
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +82,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 10),
                     InkWell(
                       onTap: () {
-                        Navigator.of(context).pushNamed('/forgot-password');
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const ForgotPasswordScreen()),
+                        );
                       },
                       child: const Text(
                         "Forgot Password?",
@@ -105,9 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ],
-                )
-              )
-            )
-        );
+                ))));
   }
 }
+
