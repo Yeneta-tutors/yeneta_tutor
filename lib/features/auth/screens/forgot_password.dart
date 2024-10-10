@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/widgets/text_field.dart';
 import 'package:yeneta_tutor/widgets/button.dart';
-// import 'package:ethiochat/features/auth/repositories/auth_repository.dart';
-
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
+import 'package:yeneta_tutor/widgets/snackbar.dart';
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   static const routeName = '/forgot-password';
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -24,14 +24,15 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   void sendPasswordResetLink() {
     final email = _emailController.text.trim();
 
-    // if (email.isNotEmpty) {
-    //   ref.read(authRepositoryProvider).sendPasswordResetEmail(
-    //         context: context,
-    //         email: email,
-    //       );
-    // } else {
-    //   showSnackBar(context: context, content: "Please enter your email");
-    // }
+    if(email.isNotEmpty){
+      ref.read(authControllerProvider).sendPasswordResetEmail(
+        context: context,
+        email: email,
+      );
+    } else {
+      showSnackBar(context, "Please enter your email");
+    }
+ 
   }
 
   @override
