@@ -1,4 +1,4 @@
-
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 enum UserRole {
   student, // 1
   tutor, // 2
@@ -17,7 +17,9 @@ class UserModel {
   final String? grade;
   final UserRole role;
   final List<String>? languageSpoken;
-  final int? educationalQualification;
+  final String? educationalQualification;
+  final String? subject;
+  final String? graduationDepartment;
   final String? profileImage;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -34,6 +36,8 @@ class UserModel {
     required this.role,
     this.languageSpoken,
     this.educationalQualification,
+    this.subject,
+    this.graduationDepartment,
     this.profileImage,
     required this.createdAt,
     required this.updatedAt,
@@ -52,6 +56,8 @@ class UserModel {
       'role': role.index,
       'language_spoken': languageSpoken,
       'educational_qualification': educationalQualification,
+      'graduation_department': graduationDepartment,
+      'subject': subject,
       'profile_image': profileImage,
       'created_at': createdAt,
       'updated_at': updatedAt,
@@ -71,6 +77,8 @@ class UserModel {
       role: UserRole.values[map['role']],
       languageSpoken: List<String>.from(map['language_spoken']),
       educationalQualification: map['educational_qualification'],
+      graduationDepartment: map['graduation_department'],
+      subject: map['subject'],
       profileImage: map['profile_image'],
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at']),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at']),
