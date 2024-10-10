@@ -46,6 +46,7 @@ class AuthController {
     required String grandFatherName,
     required String phoneNumber,
     required String gender,
+    required String grade,
     required UserRole role,
     File? profilePic,
   }) {
@@ -57,6 +58,7 @@ class AuthController {
       grandFatherName: grandFatherName,
       phoneNumber: phoneNumber,
       gender: gender,
+      grade: grade ,
       role: role,
       context: context,
       profilePic: profilePic,
@@ -76,7 +78,7 @@ class AuthController {
     );
   }
 
-  void resetPassword({
+  void sendPasswordResetEmail({
     required String email,
     required BuildContext context,
   }) {
