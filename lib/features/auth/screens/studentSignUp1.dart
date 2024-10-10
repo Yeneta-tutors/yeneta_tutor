@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
 import 'package:yeneta_tutor/features/auth/screens/studentSignUp2.dart';
 
