@@ -13,8 +13,7 @@ class UserModel {
   final String grandFatherName;
   final String gender;
   final String phoneNumber;
-  final String email;
-  final String password; // Store as hash
+  final String email; // Store as hash
   final String? grade;
   final UserRole role;
   final List<String>? languageSpoken;
@@ -31,7 +30,6 @@ class UserModel {
     required this.gender,
     required this.phoneNumber,
     required this.email,
-    required this.password,
     this.grade,
     required this.role,
     this.languageSpoken,
@@ -50,7 +48,6 @@ class UserModel {
       'gender': gender,
       'phone_number': phoneNumber,
       'email': email,
-      'password': password,
       'grade': grade,
       'role': role.index,
       'language_spoken': languageSpoken,
@@ -70,7 +67,6 @@ class UserModel {
       gender: map['gender'],
       phoneNumber: map['phone_number'],
       email: map['email'],
-      password: map['password'],
       grade: map['grade'],
       role: UserRole.values[map['role']],
       languageSpoken: List<String>.from(map['language_spoken']),
