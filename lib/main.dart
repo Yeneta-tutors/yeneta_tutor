@@ -1,8 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:yeneta_tutor/screens/splash_screen.dart';
+import 'package:yeneta_tutor/screens/splashScreen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/firebase_options.dart';
+import 'package:yeneta_tutor/features/auth/screens/forgot_password.dart';
+import 'package:yeneta_tutor/features/auth/screens/login_screen.dart'; 
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,13 +22,14 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'Yeneta Tutor',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      debugShowCheckedModeBanner: false,
-      home: Container(),
+      
+      home: SplashScreen(),
     );
   }
 }
