@@ -167,31 +167,6 @@ class _OnboardingScreenThreeState extends State<OnboardingScreen4> {
   }
 }
 
-// Placeholder pages for student and tutor sign-ups
-class StudentSignUpPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Student Sign Up'),
-      ),
-      body: Center(
-        child: Text('Student Sign Up Page'),
-      ),
-    );
-  }
-}
 
-class TutorSignUpPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Tutor Sign Up'),
-      ),
-      body: Center(
-        child: Text('Tutor Sign Up Page'),
-      ),
-    );
-  }
-}
+
+
