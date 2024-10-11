@@ -47,7 +47,7 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
   void _validateAndSubmit() {
     if (_formKey.currentState!.validate()) {
       // Perform sign-up using the AuthController
-    ref.read(authControllerProvider).signUpWithEmailAndPassword(
+      ref.read(authControllerProvider).signUpWithEmailAndPassword(
             context: context,
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
@@ -62,10 +62,9 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
             grade: _selectedGrade!,
             role: UserRole.student, // Assuming a fixed role for student
             profilePic: null, // Add profile picture if implemented
-        );
-    
-        // This ensures that you navigate only if the sign-up is successful.
+          );
 
+      // This ensures that you navigate only if the sign-up is successful.
     }
   }
 
@@ -98,7 +97,10 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
                 TextFormField(
                   controller: _phoneNumberController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Phone Number',
                     prefixIcon: Padding(
                       padding: EdgeInsets.all(8.0),
@@ -119,7 +121,10 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Email',
                     prefixIcon: Icon(Icons.email),
                   ),
@@ -138,7 +143,10 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
 
                 // Grade Dropdown
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Grade',
                     prefixIcon: Icon(Icons.school),
                   ),
@@ -168,6 +176,9 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
                   controller: _passwordController,
                   obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Password',
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
@@ -200,6 +211,9 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
                   controller: _confirmPasswordController,
                   obscureText: !_isConfirmPasswordVisible,
                   decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Confirm Password',
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
@@ -241,7 +255,6 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
     );
   }
 }
-
 
 class HomePage extends StatelessWidget {
   @override

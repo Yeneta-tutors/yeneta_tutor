@@ -79,8 +79,10 @@ class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: _givenNameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                       borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Given Name',
                     prefixIcon: Icon(Icons.person),
                   ),
@@ -97,8 +99,10 @@ class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _fathersNameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                       borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Father\'s Name',
                     prefixIcon: Icon(Icons.person),
                   ),
@@ -114,8 +118,10 @@ class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _grandFathersNameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                       borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Grand Father\'s Name',
                     prefixIcon: Icon(Icons.person),
                   ),
@@ -131,8 +137,10 @@ class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(), 
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                       borderRadius: BorderRadius.circular(10),
+                    ), 
                     prefixIcon: Icon(Icons.person_outline),
                     labelText: 'Gender',
                   ),

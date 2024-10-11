@@ -55,18 +55,18 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
             phoneNumber: _phoneNumberController.text.trim(),
             grade: "",
             gender: widget.selectedGender,
-            educationalQualification:_selectedEducationalQualification,
+            educationalQualification: _selectedEducationalQualification,
             graduationDepartment: _graduationDepartmentController.text.trim(),
             subject: _selectedSubject,
             role: UserRole.tutor,
             profilePic: null,
           );
 
-          Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
-    } 
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    }
   }
 
   @override
@@ -98,8 +98,10 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                 TextFormField(
                   controller: _phoneNumberController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Phone Number',
                     prefixIcon: Padding(
                       padding: EdgeInsets.all(8.0),
@@ -118,8 +120,10 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Email',
                     prefixIcon: Icon(Icons.email),
                   ),
@@ -137,8 +141,10 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                 const SizedBox(height: 16),
 
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Educational Qualification',
                     prefixIcon: Icon(Icons.school),
                   ),
@@ -164,8 +170,10 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                 //graduation department
                 TextFormField(
                   controller: _graduationDepartmentController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Department',
                     prefixIcon: Icon(Icons.person),
                   ),
@@ -181,8 +189,10 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Subject',
                     prefixIcon: Icon(Icons.book),
                   ),
@@ -219,6 +229,9 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                   controller: _passwordController,
                   obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Password',
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
@@ -249,6 +262,9 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                   controller: _confirmPasswordController,
                   obscureText: !_isConfirmPasswordVisible,
                   decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     labelText: 'Confirm Password',
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(

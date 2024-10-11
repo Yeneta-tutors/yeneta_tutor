@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/screens/onboardingScreen2.dart';
+import 'package:yeneta_tutor/screens/onboardingScreen3.dart';
 
 class OnboardingScreen1 extends StatelessWidget {
   @override
@@ -11,7 +12,7 @@ class OnboardingScreen1 extends StatelessWidget {
           child: Column(
             children: [
               // Skip button at the top right
-              
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -24,19 +25,19 @@ class OnboardingScreen1 extends StatelessWidget {
                   // ),
                   TextButton(
                     onPressed: () {
-                      // Handle skip action
-                  //     Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const Signup(), 
-                  //   ),
-                  // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              OnboardingScreen3(), // The next screen in the sequence
+                        ),
+                      );
                     },
                     child: const Text('Skip'),
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 20),
 
               // Illustration
@@ -48,13 +49,12 @@ class OnboardingScreen1 extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               // Title and description
               const Text(
                 'Online Learning',
                 style: TextStyle(
                   fontSize: 24,
-                  
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
@@ -66,26 +66,30 @@ class OnboardingScreen1 extends StatelessWidget {
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 40),
 
               // Next button
               ElevatedButton(
                 onPressed: () {
                   // Handle next action
-                   // Navigate to the next screen or complete onboarding
+                  // Navigate to the next screen or complete onboarding
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => OnboardingScreen2(), // The next screen in the sequence
+                      builder: (context) =>
+                          OnboardingScreen2(), // The next screen in the sequence
                     ),
                   );
                 },
-                child: Text('NEXT',),
+                child: Text(
+                  'NEXT',
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 9, 19, 58),
                   foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50), // Full-width button
+                  minimumSize:
+                      const Size(double.infinity, 50), // Full-width button
                   textStyle: const TextStyle(fontSize: 18),
                 ),
               ),
