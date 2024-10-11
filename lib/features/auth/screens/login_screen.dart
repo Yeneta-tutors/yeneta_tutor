@@ -46,7 +46,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
         appBar: AppBar(
           title: const Text("Yeneta Tutor"),
-          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         body: SingleChildScrollView(
             child: Padding(
