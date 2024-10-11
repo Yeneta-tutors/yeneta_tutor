@@ -26,21 +26,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-void login() {
-  final email = _emailController.text.trim();
-  final password = _passwordController.text.trim();
+  void login() {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
 
-  if (email.isNotEmpty && password.isNotEmpty) {
-    ref.read(authControllerProvider).login(
-          context: context,
-          email: email,
-          password: password,
-        );
-  } else {
-    showSnackBar(context, "Please enter your email and password");
+    if (email.isNotEmpty && password.isNotEmpty) {
+      ref.read(authControllerProvider).login(
+            context: context,
+            email: email,
+            password: password,
+          );
+    } else {
+      showSnackBar(context, "Please enter your email and password");
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -119,4 +118,3 @@ void login() {
                 ))));
   }
 }
-
