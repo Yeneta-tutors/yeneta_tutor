@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/screens/forgot_password.dart';
+import 'package:yeneta_tutor/screens/onboardingScreen2.dart';
+import 'package:yeneta_tutor/screens/onboardingScreen4.dart';
 import 'package:yeneta_tutor/widgets/text_field.dart';
 import 'package:yeneta_tutor/widgets/button.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
@@ -46,7 +48,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
         appBar: AppBar(
           title: const Text("Yeneta Tutor"),
-          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
         body: SingleChildScrollView(
             child: Padding(
@@ -104,7 +105,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 10),
                     InkWell(
                       onTap: () {
-                        Navigator.of(context).pushNamed('/register');
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OnboardingScreen4()),
+                        );
                       },
                       child: const Text(
                         "Don't have an account? Signup",
