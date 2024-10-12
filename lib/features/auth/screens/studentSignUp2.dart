@@ -256,21 +256,3 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
   }
 }
 
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home Page"),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            // Perform any action you want here
-          },
-          child: const Text("Go to Profile"),
-        ),
-      ),
-    );
-  }
-}
