@@ -61,11 +61,6 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
             role: UserRole.tutor,
             profilePic: null,
           );
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
     }
   }
 
@@ -103,7 +98,7 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     labelText: 'Phone Number',
-                    prefixIcon: Padding(
+                    prefixIcon: const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text('+251', style: TextStyle(fontSize: 16)),
                     ),
@@ -125,7 +120,7 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
+                    prefixIcon: const Icon(Icons.email),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -175,7 +170,7 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     labelText: 'Department',
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: const Icon(Icons.person),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -322,27 +317,3 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
   }
 }
 
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Yeneta Tutors"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("Welcome to Yeneta Tutors"),
-            ElevatedButton(
-              onPressed: () {
-                // Sign out the user
-              },
-              child: const Text("Sign Out"),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
