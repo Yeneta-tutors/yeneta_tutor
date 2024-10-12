@@ -23,16 +23,14 @@ class MyApp extends ConsumerWidget {
       home: userAsyncValue.when(
        data: (user) {
           if (user == null) {
-            // If no user is authenticated or the user is new, show onboarding screen
             return SplashScreen();
           } else {
-            // Check the user role and navigate to the appropriate screen
             if (user.role == 0) {
-              return StudentHomePage();  // Role 0: Student
+              return StudentHomePage();  
             } else if (user.role == 1) {
-              return TutorHomePage();  // Role 1: Tutor
+              return TutorHomePage(); 
             } else {
-              return LoginScreen(); // Default to login if no role matches
+              return LoginScreen(); 
             }
           }
         },
