@@ -1,10 +1,22 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
+import 'package:yeneta_tutor/firebase_options.dart';
 import 'package:yeneta_tutor/screens/splashScreen.dart';
 import 'package:yeneta_tutor/screens/studentHome.dart';
 import 'package:yeneta_tutor/screens/tutorHome.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  runApp(const ProviderScope(child: MyApp()));
+}
+
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -44,8 +56,3 @@ class MyApp extends ConsumerWidget {
     );
   }
 }
-
-
-  
-
-
