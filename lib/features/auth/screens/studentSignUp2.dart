@@ -35,18 +35,15 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
 
-  // Variables from the first pageofile picture if implemented
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Retrieve data passed from the first sign-up page, if necessary
   }
 
   // Function to validate and submit the form
   void _validateAndSubmit() {
     if (_formKey.currentState!.validate()) {
-      // Perform sign-up using the AuthController
       ref.read(authControllerProvider).signUpWithEmailAndPassword(
             context: context,
             email: _emailController.text.trim(),
@@ -60,11 +57,10 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
             graduationDepartment: '',
             subject: '',
             grade: _selectedGrade!,
-            role: UserRole.student, // Assuming a fixed role for student
-            profilePic: null, // Add profile picture if implemented
+            role: UserRole.student, 
+            profilePic: null, 
           );
 
-      // This ensures that you navigate only if the sign-up is successful.
     }
   }
 
@@ -102,7 +98,7 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     labelText: 'Phone Number',
-                    prefixIcon: Padding(
+                    prefixIcon: const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text('+251', style: TextStyle(fontSize: 16)),
                     ),
