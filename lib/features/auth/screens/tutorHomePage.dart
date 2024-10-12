@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorCoursesPage.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorProfile.dart';
 
 class TutorHomePage extends StatefulWidget {
   @override
@@ -13,7 +14,7 @@ class _TutorHomePageState extends State<TutorHomePage> {
   final List<Widget> _pages = [
     Center(child: Text('Tutor Home Page')), // Home
     CoursesPage(), // Courses
-    Center(child: Text('Profile Page')), // Profile
+    ProfilePage(), // Profile
     Center(child: Text('Messages Page')), // Messages
     Center(child: Text('Earnings Page')), // Earnings
   ];

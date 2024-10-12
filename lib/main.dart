@@ -4,6 +4,7 @@ import 'package:yeneta_tutor/features/auth/screens/courseDetails.dart';
 import 'package:yeneta_tutor/features/auth/screens/courseUpload.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorCoursesPage.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorProfile.dart';
 import 'package:yeneta_tutor/screens/splashScreen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/firebase_options.dart';
@@ -31,7 +32,7 @@ class MyApp extends ConsumerWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: SplashScreen(),
+      home: TutorHomePage(),
     );
   }
 }
