@@ -102,14 +102,4 @@ class OnboardingScreen2 extends StatelessWidget {
   }
 }
 
-// // Create a placeholder for the third screen in the onboarding
-// class OnboardingScreenThree extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: Text('This is the third onboarding screen'),
-//       ),
-//     );
-//   }
-// }
+

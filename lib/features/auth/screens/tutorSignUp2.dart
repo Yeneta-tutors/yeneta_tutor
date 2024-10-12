@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 
@@ -64,7 +65,7 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => TutorHomePage()),
       );
     }
   }
