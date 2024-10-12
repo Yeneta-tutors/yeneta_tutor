@@ -10,17 +10,16 @@ final authControllerProvider = Provider((ref) {
   return AuthController(authRepository: authRepository, ref: ref);
 });
 
-final userDataAuthProvider = FutureProvider<UserModel?>((ref) async {
-  try {
+final userDataAuthProvider = StreamProvider<UserModel?>((ref) async* {
     final authController = ref.watch(authControllerProvider);
-    final user = authController.getCurrentUser();
+
+  await for (var user in authController.authStateChanges()) {
     if (user != null) {
-      return await authController.getUserData(user.uid);
+      yield await authController.getUserData(user.uid);
+    } else {
+      yield null;  // No user is signed in
     }
-  } catch (e) {
-    print('Error fetching user data: $e');
   }
-  return null;
 });
 
 class AuthController {
@@ -32,7 +31,9 @@ class AuthController {
   User? getCurrentUser() {
     return authRepository.auth.currentUser;
   }
-
+  Stream<User?> authStateChanges() {
+    return authRepository.auth.authStateChanges();
+  }
   Future<UserModel?> getUserData(String uid) async {
     return await authRepository.getUserData(uid);
   }
