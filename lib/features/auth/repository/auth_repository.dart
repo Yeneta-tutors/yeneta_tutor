@@ -3,7 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/common/repositories/common_firebase_storage_repository.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
+import 'package:yeneta_tutor/screens/studentHome.dart';
+import 'package:yeneta_tutor/screens/tutorHome.dart';
 import 'package:yeneta_tutor/widgets/snackbar.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository(
@@ -38,15 +41,15 @@ class AuthRepository {
     required ProviderRef ref,
   }) async {
     try {
-    String formattedPhoneNumber = phoneNumber.replaceAll(RegExp(r'\D'), ''); 
-    QuerySnapshot phoneCheck = await firestore
-        .collection('users')
-        .where('phoneNumber', isEqualTo: formattedPhoneNumber)
-        .get();
-    if (phoneCheck.docs.isNotEmpty) {
-      showSnackBar(context, 'Phone number already in use.');
-      return;
-    }
+      String formattedPhoneNumber = phoneNumber.replaceAll(RegExp(r'\D'), '');
+      QuerySnapshot phoneCheck = await firestore
+          .collection('users')
+          .where('phoneNumber', isEqualTo: formattedPhoneNumber)
+          .get();
+      if (phoneCheck.docs.isNotEmpty) {
+        showSnackBar(context, 'Phone number already in use.');
+        return;
+      }
 
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
@@ -64,6 +67,17 @@ class AuthRepository {
           showSnackBar(context, 'Email already in use.');
           return;
         }
+
+        String photoUrl =
+            'https://png.pngitem.com/pimgs/s/649-6490124_katie-notopoulos-katienotopoulos-i-write-about-tech-round.png';
+
+        if (profilePic != null) {
+          // Upload profile picture to Firebase Storage and get the URL
+          String imageRef = 'profilePics/${user.uid}';
+          photoUrl = await ref
+              .read(commonFirebaseStorageRepositoryProvider)
+              .storeFileToFirebase(imageRef, profilePic);
+        }
         UserModel newUser = UserModel(
           uid: user.uid,
           email: email,
@@ -77,7 +91,7 @@ class AuthRepository {
           graduationDepartment: graduationDepartment,
           subject: subject,
           role: role,
-          profileImage: '',
+          profileImage: photoUrl,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
@@ -88,12 +102,21 @@ class AuthRepository {
         if (profilePic != null) {
           // Implement profile picture upload here
         }
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomePage(),
-          ),
-        );
+        if (role == UserRole.student) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => StudentHomePage(),
+            ),
+          );
+        } else if (role == UserRole.tutor) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TutorHomePage(),
+            ),
+          );
+        }
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
@@ -113,17 +136,39 @@ class AuthRepository {
     required BuildContext context,
   }) async {
     try {
-      await auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                HomePage()), // Replace with your actual HomePage
-      );
+      User? user = userCredential.user;
+
+      if (user != null) {
+        DocumentSnapshot userDoc =
+            await firestore.collection('users').doc(user.uid).get();
+
+             if(userDoc.exists){
+                  UserModel userModel =
+              UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
+
+                        if (userModel.role == UserRole.student) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => StudentHomePage(),
+              ),
+            );
+          } else if (userModel.role == UserRole.tutor) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TutorHomePage(),
+              ),
+            );
+          }
+      }
+      }
+ 
     } catch (e) {
       showSnackBar(context, "Invalid email or password.");
     }
