@@ -1,77 +1,94 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/courses/screens/course_details.dart';
-import 'package:yeneta_tutor/features/courses/screens/course_upload.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
+import 'package:yeneta_tutor/features/courses/screens/course_upload.dart';
+import 'package:yeneta_tutor/models/course_model.dart';
 
-class CoursesPage extends StatelessWidget {
+class CoursesPage extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final courseController = ref.watch(courseControllerProvider);
+
     return Scaffold(
       appBar: AppBar(
-        
         title: Text('COURSES'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            // Navigator.pop(context); // Navigate back to the previous page
-              Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => TutorHomePage()),
-          );
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TutorHomePage()),
+            );
           },
         ),
       ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 200, // Keeps card size constant
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.75, // Adjust the card height/width ratio
-              ),
-              itemCount: 6, // Adjust as needed for number of courses
-              itemBuilder: (BuildContext ctx, index) {
-                return GestureDetector(
-                  onTap: () {
-                    
-                    // Navigator.pushNamed(context, '/detailsPage'); // Go to details page
-                     Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CourseDetailsPage(), 
-                    ),
-                  );
-                  },
-                  child: CourseCard(), // Each card is a separate widget
-                );
-              },
-            ),
-          ),
+      body: FutureBuilder<List<Course>>(
+        future: courseController.fetchCourses(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error fetching courses'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No courses available'));
+          }
 
-          // Upload Course button at the bottom-right corner
-          Positioned(
-            bottom: 80,
-            right: 16,
-            child: FloatingActionButton(
-              onPressed: () {
-                // Navigator.pushNamed(context, '/uploadCourse'); 
-                
-                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CourseUploadPage(), 
-                    ),
-                  );// Navigate to upload course page
-              },
-              child: Icon(Icons.add),
-              backgroundColor: Colors.blueAccent,
-            ),
-          ),
-        ],
+          final courses = snapshot.data!;
+
+          return Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 200,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemCount: courses.length,
+                  itemBuilder: (BuildContext ctx, index) {
+                    final course = courses[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CourseDetailsPage(
+                              courseId: course.courseId, // Pass the courseId
+                            ),
+                          ),
+                        );
+                      },
+                      child: CourseCard(
+                          courseId: course.courseId,
+                          courseTitle: course.title,
+                          thumbnail: course.thumbnail),
+                    );
+                  },
+                ),
+              ),
+              Positioned(
+                bottom: 50,
+                right: 16,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CourseUploadPage(),
+                      ),
+                    );
+                  },
+                  child: Icon(Icons.add),
+                  backgroundColor: Colors.blueAccent,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -79,6 +96,16 @@ class CoursesPage extends StatelessWidget {
 
 // Custom Widget for Course Card
 class CourseCard extends StatelessWidget {
+  final String courseId;
+  final String courseTitle;
+  final String? thumbnail;
+
+  const CourseCard({
+    required this.courseId,
+    required this.courseTitle,
+    required this.thumbnail,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -87,30 +114,35 @@ class CourseCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Thumbnail Image
           Expanded(
-            child: Image.asset(
-              'images/yeneta_logo.jpg', // Placeholder thumbnail image
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
+            child: thumbnail != null && thumbnail!.isNotEmpty
+                ? Image.network(
+                    thumbnail!, 
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  )
+                : Image.asset(
+                    'images/yeneta_logo.jpg', 
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  ),
           ),
 
           // Course details
-          const Padding(
-            padding: EdgeInsets.all(8.0),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Course: Maths',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  courseTitle,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 4),
-                Text('Duration: 1hr'),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
+                const Text('Duration: 1hr'),
+                const SizedBox(height: 4),
                 Row(
-                  children: [
+                  children: const [
                     Icon(Icons.star, color: Colors.green, size: 16),
                     Text('4.5 (200)', style: TextStyle(color: Colors.green)),
                   ],
