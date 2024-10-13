@@ -72,13 +72,11 @@ class OnboardingScreen1 extends StatelessWidget {
               // Next button
               ElevatedButton(
                 onPressed: () {
-                  // Handle next action
-                  // Navigate to the next screen or complete onboarding
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          OnboardingScreen2(), // The next screen in the sequence
+                          OnboardingScreen2(), 
                     ),
                   );
                 },

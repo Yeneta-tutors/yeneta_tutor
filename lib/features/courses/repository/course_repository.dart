@@ -56,10 +56,10 @@ class CourseRepository {
         subject: course.subject,
         chapter: course.chapter,
         description: course.description,
-        videoUrl: videoUrl ?? course.videoUrl,
-        demoVideoUrl: demoVideoUrl ?? course.demoVideoUrl,
+        videoUrl: videoUrl ?? '',
+        demoVideoUrl: demoVideoUrl ?? '',
         price: course.price,
-        thumbnail: thumbnailUrl ?? course.thumbnail,
+        thumbnail: thumbnailUrl ?? '',
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
       );

@@ -23,6 +23,7 @@ class UserModel {
   final String? subject;
   final String? graduationDepartment;
   final String? profileImage;
+  final String? bio;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -41,6 +42,7 @@ class UserModel {
     this.subject,
     this.graduationDepartment,
     this.profileImage,
+    this.bio,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -61,6 +63,7 @@ class UserModel {
       'graduation_department': graduationDepartment,
       'subject': subject,
       'profile_image': profileImage,
+      'bio': bio,
       'created_at': createdAt,
       'updated_at': updatedAt,
     };
@@ -84,6 +87,7 @@ class UserModel {
       graduationDepartment: map['graduation_department'] ?? '',
       subject: map['subject'] ?? '',
       profileImage: map['profile_image'] ?? '',
+      bio: map['bio'] ?? '',
       createdAt: map['created_at'] is Timestamp
           ? (map['created_at'] as Timestamp).toDate()
           : DateTime.now(),

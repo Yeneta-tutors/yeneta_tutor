@@ -4,8 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CourseUploadPage extends ConsumerStatefulWidget {
+  final Course? course;
+  CourseUploadPage({this.course});
+
   @override
   _CourseUploadPageState createState() => _CourseUploadPageState();
 }
@@ -20,19 +24,63 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
   File? _thumbnailFile;
 
   // Controllers for text fields
-  TextEditingController _titleController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
-  TextEditingController _priceController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
 
   // Grade, Subject, and Chapter dropdown options
   final List<String> _grades = ['9', '10', '11', '12'];
-  final List<String> _subjects = ['English', 'Maths', 'Physics', 'Biology', 'Chemistry', 'Economics', 'ICT'];
-  final List<String> _chapters = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+  final List<String> _subjects = [
+    'English',
+    'Maths',
+    'Physics',
+    'Biology',
+    'Chemistry',
+    'Economics',
+    'ICT'
+  ];
+  final List<String> _chapters = [
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    '11',
+    '12'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.course != null) {
+      // Populate form with existing course data
+      _titleController.text = widget.course!.title;
+      _descriptionController.text = widget.course!.description;
+      _priceController.text = widget.course!.price.toString();
+      _grade = widget.course!.grade;
+      _subject = widget.course!.subject;
+      _chapter = widget.course!.chapter;
+      // For file fields (videos and image), you'll need to fetch or load the file separately if necessary
+    }
+  }
+
+  Future<void> _requestStoragePermission() async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+  }
 
   // Function to pick files (demo video, course video, and image)
   Future<File?> _pickFile(String type) async {
     FileType fileType = type == 'video' ? FileType.video : FileType.image;
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: fileType);
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(type: fileType);
     if (result != null && result.files.single.path != null) {
       return File(result.files.single.path!);
     }
@@ -46,7 +94,7 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Course Upload'),
+        title: Text(widget.course == null ? 'Upload Course' : 'Edit Course'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -118,7 +166,7 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
                 },
               ),
 
-             
+              // Chapter Dropdown
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(labelText: 'Chapter'),
                 value: _chapter,
@@ -171,6 +219,7 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
               // Select Thumbnail Image Button
               ElevatedButton(
                 onPressed: () async {
+                  await _requestStoragePermission();
                   _thumbnailFile = await _pickFile('image');
                   if (_thumbnailFile != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -227,34 +276,54 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    // Create the new Course object
-                    Course newCourse = Course(
-                      courseId: '', // Generate or use an ID
+                    // Create or update the Course object
+                    Course course = Course(
+                      courseId: widget.course?.courseId ??
+                          '', // Use existing ID if editing
                       teacherId: '', // This will be set in the controller
                       title: _titleController.text,
                       grade: _grade!,
                       subject: _subject!,
                       chapter: _chapter!,
                       description: _descriptionController.text,
-                      videoUrl: '', 
-                      demoVideoUrl: '', 
+                      videoUrl: '', // Set after uploading
+                      demoVideoUrl: '', // Set after uploading
                       price: double.tryParse(_priceController.text) ?? 0.0,
-                      thumbnail: '', 
+                      thumbnail: '', // Set after uploading
                       createdAt: DateTime.now(),
                       updatedAt: DateTime.now(),
                     );
-                    courseController.addCourse(
-                      course: newCourse,
-                      videoFile: _courseVideoFile,
-                      demoVideoFile: _demoVideoFile,
-                      thumbnailFile: _thumbnailFile,
-                      context: context,
+
+                    if (widget.course == null) {
+                      // Adding a new course
+                     courseController.addCourse(
+                        course: course,
+                        videoFile: _courseVideoFile,
+                        demoVideoFile: _demoVideoFile,
+                        thumbnailFile: _thumbnailFile,
+                        context: context,
+                      );
+                    } else {
+                      // Updating an existing course
+                      await courseController.updateCourse(
+                        course,
+                        grade: course.grade, 
+                        subject: course.subject, 
+                        chapter: course.chapter,
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Course updated successfully')),
+                      );
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Course uploaded successfully')),
                     );
 
-                    // Show success message or navigate to another screen
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Course uploaded successfully')),
-                    );
+                    // Navigate back after successful upload/update
+                    Navigator.pop(context);
                   }
                 },
                 child: const Text('Submit'),
