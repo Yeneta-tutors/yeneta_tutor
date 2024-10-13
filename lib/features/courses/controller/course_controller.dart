@@ -90,7 +90,7 @@ class CourseController {
   }
 
   // Update a course
-  Future<void> updateCourse(Course course) async {
+  Future<void> updateCourse(Course course, {required String grade, required String subject, required String chapter}) async {
     try {
       await courseRepository.updateCourse(course);
     } catch (e) {
