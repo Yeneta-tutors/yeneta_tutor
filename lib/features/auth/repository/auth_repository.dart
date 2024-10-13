@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,6 +36,7 @@ class AuthRepository {
     required String educationalQualification,
     required String graduationDepartment,
     required String subject,
+    required String bio,
     required UserRole role,
     required BuildContext context,
     File? profilePic,
@@ -152,12 +152,6 @@ class AuthRepository {
 
         if (userDoc.exists) {
           final data = userDoc.data();
-          if (kDebugMode) {
-            print("User Document Exists: ${userDoc.exists}");
-          }
-          if (kDebugMode) {
-            print("User Document Data: ${data}");
-          }
           if (data != null) {
             UserModel userModel =
                 UserModel.fromMap(data as Map<String, dynamic>);
@@ -203,6 +197,30 @@ class AuthRepository {
       showSnackBar(context, "Error in reset password: $e");
     }
   }
+ Future <void> updatePassword({
+  required String oldPassword,
+  required String newPassword,
+  required BuildContext context,
+}) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+        AuthCredential credential = EmailAuthProvider.credential(
+      email: user!.email!,
+      password: oldPassword,
+    );
+    await user.reauthenticateWithCredential(credential);
+  
+    await user.updatePassword(newPassword);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Password changed successfully')),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to update password: $e')),
+    );
+  }
+}
 
   // Fetch user data from Firestore
   Future<UserModel?> getUserData(String uid) async {
