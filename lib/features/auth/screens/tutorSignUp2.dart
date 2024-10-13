@@ -58,6 +58,7 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
             educationalQualification: _selectedEducationalQualification,
             graduationDepartment: _graduationDepartmentController.text.trim(),
             subject: _selectedSubject,
+            bio:"",
             role: UserRole.tutor,
             profilePic: null,
           );
