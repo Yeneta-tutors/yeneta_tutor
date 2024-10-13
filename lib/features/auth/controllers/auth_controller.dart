@@ -11,13 +11,13 @@ final authControllerProvider = Provider((ref) {
 });
 
 final userDataAuthProvider = StreamProvider<UserModel?>((ref) async* {
-    final authController = ref.watch(authControllerProvider);
+  final authController = ref.watch(authControllerProvider);
 
   await for (var user in authController.authStateChanges()) {
     if (user != null) {
       yield await authController.getUserData(user.uid);
     } else {
-      yield null;  // No user is signed in
+      yield null; // No user is signed in
     }
   }
 });
@@ -31,9 +31,11 @@ class AuthController {
   User? getCurrentUser() {
     return authRepository.auth.currentUser;
   }
+
   Stream<User?> authStateChanges() {
     return authRepository.auth.authStateChanges();
   }
+
   Future<UserModel?> getUserData(String uid) async {
     return await authRepository.getUserData(uid);
   }
@@ -51,6 +53,7 @@ class AuthController {
     required educationalQualification,
     required graduationDepartment,
     required subject,
+    required bio,
     required UserRole role,
     File? profilePic,
   }) {
@@ -62,10 +65,11 @@ class AuthController {
       grandFatherName: grandFatherName,
       phoneNumber: phoneNumber,
       gender: gender,
-      grade: grade ,
+      grade: grade,
       educationalQualification: educationalQualification,
       graduationDepartment: graduationDepartment,
       subject: subject,
+      bio: bio,
       role: role,
       context: context,
       profilePic: profilePic,
@@ -92,6 +96,19 @@ class AuthController {
     authRepository.resetPassword(
       email: email,
       context: context,
+    );
+  }
+
+  void updatePassword({
+    required String email,
+    required String oldPassword,
+    required String newPassword,
+    required BuildContext context,
+  }) {
+    authRepository.updatePassword(
+        oldPassword: oldPassword, 
+        newPassword: newPassword,
+        context: context
     );
   }
 
@@ -138,4 +155,6 @@ class AuthController {
       // Handle profile picture update logic here
     }
   }
+
+  
 }
