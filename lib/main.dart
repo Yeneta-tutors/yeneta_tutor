@@ -4,6 +4,7 @@ import 'package:yeneta_tutor/features/courses/screens/course_details.dart';
 import 'package:yeneta_tutor/features/courses/screens/course_upload.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorCoursesPage.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorProfile.dart';
 import 'package:yeneta_tutor/screens/splashScreen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';

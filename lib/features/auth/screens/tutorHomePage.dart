@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorCoursesPage.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorProfile.dart';
 
 class TutorHomePage extends StatefulWidget {
   @override
@@ -13,9 +14,9 @@ class _TutorHomePageState extends State<TutorHomePage> {
   final List<Widget> _pages = [
     const Center(child: Text('Tutor Home Page')), // Home
     CoursesPage(), // Courses
-    const Center(child: Text('Profile Page')), // Profile
-    const Center(child: Text('Messages Page')), // Messages
-    const Center(child: Text('Earnings Page')), // Earnings
+    ProfilePage(), // Profile
+    Center(child: Text('Messages Page')), // Messages
+    Center(child: Text('Earnings Page')), // Earnings
   ];
 
   // Method to handle when an icon is tapped
