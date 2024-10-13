@@ -1,21 +1,27 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
+import 'package:yeneta_tutor/features/auth/repository/auth_repository.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 import 'package:yeneta_tutor/common/repositories/common_firebase_storage_repository.dart';
 
 final courseRepositoryProvider = Provider((ref) => CourseRepository(
       firestore: FirebaseFirestore.instance,
       storageRepository: ref.read(commonFirebaseStorageRepositoryProvider),
+      authRepository: ref.read(authRepositoryProvider),
     ));
 
 class CourseRepository {
   final FirebaseFirestore firestore;
   final CommonFirebaseStorageRepository storageRepository;
+  final AuthRepository authRepository;
+  final Uuid uuid = Uuid(); // Initialize Uuid here
 
   CourseRepository({
     required this.firestore,
     required this.storageRepository,
+    required this.authRepository,
   });
 
   // Add a new course
@@ -26,22 +32,25 @@ class CourseRepository {
       String? demoVideoUrl;
       String? thumbnailUrl;
 
+      // Generate a new course ID
+      String newCourseId = uuid.v4();
+
       if (videoFile != null) {
         videoUrl = await storageRepository.storeFileToFirebase(
-            'courses/videos/${course.courseId}', videoFile);
+            'courses/videos/$newCourseId', videoFile);
       }
       if (demoVideoFile != null) {
         demoVideoUrl = await storageRepository.storeFileToFirebase(
-            'courses/demo_videos/${course.courseId}', demoVideoFile);
+            'courses/demo_videos/$newCourseId', demoVideoFile);
       }
       if (thumbnailFile != null) {
         thumbnailUrl = await storageRepository.storeFileToFirebase(
-            'courses/thumbnails/${course.courseId}', thumbnailFile);
+            'courses/thumbnails/$newCourseId', thumbnailFile);
       }
 
       final newCourse = Course(
-        courseId: course.courseId,
-        teacherId: course.teacherId,
+        courseId: newCourseId, // Use the newly generated ID
+        teacherId: authRepository.getCurrentUserId(),
         title: course.title,
         grade: course.grade,
         subject: course.subject,
@@ -55,9 +64,10 @@ class CourseRepository {
         updatedAt: course.updatedAt,
       );
 
+      // Set the document in Firestore
       await firestore
           .collection('courses')
-          .doc(course.courseId)
+          .doc(newCourseId) // Use the new course ID
           .set(newCourse.toMap());
     } catch (e) {
       throw Exception('Failed to add course: $e');

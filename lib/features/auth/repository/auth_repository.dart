@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/common/repositories/common_firebase_storage_repository.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
 import 'package:yeneta_tutor/screens/studentHome.dart';
-import 'package:yeneta_tutor/screens/tutorHome.dart';
 import 'package:yeneta_tutor/widgets/snackbar.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository(
@@ -17,6 +18,7 @@ final authRepositoryProvider = Provider((ref) => AuthRepository(
 class AuthRepository {
   final FirebaseAuth auth;
   final FirebaseFirestore firestore;
+  
   AuthRepository({
     required this.auth,
     required this.firestore,
@@ -46,6 +48,7 @@ class AuthRepository {
           .collection('users')
           .where('phoneNumber', isEqualTo: formattedPhoneNumber)
           .get();
+
       if (phoneCheck.docs.isNotEmpty) {
         showSnackBar(context, 'Phone number already in use.');
         return;
@@ -78,6 +81,8 @@ class AuthRepository {
               .read(commonFirebaseStorageRepositoryProvider)
               .storeFileToFirebase(imageRef, profilePic);
         }
+        
+        // Create UserModel and save to Firestore
         UserModel newUser = UserModel(
           uid: user.uid,
           email: email,
@@ -98,10 +103,7 @@ class AuthRepository {
 
         await firestore.collection('users').doc(user.uid).set(newUser.toMap());
 
-        // Upload profile picture if provided
-        if (profilePic != null) {
-          // Implement profile picture upload here
-        }
+        // Navigate to the appropriate home page based on user role
         if (role == UserRole.student) {
           Navigator.pushReplacement(
             context,
@@ -119,13 +121,14 @@ class AuthRepository {
         }
       }
     } on FirebaseAuthException catch (e) {
+      // Handle Firebase Auth errors
       if (e.code == 'email-already-in-use') {
         showSnackBar(context, 'Email already in use.');
       } else {
         showSnackBar(context, 'Error: ${e.message}');
       }
     } catch (e) {
-      showSnackBar(context, 'Error during signup');
+      showSnackBar(context, 'Error during signup: $e');
     }
   }
 
@@ -147,29 +150,43 @@ class AuthRepository {
         DocumentSnapshot userDoc =
             await firestore.collection('users').doc(user.uid).get();
 
-             if(userDoc.exists){
-                  UserModel userModel =
-              UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
-
-                        if (userModel.role == UserRole.student) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => StudentHomePage(),
-              ),
-            );
-          } else if (userModel.role == UserRole.tutor) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TutorHomePage(),
-              ),
-            );
+        if (userDoc.exists) {
+          final data = userDoc.data();
+          if (kDebugMode) {
+            print("User Document Exists: ${userDoc.exists}");
           }
+          if (kDebugMode) {
+            print("User Document Data: ${data}");
+          }
+          if (data != null) {
+            UserModel userModel =
+                UserModel.fromMap(data as Map<String, dynamic>);
+
+            // Navigate to the appropriate home page based on user role
+            if (userModel.role == UserRole.student) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StudentHomePage(),
+                ),
+              );
+            } else if (userModel.role == UserRole.tutor) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TutorHomePage(),
+                ),
+              );
+            }
+          } else {
+            showSnackBar(context, "User document is null.");
+          }
+        } else {
+          showSnackBar(context, "User not found in the database.");
+        }
       }
-      }
- 
     } catch (e) {
+      print("Login error: $e");
       showSnackBar(context, "Invalid email or password.");
     }
   }
@@ -181,8 +198,9 @@ class AuthRepository {
   }) async {
     try {
       await auth.sendPasswordResetEmail(email: email);
+      showSnackBar(context, "Password reset email sent.");
     } catch (e) {
-      showSnackBar(context, "Error in reset password");
+      showSnackBar(context, "Error in reset password: $e");
     }
   }
 
@@ -195,7 +213,7 @@ class AuthRepository {
         return UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
       }
     } catch (e) {
-      // Handle error
+      print("Error fetching user data: $e");
     }
     return null;
   }
@@ -221,23 +239,23 @@ class AuthRepository {
     await firestore.collection('users').doc(uid).update(updatedData);
   }
 
+  // Get current user ID
+  String getCurrentUserId() {
+    return auth.currentUser?.uid ?? '';
+  }
+
   // Stream user data
   Stream<UserModel> getUserStream(String uid) {
     return firestore
         .collection('users')
         .doc(uid)
         .snapshots()
-        .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>));
-  }
-}
-
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text('Home Page'),
-      ),
-    );
+        .map((doc) {
+          if (doc.exists) {
+            return UserModel.fromMap(doc.data() as Map<String, dynamic>);
+          } else {
+            throw Exception("User document does not exist.");
+          }
+        });
   }
 }

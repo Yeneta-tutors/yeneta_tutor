@@ -13,12 +13,12 @@ class StudentHomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Welcome, Student!',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
-            Text(
+            const Text(
               'Here are your current activities:',
               style: TextStyle(fontSize: 16),
             ),
@@ -27,7 +27,7 @@ class StudentHomePage extends StatelessWidget {
               onPressed: () {
                 // Placeholder action
               },
-              child: Text('View Your Courses'),
+              child: const Text('View Your Courses'),
             ),
             ElevatedButton(
               onPressed: () {

@@ -1,12 +1,16 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:yeneta_tutor/features/courses/screens/course_details.dart';
+import 'package:yeneta_tutor/features/courses/screens/course_upload.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorCoursesPage.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
+import 'package:yeneta_tutor/screens/splashScreen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
 import 'package:yeneta_tutor/firebase_options.dart';
 import 'package:yeneta_tutor/screens/splashScreen.dart';
 import 'package:yeneta_tutor/screens/studentHome.dart';
-import 'package:yeneta_tutor/screens/tutorHome.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

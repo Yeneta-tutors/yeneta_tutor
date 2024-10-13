@@ -68,4 +68,6 @@ class Course {
        
     );
   }
+
+  get uuid => null;
 }

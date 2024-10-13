@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum UserRole {
   student, // 0
   tutor, // 1
@@ -66,22 +68,28 @@ class UserModel {
 
   static UserModel fromMap(Map<String, dynamic> map) {
     return UserModel(
-      uid: map['uid'],
-      firstName: map['first_name'],
-      fatherName: map['father_name'],
-      grandFatherName: map['grand_father_name'],
-      gender: map['gender'],
-      phoneNumber: map['phone_number'],
-      email: map['email'],
-      grade: map['grade'],
+      uid: map['uid'] ?? '',
+      firstName: map['first_name'] ?? '',
+      fatherName: map['father_name'] ?? '',
+      grandFatherName: map['grand_father_name'] ?? '',
+      gender: map['gender'] ?? '',
+      phoneNumber: map['phone_number'] ?? '',
+      email: map['email'] ?? '',
+      grade: map['grade'] ?? '',
       role: UserRole.values[map['role']],
-      languageSpoken: List<String>.from(map['language_spoken']),
-      educationalQualification: map['educational_qualification'],
-      graduationDepartment: map['graduation_department'],
-      subject: map['subject'],
-      profileImage: map['profile_image'],
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at']),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at']),
+      languageSpoken: map['language_spoken'] != null
+          ? List<String>.from(map['language_spoken'])
+          : [],
+      educationalQualification: map['educational_qualification'] ?? '',
+      graduationDepartment: map['graduation_department'] ?? '',
+      subject: map['subject'] ?? '',
+      profileImage: map['profile_image'] ?? '',
+      createdAt: map['created_at'] is Timestamp
+          ? (map['created_at'] as Timestamp).toDate()
+          : DateTime.now(),
+      updatedAt: map['updated_at'] is Timestamp
+          ? (map['updated_at'] as Timestamp).toDate()
+          : DateTime.now(),
     );
   }
 }
