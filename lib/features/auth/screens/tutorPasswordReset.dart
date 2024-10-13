@@ -1,34 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 
-class ResetPasswordPage extends StatefulWidget {
+class ResetPasswordPage extends ConsumerStatefulWidget {
   @override
   _ResetPasswordPageState createState() => _ResetPasswordPageState();
 }
 
-class _ResetPasswordPageState extends State<ResetPasswordPage> {
+class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
   final _formKey = GlobalKey<FormState>();
   bool _oldPasswordVisible = false;
   bool _newPasswordVisible = false;
   bool _confirmPasswordVisible = false;
-  
+
   String? _oldPassword;
   String? _newPassword;
   String? _confirmPassword;
 
-  //  old password for validation simulation
-  String storedOldPassword = "1234567"; 
+  // Controllers for managing input text
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
-  // Validate old password
-  bool _validateOldPassword(String value) {
-    return value == storedOldPassword; // Replace with actual password checking logic
-  }
-
-  // Function to check if passwords match
-  String? _confirmPasswordValidator(String value) {
-    if (value == null || value.isEmpty) {
+  String? _confirmPasswordValidator(String? value) {
+    if (value!.isEmpty) {
       return "Please confirm new password";
     }
-    if (value != _newPassword) {
+    if (value != _newPasswordController.text) {
       return "Passwords do not match";
     }
     return null;
@@ -38,14 +37,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      // Replace old password with the new password in the database
-      setState(() {
-        storedOldPassword = _newPassword!;
-      });
-
-      // Show success popup
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password changed successfully')),
+      final authController = ref.read(authControllerProvider);
+      authController.updatePassword(
+        email: authController
+            .getCurrentUser()!
+            .email!, 
+        oldPassword: _oldPasswordController.text,
+        newPassword: _newPasswordController.text,
+        context: context,
       );
     }
   }
@@ -70,6 +69,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             children: [
               // Old Password
               TextFormField(
+                controller: _oldPasswordController,
                 obscureText: !_oldPasswordVisible,
                 decoration: InputDecoration(
                   labelText: "Old Password",
@@ -91,18 +91,16 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   if (value == null || value.isEmpty) {
                     return "Please enter old password";
                   }
-                  if (!_validateOldPassword(value)) {
-                    return "Old password is incorrect";
-                  }
                   return null;
                 },
                 onSaved: (value) => _oldPassword = value,
               ),
-              
+
               SizedBox(height: 16.0),
 
               // New Password
               TextFormField(
+                controller: _newPasswordController,
                 obscureText: !_newPasswordVisible,
                 decoration: InputDecoration(
                   labelText: "New Password",
@@ -131,11 +129,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 },
                 onSaved: (value) => _newPassword = value,
               ),
-              
+
               SizedBox(height: 16.0),
 
               // Confirm New Password
               TextFormField(
+                controller: _confirmPasswordController,
                 obscureText: !_confirmPasswordVisible,
                 decoration: InputDecoration(
                   labelText: "Confirm New Password",
@@ -153,15 +152,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     },
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please confirm new password";
-                  }
-                  if (value != _newPassword) {
-                    return "Passwords do not match";
-                  }
-                  return null;
-                },
+                validator: _confirmPasswordValidator,
                 onSaved: (value) => _confirmPassword = value,
               ),
 
@@ -172,7 +163,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 onPressed: _submitForm,
                 child: Text("Submit"),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white, backgroundColor: Colors.black, padding: EdgeInsets.symmetric(horizontal: 32.0, vertical: 12.0), // Text color
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.black,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 32.0, vertical: 12.0), // Text color
                 ),
               ),
             ],
