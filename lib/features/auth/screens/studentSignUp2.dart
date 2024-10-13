@@ -56,6 +56,7 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
             educationalQualification: '',
             graduationDepartment: '',
             subject: '',
+            bio:'',
             grade: _selectedGrade!,
             role: UserRole.student, 
             profilePic: null, 
