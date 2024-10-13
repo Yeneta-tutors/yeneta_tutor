@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'dart:io';
 
-class EditProfilePage extends StatefulWidget {
+import 'package:yeneta_tutor/models/user_model.dart';
+
+class EditProfilePage extends ConsumerStatefulWidget {
+  final UserModel? user;
+  EditProfilePage({this.user});
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   File? _imageFile;
   String? _firstName;
@@ -21,21 +27,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String? _graduationDepartment;
   String? _bio;
 
-  // Dummy data fetch simulation
-  void fetchData() {
-    // Simulate fetched data from the database
-    setState(() {
-      _firstName = "John";
-      _middleName = "Doe";
-      _lastName = "Smith";
-      _email = "john@example.com";
-      _gender = "Male";
-      _phoneNumber = "1234567890";
-      _educationalQualification = "BSc/BA";
-      _languageSpoken = "English";
-      _graduationDepartment = "Computer Science";
-      _bio = "Passionate educator with 5 years of experience...";
-    });
+       @override
+    void initState() {
+    super.initState();
+    if (widget.user != null) {
+      _firstName = widget.user!.firstName;
+      _middleName = widget.user!.fatherName ;
+      _lastName = widget.user!.grandFatherName;
+      _email = widget.user!.email;
+      _gender = widget.user!.gender;
+      _phoneNumber = widget.user!.phoneNumber;
+      _educationalQualification = widget.user!.educationalQualification ?? '';
+      // _languageSpoken = (widget.user!.languageSpoken ?? '') as String?;
+      _graduationDepartment = widget.user!.graduationDepartment;
+      _bio = widget.user!.bio;
+    }
   }
 
   // Pick image from gallery
@@ -49,10 +55,34 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
+ // Save profile updates
+  void _saveProfile() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      final updatedData = {
+        'firstName': _firstName,
+        'middleName': _middleName,
+        'lastName': _lastName,
+        'email': _email,
+        'gender': _gender,
+        'phoneNumber': _phoneNumber,
+        'educationalQualification': _educationalQualification,
+        'languageSpoken': _languageSpoken,
+        'graduationDepartment': _graduationDepartment,
+        'bio': _bio,
+      };
+
+      // Update user profile through AuthController
+      ref.read(authControllerProvider).updateUser(
+            uid: widget.user!.uid,
+            updatedData: updatedData,
+          );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Profile updated successfully')),
+      );
+    }
   }
 
   @override
@@ -196,15 +226,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  // Save data to the database here
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Profile updated successfully')),
-                  );
-                }
-              },
+              onPressed: _saveProfile,
               child: Text("Save Profile"),
             ),
           ),
