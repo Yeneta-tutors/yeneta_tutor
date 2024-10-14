@@ -7,7 +7,6 @@ import 'package:yeneta_tutor/features/courses/controller/course_controller.dart'
 import 'package:yeneta_tutor/features/courses/screens/course_upload.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 
-
 class CourseDetailsPage extends ConsumerStatefulWidget {
   final String courseId;
 
@@ -31,15 +30,18 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
   }
 
   Future<void> _loadCourseDetails() async {
+    
     try {
       final course = await ref
           .read(courseControllerProvider)
           .fetchCourseById(widget.courseId);
+           
       if (course != null) {
         setState(() {
+         
           _course = course;
           _videoPlayerController =
-           VideoPlayerController.networkUrl(Uri.parse(course.demoVideoUrl));
+              VideoPlayerController.networkUrl(Uri.parse(course.demoVideoUrl));
           _chewieController = ChewieController(
             videoPlayerController: _videoPlayerController,
             aspectRatio: 16 / 9,
@@ -48,6 +50,13 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
           );
         });
       }
+      print(course?.demoVideoUrl);
+      _videoPlayerController.addListener(() {
+        if (_videoPlayerController.value.hasError) {
+          print(
+              "Video Player Error: ${_videoPlayerController.value.errorDescription}");
+        }
+      });
       await _loadTeacherName(course!.teacherId);
     } catch (e) {
       // Handle failure to fetch course
@@ -157,10 +166,11 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                        Navigator.push(
-                         context,
-                         MaterialPageRoute(
-                           builder: (context) => CourseUploadPage(course: _course),  
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              CourseUploadPage(course: _course),
                         ),
                       );
                     },
