@@ -278,18 +278,17 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
                   if (_formKey.currentState!.validate()) {
                     // Create or update the Course object
                     Course course = Course(
-                      courseId: widget.course?.courseId ??
-                          '', // Use existing ID if editing
-                      teacherId: '', // This will be set in the controller
+                      courseId: widget.course?.courseId ??'', 
+                      teacherId: '', 
                       title: _titleController.text,
                       grade: _grade!,
                       subject: _subject!,
                       chapter: _chapter!,
                       description: _descriptionController.text,
-                      videoUrl: '', // Set after uploading
-                      demoVideoUrl: '', // Set after uploading
+                      videoUrl: '', 
+                      demoVideoUrl: '',
                       price: double.tryParse(_priceController.text) ?? 0.0,
-                      thumbnail: '', // Set after uploading
+                      thumbnail: '', 
                       createdAt: DateTime.now(),
                       updatedAt: DateTime.now(),
                     );
