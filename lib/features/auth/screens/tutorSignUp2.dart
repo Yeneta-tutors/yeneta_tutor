@@ -217,6 +217,11 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                     }
                     return null;
                   },
+                  isExpanded: false,
+                dropdownColor: Colors.grey[200], // Customize dropdown background color
+                icon: Icon(Icons.arrow_drop_down), // Customize dropdown arrow icon
+               iconSize: 20, 
+               menuMaxHeight: 200,
                 ),
 
                 const SizedBox(height: 20),

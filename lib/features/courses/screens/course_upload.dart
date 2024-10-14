@@ -141,6 +141,11 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
                   }
                   return null;
                 },
+                isExpanded: false,
+                dropdownColor: Colors.grey[200], // Customize dropdown background color
+                icon: Icon(Icons.arrow_drop_down), // Customize dropdown arrow icon
+               iconSize: 20, 
+               menuMaxHeight: 200,
               ),
 
               // Subject Dropdown
@@ -164,6 +169,11 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
                   }
                   return null;
                 },
+                isExpanded: false,
+                dropdownColor: Colors.grey[200], // Customize dropdown background color
+                icon: Icon(Icons.arrow_drop_down), // Customize dropdown arrow icon
+               iconSize: 20, 
+               menuMaxHeight: 200,
               ),
 
               // Chapter Dropdown
@@ -187,6 +197,11 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
                   }
                   return null;
                 },
+                isExpanded: false,
+                dropdownColor: Colors.grey[200], // Customize dropdown background color
+                icon: Icon(Icons.arrow_drop_down), // Customize dropdown arrow icon
+               iconSize: 20, 
+               menuMaxHeight: 200,
               ),
 
               SizedBox(height: 16),
