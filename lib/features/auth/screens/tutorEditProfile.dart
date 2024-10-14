@@ -27,12 +27,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   String? _graduationDepartment;
   String? _bio;
 
-       @override
-    void initState() {
+  @override
+  void initState() {
     super.initState();
     if (widget.user != null) {
       _firstName = widget.user!.firstName;
-      _middleName = widget.user!.fatherName ;
+      _middleName = widget.user!.fatherName;
       _lastName = widget.user!.grandFatherName;
       _email = widget.user!.email;
       _gender = widget.user!.gender;
@@ -46,7 +46,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   // Pick image from gallery
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
@@ -55,7 +56,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     }
   }
 
- // Save profile updates
+  // Save profile updates
   void _saveProfile() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -72,16 +73,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         'graduationDepartment': _graduationDepartment,
         'bio': _bio,
       };
-
-      // Update user profile through AuthController
-      ref.read(authControllerProvider).updateUser(
+      ref.read(authControllerProvider).updateUserProfile(
             uid: widget.user!.uid,
-            updatedData: updatedData,
+            profileData: updatedData,
+            profilePic: _imageFile,
+            context: context,
           );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Profile updated successfully')),
-      );
     }
   }
 
@@ -114,9 +111,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         CircleAvatar(
                           radius: 50.0,
                           backgroundImage: _imageFile != null
-                              ? FileImage(_imageFile!)
-                              : AssetImage("images/yeneta_logo.jpg") // Placeholder for fetched image
-                                  as ImageProvider,
+                              ? FileImage(
+                                  _imageFile!) 
+                              : (widget.user != null &&
+                                      widget.user!.profileImage != null &&
+                                      widget.user!.profileImage!.isNotEmpty)
+                                  ? NetworkImage(widget.user!
+                                      .profileImage!) 
+                                  : NetworkImage(
+                                          "https://via.placeholder.com/150") 
+                                      as ImageProvider,
                         ),
                         IconButton(
                           icon: Icon(Icons.edit),
@@ -131,7 +135,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         children: [
                           TextFormField(
                             initialValue: _firstName,
-                            decoration: InputDecoration(labelText: "First Name"),
+                            decoration:
+                                InputDecoration(labelText: "First Name"),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Please enter first name";
@@ -142,7 +147,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                           ),
                           TextFormField(
                             initialValue: _middleName,
-                            decoration: InputDecoration(labelText: "Middle Name"),
+                            decoration:
+                                InputDecoration(labelText: "Middle Name"),
                             onSaved: (value) => _middleName = value,
                           ),
                           TextFormField(
@@ -154,7 +160,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                             initialValue: _email,
                             decoration: InputDecoration(labelText: "Email"),
                             validator: (value) {
-                              if (value == null || value.isEmpty || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  !RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                                      .hasMatch(value)) {
                                 return "Please enter a valid email";
                               }
                               return null;
@@ -176,7 +185,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                           ),
                           TextFormField(
                             initialValue: _phoneNumber,
-                            decoration: InputDecoration(labelText: "Phone Number"),
+                            decoration:
+                                InputDecoration(labelText: "Phone Number"),
                             keyboardType: TextInputType.phone,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -188,7 +198,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                           ),
                           DropdownButtonFormField<String>(
                             value: _educationalQualification,
-                            decoration: InputDecoration(labelText: "Educational Qualification"),
+                            decoration: InputDecoration(
+                                labelText: "Educational Qualification"),
                             items: ["BSc/BA", "MSc/MA", "PhD"]
                                 .map((qual) => DropdownMenuItem(
                                       child: Text(qual),
@@ -201,12 +212,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                           ),
                           TextFormField(
                             initialValue: _languageSpoken,
-                            decoration: InputDecoration(labelText: "Language Spoken"),
+                            decoration:
+                                InputDecoration(labelText: "Language Spoken"),
                             onSaved: (value) => _languageSpoken = value,
                           ),
                           TextFormField(
                             initialValue: _graduationDepartment,
-                            decoration: InputDecoration(labelText: "Graduation Department"),
+                            decoration: InputDecoration(
+                                labelText: "Graduation Department"),
                             onSaved: (value) => _graduationDepartment = value,
                           ),
                           TextFormField(

@@ -106,10 +106,7 @@ class AuthController {
     required BuildContext context,
   }) {
     authRepository.updatePassword(
-        oldPassword: oldPassword, 
-        newPassword: newPassword,
-        context: context
-    );
+        oldPassword: oldPassword, newPassword: newPassword, context: context);
   }
 
   Stream<UserModel> getUserStream(String uid) {
@@ -130,10 +127,14 @@ class AuthController {
   void updateUser({
     required String uid,
     required Map<String, dynamic> updatedData,
+    required BuildContext context,
   }) {
     authRepository.updateUser(
       uid: uid,
       updatedData: updatedData,
+      ref: ref,
+      profilePic: null,
+      context: context,
     );
   }
 
@@ -145,16 +146,14 @@ class AuthController {
     required String uid,
     required Map<String, dynamic> profileData,
     File? profilePic,
+    required BuildContext context,
   }) {
     authRepository.updateUser(
       uid: uid,
       updatedData: profileData,
+      profilePic: profilePic,
+      ref: ref,
+      context: context,
     );
-
-    if (profilePic != null) {
-      // Handle profile picture update logic here
-    }
   }
-
-  
 }

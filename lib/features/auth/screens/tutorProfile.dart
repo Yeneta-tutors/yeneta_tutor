@@ -13,13 +13,6 @@ class ProfilePage extends ConsumerWidget {
 
     return Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              // Handle back navigation
-              Navigator.pop(context);
-            },
-          ),
           title: Text('Profile'),
           centerTitle: true,
           actions: [
