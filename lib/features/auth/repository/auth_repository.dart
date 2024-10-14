@@ -17,7 +17,7 @@ final authRepositoryProvider = Provider((ref) => AuthRepository(
 class AuthRepository {
   final FirebaseAuth auth;
   final FirebaseFirestore firestore;
-  
+
   AuthRepository({
     required this.auth,
     required this.firestore,
@@ -81,7 +81,7 @@ class AuthRepository {
               .read(commonFirebaseStorageRepositoryProvider)
               .storeFileToFirebase(imageRef, profilePic);
         }
-        
+
         // Create UserModel and save to Firestore
         UserModel newUser = UserModel(
           uid: user.uid,
@@ -197,30 +197,31 @@ class AuthRepository {
       showSnackBar(context, "Error in reset password: $e");
     }
   }
- Future <void> updatePassword({
-  required String oldPassword,
-  required String newPassword,
-  required BuildContext context,
-}) async {
-  try {
-    User? user = FirebaseAuth.instance.currentUser;
-        AuthCredential credential = EmailAuthProvider.credential(
-      email: user!.email!,
-      password: oldPassword,
-    );
-    await user.reauthenticateWithCredential(credential);
-  
-    await user.updatePassword(newPassword);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Password changed successfully')),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to update password: $e')),
-    );
+  Future<void> updatePassword({
+    required String oldPassword,
+    required String newPassword,
+    required BuildContext context,
+  }) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: user!.email!,
+        password: oldPassword,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      await user.updatePassword(newPassword);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Password changed successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update password: $e')),
+      );
+    }
   }
-}
 
   // Fetch user data from Firestore
   Future<UserModel?> getUserData(String uid) async {
@@ -251,11 +252,33 @@ class AuthRepository {
 
   // Update user data
   Future<void> updateUser({
-    required String uid,
-    required Map<String, dynamic> updatedData,
-  }) async {
+  required String uid,
+  required Map<String, dynamic> updatedData,
+  required File? profilePic,
+  required ProviderRef ref,
+  required BuildContext context,
+}) async {
+  try {
+  
+    if (profilePic != null) {
+
+      String imageRef = 'profilePics/$uid';  
+
+      String photoUrl = await ref
+          .read(commonFirebaseStorageRepositoryProvider)
+          .storeFileToFirebase(imageRef, profilePic);
+
+
+      updatedData['profile_image'] = photoUrl;
+    }
+
     await firestore.collection('users').doc(uid).update(updatedData);
+
+  } catch (e) {
+    showSnackBar(context, 'Failed to update user profile: $e');
+   
   }
+}
 
   // Get current user ID
   String getCurrentUserId() {
@@ -264,16 +287,12 @@ class AuthRepository {
 
   // Stream user data
   Stream<UserModel> getUserStream(String uid) {
-    return firestore
-        .collection('users')
-        .doc(uid)
-        .snapshots()
-        .map((doc) {
-          if (doc.exists) {
-            return UserModel.fromMap(doc.data() as Map<String, dynamic>);
-          } else {
-            throw Exception("User document does not exist.");
-          }
-        });
+    return firestore.collection('users').doc(uid).snapshots().map((doc) {
+      if (doc.exists) {
+        return UserModel.fromMap(doc.data() as Map<String, dynamic>);
+      } else {
+        throw Exception("User document does not exist.");
+      }
+    });
   }
 }
