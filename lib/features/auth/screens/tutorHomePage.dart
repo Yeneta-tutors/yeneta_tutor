@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorCoursesPage.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorHomePageDemo.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorProfile.dart';
 
 class TutorHomePage extends StatefulWidget {
@@ -12,8 +13,8 @@ class _TutorHomePageState extends State<TutorHomePage> {
 
   // List of pages to navigate between
   final List<Widget> _pages = [
-    const Center(child: Text('Tutor Home Page')), // Home
-    CoursesPage(), 
+    TutorHomePageDemo(), // Home
+    CoursesPage(), // Courses
     ProfilePage(), // Profile
     Center(child: Text('Messages Page')), // Messages
     Center(child: Text('Earnings Page')), // Earnings
@@ -27,14 +28,15 @@ class _TutorHomePageState extends State<TutorHomePage> {
   }
 
   @override
+
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Tutor App Home Page'),
-        backgroundColor:
-            const Color.fromRGBO(9, 15, 44, 1),
-            foregroundColor: Colors.white, // Dark blue app bar
-      ),
+      // appBar: AppBar(
+      //   title: Text('Tutor App Home Page'),
+      //   backgroundColor:
+      //       const Color.fromRGBO(9, 15, 44, 1),
+      //       foregroundColor: Colors.white, // Dark blue app bar
+      // ),
       body: _pages[_selectedIndex], // Display the corresponding page
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,

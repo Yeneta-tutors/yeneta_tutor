@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorHomePageDemo.dart';
 import 'package:yeneta_tutor/features/courses/screens/course_details.dart';
 import 'package:yeneta_tutor/features/courses/screens/course_upload.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorCoursesPage.dart';
@@ -40,7 +41,7 @@ class MyApp extends ConsumerWidget {
       home: userAsyncValue.when(
        data: (user) {
           if (user == null) {
-            return SplashScreen();
+            return SplashScreen();//
           } else {
             if (user.role == 0) {
               return StudentHomePage();  
