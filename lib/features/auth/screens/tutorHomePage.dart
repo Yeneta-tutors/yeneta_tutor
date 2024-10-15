@@ -13,7 +13,7 @@ class _TutorHomePageState extends State<TutorHomePage> {
   // List of pages to navigate between
   final List<Widget> _pages = [
     const Center(child: Text('Tutor Home Page')), // Home
-    CoursesPage(), // Courses
+    CoursesPage(), 
     ProfilePage(), // Profile
     Center(child: Text('Messages Page')), // Messages
     Center(child: Text('Earnings Page')), // Earnings

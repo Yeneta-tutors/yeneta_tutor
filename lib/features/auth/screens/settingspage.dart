@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
 import 'package:yeneta_tutor/features/auth/screens/privacyPolicy.dart';
 import 'package:yeneta_tutor/features/auth/screens/termsAndConditions.dart';
+import 'package:yeneta_tutor/screens/onboardingScreen4.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends ConsumerWidget {
+  const SettingsPage({super.key});
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context); // Navigate back to the previous page
-            Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoginScreen(),
-                      ),
-                    );
+            // Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //             builder: (context) => LoginScreen(),
+            //           ),
+            //         );
           },
         ),
         title: Text('Settings'),
@@ -97,6 +102,7 @@ class SettingsPage extends StatelessWidget {
                   trailing: Icon(Icons.arrow_forward_ios),
                   onTap: () {
                     // Navigator.pushNamed(context, '/login');
+                    ref.read(authControllerProvider).signOut();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -114,7 +120,7 @@ class SettingsPage extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: GestureDetector(
               onTap: () {
-                _showDeleteConfirmation(context);
+                _showDeleteConfirmation(context, ref);
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -135,7 +141,7 @@ class SettingsPage extends StatelessWidget {
   }
 
   // Method to show the delete confirmation dialog
-  void _showDeleteConfirmation(BuildContext context) {
+  void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -150,13 +156,14 @@ class SettingsPage extends StatelessWidget {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                // Perform account deletion logic here
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/onboarding_screen4', // Navigate to onboarding screen 4
-                  (Route<dynamic> route) => false, // Clear all previous routes
-                );
+              onPressed: (){
+                ref.read(authControllerProvider).deleteUser();
+                Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OnboardingScreen4(),
+                      ),
+                    );
               },
               child: Text('Yes'),
             ),
@@ -167,55 +174,3 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-// void main() {
-//   runApp(MaterialApp(
-//     home: SettingsPage(),
-//     routes: {
-//       '/privacy_policy': (context) => PrivacyPolicyPage(),
-//       '/terms_conditions': (context) => TermsConditionsPage(),
-//       '/login': (context) => LoginPage(),
-//       '/onboarding_screen4': (context) => OnboardingScreen4(),
-//     },
-//   ));
-// }
-
-// Placeholder Pages for routing
-// class PrivacyPolicyPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text('Privacy Policy')),
-//       body: Center(child: Text('Privacy Policy Page')),
-//     );
-//   }
-// }
-
-class TermsConditionsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Terms & Conditions')),
-      body: Center(child: Text('Terms & Conditions Page')),
-    );
-  }
-}
-
-class LoginPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Login')),
-      body: Center(child: Text('Login Page')),
-    );
-  }
-}
-
-class OnboardingScreen4 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Onboarding')),
-      body: Center(child: Text('Onboarding Screen 4')),
-    );
-  }
-}

@@ -32,7 +32,28 @@ class CoursesPage extends ConsumerWidget {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error fetching courses'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No courses available'));
+            // Show a message but keep the FAB
+            return Stack(
+              children: [
+                Center(child: Text('No courses available')),
+                Positioned(
+                  bottom: 50,
+                  right: 16,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CourseUploadPage(),
+                        ),
+                      );
+                    },
+                    child: Icon(Icons.add),
+                    backgroundColor: Colors.blueAccent,
+                  ),
+                ),
+              ],
+            );
           }
 
           final courses = snapshot.data!;
@@ -70,6 +91,7 @@ class CoursesPage extends ConsumerWidget {
                   },
                 ),
               ),
+              // Floating action button remains here
               Positioned(
                 bottom: 50,
                 right: 16,
@@ -94,7 +116,6 @@ class CoursesPage extends ConsumerWidget {
   }
 }
 
-// Custom Widget for Course Card
 class CourseCard extends StatelessWidget {
   final String courseId;
   final String courseTitle;
@@ -117,18 +138,17 @@ class CourseCard extends StatelessWidget {
           Expanded(
             child: thumbnail != null && thumbnail!.isNotEmpty
                 ? Image.network(
-                    thumbnail!, 
+                    thumbnail!,
                     fit: BoxFit.cover,
                     width: double.infinity,
                   )
                 : Image.asset(
-                    'images/yeneta_logo.jpg', 
+                    'images/yeneta_logo.jpg',
                     fit: BoxFit.cover,
                     width: double.infinity,
                   ),
           ),
 
-          // Course details
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(

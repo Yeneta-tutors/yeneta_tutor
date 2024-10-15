@@ -138,9 +138,7 @@ class AuthController {
     );
   }
 
-  void signOut() {
-    authRepository.auth.signOut();
-  }
+ 
 
   void updateUserProfile({
     required String uid,
@@ -155,5 +153,13 @@ class AuthController {
       ref: ref,
       context: context,
     );
+  }
+
+   void signOut() {
+    authRepository.signOut();
+  }
+
+  void deleteUser() {
+    authRepository.deleteAccount();
   }
 }

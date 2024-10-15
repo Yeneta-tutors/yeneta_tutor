@@ -295,4 +295,28 @@ class AuthRepository {
       }
     });
   }
+  Future<void> signOut() async {
+
+    try {
+      await auth.signOut();
+    } catch (e) {
+      throw Exception('Could not sign out: $e');
+    }
+    
+  }
+
+  Future<void> deleteAccount() async {
+       try {
+      User? user = auth.currentUser;
+      if (user != null) {
+        await user.delete(); 
+      }
+    } catch (e) {
+      throw Exception('Could not delete user: $e');
+    }
+  }
+
+
 }
+
+
