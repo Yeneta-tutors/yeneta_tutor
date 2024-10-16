@@ -25,7 +25,7 @@ class CoursesPage extends ConsumerWidget {
         ),
       ),
       body: FutureBuilder<List<Course>>(
-        future: courseController.fetchCourses(),
+        future: courseController.fetchCoursesByTeacherId(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
