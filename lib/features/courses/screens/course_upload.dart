@@ -69,12 +69,22 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
     }
   }
 
-  Future<void> _requestStoragePermission() async {
-    var status = await Permission.storage.status;
-    if (!status.isGranted) {
-      await Permission.storage.request();
-    }
+Future<void> _requestStoragePermission() async {
+  var status = await Permission.storage.status;
+
+  if (status.isDenied) {
+    status = await Permission.storage.request();
   }
+  if (status.isPermanentlyDenied) {
+    openAppSettings();
+  } else if (status.isGranted) {
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Storage permission denied')),
+    );
+  }
+}
+
 
   // Function to pick files (demo video, course video, and image)
   Future<File?> _pickFile(String type) async {
@@ -142,8 +152,8 @@ class _CourseUploadPageState extends ConsumerState<CourseUploadPage> {
                   return null;
                 },
                 isExpanded: false,
-                dropdownColor: Colors.grey[200], // Customize dropdown background color
-                icon: Icon(Icons.arrow_drop_down), // Customize dropdown arrow icon
+                dropdownColor: Colors.grey[200], 
+                icon: Icon(Icons.arrow_drop_down), 
                iconSize: 20, 
                menuMaxHeight: 200,
               ),
