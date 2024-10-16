@@ -144,6 +144,11 @@ class CourseRepository {
           .where('chapter', isEqualTo: chapter)
           .where('subject', isEqualTo: subject)
           .get();
+
+       if (querySnapshot.docs.isEmpty) {
+          print('No courses found for the selected filters');
+      return [];
+    }
       return querySnapshot.docs
           .map((doc) => Course.fromMap(doc.data()))
           .toList();
