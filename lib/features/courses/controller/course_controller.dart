@@ -98,6 +98,38 @@ class CourseController {
     }
   }
 
+  // Fetch courses by teacher ID
+  Future<List<Course>> fetchCoursesByTeacherId() async {
+    try {
+      return await courseRepository.fetchCoursesForTutor();
+    } catch (e) {
+      throw Exception('Failed to fetch courses: $e');
+    }
+  }
+
+  // filtered courses
+  Future<List<Course>> fetchFilteredCourses(String grade, String subject, String chapter) async {
+    try {
+      return await courseRepository.fetchFilteredCourses(
+        grade: grade,
+        subject: subject,
+        chapter: chapter,
+      );
+    } catch (e) {
+      print('Error in fetchFilteredCourses: $e');
+      throw Exception('Failed to fetch courses: $e');
+    }
+  }
+
+  //search courses by title and subject
+  Future<List<Course>> searchCourses(String query) async {
+    try {
+      return await courseRepository.searchCourses(query);
+    } catch (e) {
+      throw Exception('Failed to search courses: $e');
+    }
+  }
+
   // Delete a course
   Future<void> deleteCourse(String courseId) async {
     try {
