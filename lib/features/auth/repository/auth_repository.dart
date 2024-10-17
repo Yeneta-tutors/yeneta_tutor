@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/common/repositories/common_firebase_storage_repository.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
-import 'package:yeneta_tutor/screens/studentHome.dart';
+import 'package:yeneta_tutor/features/auth/screens/studentHome.dart';
 import 'package:yeneta_tutor/widgets/snackbar.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository(
