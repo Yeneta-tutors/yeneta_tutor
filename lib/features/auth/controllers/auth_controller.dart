@@ -32,6 +32,11 @@ class AuthController {
     return authRepository.auth.currentUser;
   }
 
+  // get current user  id
+  String getCurrentUserId() {
+    return authRepository.getCurrentUserId();
+  }
+
   Stream<User?> authStateChanges() {
     return authRepository.auth.authStateChanges();
   }
@@ -138,8 +143,6 @@ class AuthController {
     );
   }
 
- 
-
   void updateUserProfile({
     required String uid,
     required Map<String, dynamic> profileData,
@@ -155,7 +158,7 @@ class AuthController {
     );
   }
 
-   void signOut() {
+  void signOut() {
     authRepository.signOut();
   }
 

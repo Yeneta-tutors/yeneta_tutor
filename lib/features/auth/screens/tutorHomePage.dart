@@ -64,8 +64,8 @@ class _TutorHomePageState extends State<TutorHomePage> {
         ],
         currentIndex: _selectedIndex,
 
-        selectedItemColor: Colors.brown, // Icon color when selected
-        unselectedItemColor: Colors.white, // Icon color when not selected
+        selectedItemColor: Colors.brown, 
+        unselectedItemColor: Colors.white, 
         backgroundColor: const Color.fromRGBO(9, 15, 44, 1), // Dark blue background
         selectedFontSize: 14, // Larger text when selected
         unselectedFontSize: 12, // Smaller text when not selected
