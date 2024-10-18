@@ -9,18 +9,30 @@ class ProfilePage extends ConsumerWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
   @override
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userData = ref.watch(userDataAuthProvider);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Profile'),
+        backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back,
+              color: const Color.fromARGB(255, 255, 255, 255)),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text('Profile',
+            style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255))),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Icon(Icons.settings,
+                color: const Color.fromARGB(255, 255, 255, 255)),
             onPressed: () {
-              // Navigate to the settings page
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SettingsPage()),
@@ -30,81 +42,124 @@ class ProfilePage extends ConsumerWidget {
         ],
       ),
       body: userData.when(
-        data: (user) => Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // Profile photo section
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: user?.profileImage != null
-                    ? NetworkImage(user!.profileImage!)
-                    : NetworkImage(
-                        'https://via.placeholder.com/150'), // Replace with your image url
-              ),
-              const SizedBox(height: 16),
-
-              Text(
-                "${user?.firstName ?? 'Unknown'} ${user?.fatherName ?? ''} ",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+        data: (user) => Stack(
+          children: [
+            // Curved blue-black background section
+            Container(
+              height: 140, // Adjusted height to cover half the avatar
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 9, 19, 58), // Blue-black color
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
                 ),
               ),
-              const SizedBox(height: 8),
-
-              // Description section
-              Text(
-                user?.bio != null && user!.bio!.isNotEmpty
-                    ? user.bio!
-                    : 'Passionate educator with 5 years of experience tutoring high school and college students in STEM subjects.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 32),
-
-              // Row for Edit Profile and Change Password Buttons
-              Row(
+            ),
+            // Profile content
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 70, left: 16, right: 16), // Adjusted top padding
+              child: Column(
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to the edit profile page
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditProfilePage(user: user),
+                  // Profile photo section
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: user?.profileImage != null
+                        ? NetworkImage(user!.profileImage!)
+                        : NetworkImage(
+                            'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Text(
+                    "${user?.firstName ?? 'Unknown'} ${user?.fatherName ?? ''} ",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Description section
+                  Text(
+                    user?.bio != null && user!.bio!.isNotEmpty
+                        ? user.bio!
+                        : 'Passionate educator with 5 years of experience tutoring high school and college students in STEM subjects.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Row for Edit Profile and Change Password Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 9, 19, 58), // Blue-black color
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                          onPressed: () {
+                            // Navigate to the edit profile page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    EditProfilePage(user: user),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Text(
+                          "EDIT PROFILE",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
                           ),
-                        );
-                      },
-                      child: Text('EDIT PROFILE'),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
+                        ),
+                      )
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                  child: SizedBox(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Color.fromARGB(255, 9, 19, 58)), // Blue-black color
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+              // Handle password reset
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ResetPasswordPage()),
+              );
+            },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Text(
+                          "CHANGE PASSWORD",
+                          style: TextStyle(
+                            color: Color(0xFF1A237E), // Blue-black text color
+                            fontSize: 12,
+                            overflow: TextOverflow.ellipsis, // Prevent text wrapping
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to the change password page
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ResetPasswordPage(),
-                          ),
-                        );
-                      },
-                      child: Text('CHANGE PASSWORD'),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
-                      ),
-                    ),
+                ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         loading: () => Center(child: CircularProgressIndicator()),
         error: (err, stack) => Text('Error loading profile'),
@@ -112,5 +167,3 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 }
-
-// Dummy Settings Page

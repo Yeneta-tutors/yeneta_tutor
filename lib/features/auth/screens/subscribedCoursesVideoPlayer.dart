@@ -5,19 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/services.dart';
-import 'package:yeneta_tutor/features/auth/screens/SubscriptionPlanSelectionPage%20.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorProfileView.dart';
 
-class CourseDetailsPage extends StatefulWidget {
+class SubscribedCoursesVideoPlayer extends StatefulWidget {
   final Map<String, dynamic> course;
 
-  CourseDetailsPage({required this.course});
+  SubscribedCoursesVideoPlayer({required this.course});
 
   @override
-  _CourseDetailsPageState createState() => _CourseDetailsPageState();
+  _SubscribedCoursesVideoPlayer createState() => _SubscribedCoursesVideoPlayer();
 }
 
-class _CourseDetailsPageState extends State<CourseDetailsPage> {
+class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> {
   VideoPlayerController? _controller;
   bool _isFullScreen = false;
   bool _controlsVisible = false;
@@ -85,7 +84,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Course Details'),
+        title: Text('Course Video Player'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -194,7 +193,7 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
                   CircleAvatar(
                     radius: 30,
                     backgroundImage: NetworkImage(
-                      'images/yeneta_logo.jpg',
+                      'images/avator_image.png',
                     ),
                   ),
                   SizedBox(width: 10),
@@ -233,11 +232,17 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SubscriptionPlanSelectionPage(),
+                          builder: (context) => chatWithTeacher(),
                         ),
                       );
                     },
-                    child: Text('Subscribe'),
+                    child: Text('Ask a Question'),
+                    style: ElevatedButton.styleFrom(
+                   backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                  foregroundColor: Colors.white,
+                
+                  textStyle: const TextStyle(fontSize: 12),
+                               ),
                   ),
                 ],
               ),
@@ -299,12 +304,12 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
 
 
 
-// class SubscriptionPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text('Subscription')),
-//       body: Center(child: Text('Subscription Information Here')),
-//     );
-//   }
-// }
+class chatWithTeacher extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Subscription')),
+      body: Center(child: Text('chat section  Here')),
+    );
+  }
+}

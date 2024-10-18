@@ -4,7 +4,7 @@ class TutorProfileForStudents extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 9, 19, 58),
         elevation: 0,
@@ -39,7 +39,7 @@ class TutorProfileForStudents extends StatelessWidget {
                 child: CircleAvatar(
                   radius: 60,
                   backgroundImage: AssetImage(
-                    'images/yeneta_logo.jpg', // Replace with actual image
+                    'images/avatar_image.png', // Replace with actual image
                   ),
                 ),
               ),

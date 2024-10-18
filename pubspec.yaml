@@ -84,6 +84,8 @@ flutter:
     - images/geography_thumbnail.png
     - images/history_thumbnail.png
     - images/ict_thumbnail.png
+    - images/avator_image.png
+    - images/chapa_logo.png
     
 
   # An image asset can refer to one or more resolution-specific "variants", see

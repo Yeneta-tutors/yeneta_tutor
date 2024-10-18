@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/features/auth/screens/studentHomePageDemo.dart';
 import 'package:yeneta_tutor/features/auth/screens/studentProfile.dart';
+import 'package:yeneta_tutor/features/auth/screens/subscribedCourses.dart';
 
 
 class StudentHomePage extends StatefulWidget {
@@ -14,7 +15,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
   // List of pages to navigate between
   final List<Widget> _pages = [
     StudentHomePageDemo(), // Home
-    Center(child: Text('stident courses  Page')),  
+    Subscribedcourses(),  
     studentProfile(), // Profile
     Center(child: Text('studnet Messages Page')), // Messages
     Center(child: Text('studnet Earnings Page')), // Earnings
