@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/courses/screens/course_details.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
+import 'package:yeneta_tutor/models/user_model.dart';
 import 'package:yeneta_tutor/widgets/snackbar.dart';
 
 class TutorHomePageDemo extends ConsumerStatefulWidget {
@@ -21,266 +23,283 @@ class _TutorHomePageDemoState extends ConsumerState<TutorHomePageDemo> {
   @override
   Widget build(BuildContext context) {
     final courseController = ref.watch(courseControllerProvider);
+    final authcontroller = ref.read(authControllerProvider);
+
+    final teacherId = authcontroller.getCurrentUserId();
+    final teacher = authcontroller.getUserData(teacherId);
 
     Future<List<Course>> coursesFuture() async {
       return await courseController.fetchCoursesByTeacherId();
     }
 
-    Future<List<Course>> fetchFilteredCoursesFuture() async {
-      if (selectedGrade != null &&
-          selectedSubject != null &&
-          selectedChapter != null) {
-        try {
-          return await courseController.fetchFilteredCourses(
-              selectedGrade!, selectedSubject!, selectedChapter!);
-        } catch (e) {
-          print('Error fetching filtered courses: $e');
-        }
+  Future<List<Course>> fetchFilteredCoursesFuture() async {
+  try {
+    if (selectedGrade != null && selectedSubject != null && selectedChapter != null) {
+      final courses = await courseController.fetchFilteredCourses(
+        selectedGrade!, selectedSubject!, selectedChapter!
+      );
+            if (courses.isEmpty) {
+              if(mounted){
+                showSnackBar(context, "No courses found for the selected filters.");
+
+              }
+        return []; 
       }
-
-      return [];
+      
+      return courses;
+    } else {
+      print('One or more filters are null');
+      return []; 
     }
+  } catch (e) {
+    print('Error fetching filtered courses: $e');
+    showSnackBar(context, "Error fetching courses.");
+    return []; 
+  }
+}
 
-// Future to search courses by title and subject
     Future<List<Course>> searchCoursesFuture(String query) async {
       return await courseController.searchCourses(query);
     }
 
     return Scaffold(
-  backgroundColor: Colors.grey[100],
-  body: SingleChildScrollView(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Header and filter sections
-        Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF0D1B2A),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30),
-              bottomRight: Radius.circular(30),
-            ),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // Header section with profile image, welcome text, and bell icon
-              Row(
+      backgroundColor: Colors.grey[100],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header and filter sections
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF0D1B2A),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 children: [
-                  CircleAvatar(
-                    backgroundImage: AssetImage('images/yeneta_logo.jpg'),
-                    radius: 25,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    'Welcome, Tutor',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
-                  const Spacer(),
-                  Stack(
+                  // Header section with profile image, welcome text, and bell icon
+                  Row(
                     children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.notifications,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          // Handle notification icon press
-                        },
+                      CircleAvatar(
+                        backgroundImage: AssetImage('images/yeneta_logo.jpg'),
+                        radius: 25,
                       ),
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          padding: EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Text(
-                            '1',
-                            style: TextStyle(
+                      const SizedBox(width: 10),
+                      Text(
+                        'Welcome, Tutor',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const Spacer(),
+                      Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.notifications,
                               color: Colors.white,
-                              fontSize: 12,
+                            ),
+                            onPressed: () {
+                              // Handle notification icon press
+                            },
+                          ),
+                          Positioned(
+                            right: 8,
+                            top: 8,
+                            child: Container(
+                              padding: EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Text(
+                                '1',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
                           ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Search bar section
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      hintText: 'Filter my courses',
+                      prefixIcon: const Icon(Icons.search),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Categories text and filter icon
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Categories',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
                         ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.filter_alt),
+                        color: Colors.white,
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => FilterDialog(
+                              onApplyFilter: (grade, subject, chapter) {
+                                setState(() {
+                                  selectedGrade = grade;
+                                  selectedSubject = subject;
+                                  selectedChapter = chapter;
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-
-              // Search bar section
-              TextField(
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: 'Filter my courses',
-                  prefixIcon: const Icon(Icons.search),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Categories text and filter icon
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Categories',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.filter_alt),
-                    color: Colors.white,
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => FilterDialog(
-                          onApplyFilter: (grade, subject, chapter) {
-                            setState(() {
-                              selectedGrade = grade;
-                              selectedSubject = subject;
-                              selectedChapter = chapter;
-                            });
-                            Navigator.of(context).pop();
-                          },
-                        ),
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text('Most Subscribed Courses',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            SizedBox(
+              height: 200,
+              child: FutureBuilder<List<Course>>(
+                future: searchQuery.isNotEmpty
+                    ? searchCoursesFuture(searchQuery)
+                    : (selectedGrade != null &&
+                            selectedSubject != null &&
+                            selectedChapter != null)
+                        ? fetchFilteredCoursesFuture()
+                        : coursesFuture(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                        child: Text('No most subscribed courses found.'));
+                  }
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final course = snapshot.data![index];
+                      return CourseCard(
+                        title: course.title,
+                        subject: course.subject,
+                        grade: course.grade,
+                        chapter: course.chapter,
+                        price: course.price.toString(),
+                        thumbnail: course.thumbnail,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CourseDetailsPage(
+                                courseId: course.courseId,
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
-                  ),
-                ],
+                  );
+                },
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text('Most Subscribed Courses',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        ),
-        SizedBox(
-          height: 200,
-          child: FutureBuilder<List<Course>>(
-            future: searchQuery.isNotEmpty
-                ? searchCoursesFuture(searchQuery)
-                : (selectedGrade != null &&
-                        selectedSubject != null &&
-                        selectedChapter != null)
-                    ? fetchFilteredCoursesFuture()
-                    : coursesFuture(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(
-                    child: Text('No most subscribed courses found.'));
-              }
-              return ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  final course = snapshot.data![index];
-                  return CourseCard(
-                    title: course.title,
-                    subject: course.subject,
-                    grade: course.grade,
-                    chapter: course.chapter,
-                    price: course.price.toString(),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CourseDetailsPage(
-                            courseId: course.courseId,
-                          ),
-                        ),
-                      );
-                                        },
-                  );
-                },
-              );
-            },
-          ),
-        ),
+            ),
 
-        // My Courses Section
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: const Text(
-            'My Courses',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+            // My Courses Section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: const Text(
+                'My Courses',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: 300,
+              child: FutureBuilder<List<Course>>(
+                  future: searchQuery.isNotEmpty
+                      ? searchCoursesFuture(searchQuery)
+                      : (selectedGrade != null &&
+                              selectedSubject != null &&
+                              selectedChapter != null)
+                          ? fetchFilteredCoursesFuture()
+                          : coursesFuture(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No courses found.'));
+                    }
+                    return ListView.builder(
+                       shrinkWrap: true, 
+                       physics: NeverScrollableScrollPhysics(), 
+                      scrollDirection: Axis.vertical,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final course = snapshot.data![index];
+                        return MyCourseCard(
+                          title: course.title,
+                          subject: course.subject,
+                          grade: course.grade,
+                          chapter: course.chapter,
+                          price: course.price.toString(),
+                          thumbnail: course.thumbnail,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CourseDetailsPage(
+                                  courseId: course.courseId,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+            ),
+          ],
         ),
-        SizedBox(
-          height: 300,  // Set the height you need
-          child: FutureBuilder<List<Course>>(
-            future: searchQuery.isNotEmpty
-                ? searchCoursesFuture(searchQuery)
-                : (selectedGrade != null &&
-                        selectedSubject != null &&
-                        selectedChapter != null)
-                    ? fetchFilteredCoursesFuture()
-                    : coursesFuture(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text('No courses found.'));
-              }
-              return ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  final course = snapshot.data![index];
-                  return MyCourseCard(
-                    title: course.title,
-                    subject: course.subject,
-                    grade: course.grade,
-                    chapter: course.chapter,
-                    price: course.price.toString(),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CourseDetailsPage(
-                            courseId: course.courseId,
-                          ),
-                        ),
-                      );
-                                        },
-                  );
-                },
-              );
-            },
-          ),
-        ),
-      ],
-    ),
-  ),
-);
-
+      ),
+    );
   }
 }
 
@@ -290,6 +309,7 @@ class MyCourseCard extends StatelessWidget {
   final String chapter;
   final String grade;
   final String price;
+  final String? thumbnail;
   final VoidCallback onPressed;
 
   const MyCourseCard({
@@ -299,6 +319,7 @@ class MyCourseCard extends StatelessWidget {
     required this.grade,
     required this.subject,
     required this.price,
+    required this.thumbnail,
     required this.onPressed,
   });
 
@@ -325,12 +346,19 @@ class MyCourseCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                'images/yeneta_logo.jpg',
-                height: 120,
-                width: 120,
-                fit: BoxFit.cover,
-              ),
+              child: thumbnail != null && thumbnail!.isNotEmpty
+                  ? Image.network(
+                      thumbnail!,
+                      fit: BoxFit.cover,
+                      height: 120,
+                      width: 120,  // Fix the size here
+                    )
+                  : Image.asset(
+                      'images/yeneta_logo.jpg',
+                      fit: BoxFit.cover,
+                      height: 120,  // Provide fixed height and width
+                      width: 120,   // instead of double.infinity
+                    ),
             ),
             SizedBox(width: 12),
             Expanded(
@@ -390,6 +418,7 @@ class CourseCard extends StatelessWidget {
   final String chapter;
   final String grade;
   final String price;
+  final String? thumbnail;
   // final double rating;
   // final int studentCount;
   final VoidCallback onPressed;
@@ -401,11 +430,12 @@ class CourseCard extends StatelessWidget {
     required this.chapter,
     required this.grade,
     required this.price,
+    required this.thumbnail,
     // required this.studentCount,
     // required this.rating,
     required this.onPressed,
   });
-
+//ANLCZZ    3525
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -417,11 +447,17 @@ class CourseCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Image.asset(
-                'images/yeneta_logo.jpg',
-                fit: BoxFit.cover,
-                width: 180,
-              ),
+              child: thumbnail != null && thumbnail!.isNotEmpty
+                  ? Image.network(
+                      thumbnail!,
+                      fit: BoxFit.cover,
+                      width: 180,
+                    )
+                  : Image.asset(
+                      'images/yeneta_logo.jpg',
+                      fit: BoxFit.cover,
+                      width: 180,
+                    ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),

@@ -16,7 +16,7 @@ class _TutorHomePageState extends State<TutorHomePage> {
     TutorHomePageDemo(), // Home
     CoursesPage(), // Courses
     ProfilePage(), // Profile
-    Center(child: Text('Messages Page')), // Messages
+    Center(child: Text('Chat'),),
     Center(child: Text('Earnings Page')), // Earnings
   ];
 
