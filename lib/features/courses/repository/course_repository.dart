@@ -133,45 +133,57 @@ class CourseRepository {
 
 // Filtered courses by grade  chapter and subject
 
-  Future<List<Course>> fetchFilteredCourses(
-      {required String grade,
-      required String chapter,
-      required String subject}) async {
-    try {
-      final querySnapshot = await firestore
-          .collection('courses')
-          .where('grade', isEqualTo: grade)
-          .where('chapter', isEqualTo: chapter)
-          .where('subject', isEqualTo: subject)
-          .get();
+  Future<List<Course>> fetchFilteredCourses({
+  required String grade,
+  required String chapter,
+  required String subject,
+}) async {
+  try {
+    final querySnapshot = await firestore
+        .collection('courses')
+        .where('grade', isEqualTo: grade)
+        .where('chapter', isEqualTo: chapter)
+        .where('subject', isEqualTo: subject)
+        .get();
 
-       if (querySnapshot.docs.isEmpty) {
-          print('No courses found for the selected filters');
-      return [];
+    print('Found ${querySnapshot.docs.length} courses for filters: Grade=$grade, Chapter=$chapter, Subject=$subject');
+
+    if (querySnapshot.docs.isEmpty) {
+      print('No courses found for the selected filters');
+      return []; 
     }
-      return querySnapshot.docs
-          .map((doc) => Course.fromMap(doc.data()))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to fetch courses: $e');
-    }
+
+    return querySnapshot.docs
+        .map((doc) => Course.fromMap(doc.data()))
+        .toList();
+  } catch (e) {
+    print('Error fetching courses: $e');
+    return []; 
   }
+}
+
 
   //search courses by title and subject
   Future<List<Course>> searchCourses(String query) async {
-    try {
-      final querySnapshot = await firestore
-          .collection('courses')
-          .where('title', isGreaterThanOrEqualTo: query)
-          .where('title', isLessThan: '${query}z')
-          .get();
-      return querySnapshot.docs
-          .map((doc) => Course.fromMap(doc.data()))
-          .toList();
-    } catch (e) {
-      throw Exception('Failed to fetch courses: $e');
+  try {
+    final querySnapshot = await firestore.collection('courses').get();
+
+    final queryLowerCase = query.toLowerCase();
+
+    final filteredCourses = querySnapshot.docs
+        .map((doc) => Course.fromMap(doc.data()))
+        .where((course) => course.title.toLowerCase().contains(queryLowerCase))
+        .toList();
+
+    if (filteredCourses.isEmpty) {
+      print("No courses found for the selected filters");
     }
+
+    return filteredCourses;
+  } catch (e) {
+    throw Exception('Failed to fetch courses: $e');
   }
+}
 
   // Delete a course
   Future<void> deleteCourse(String courseId) async {
