@@ -1,9 +1,9 @@
 class Message {
-  String messageId;
-  String chatId;
-  String senderId; // Foreign key from users
-  String message;
-  DateTime createdAt;
+  final String messageId;
+  final String chatId;
+  final String senderId;
+  final String message;
+  final DateTime createdAt;
 
   Message({
     required this.messageId,
@@ -13,24 +13,23 @@ class Message {
     required this.createdAt,
   });
 
-  // Convert a Message instance to a Map
   Map<String, dynamic> toMap() {
     return {
-      'message_id': messageId,
-      'chat_id': chatId,
-      'sender_id': senderId,
+      'messageId': messageId,
+      'chatId': chatId,
+      'senderId': senderId,
       'message': message,
-      'created_at': createdAt,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
   factory Message.fromMap(Map<String, dynamic> map) {
     return Message(
-      messageId: map['message_id'],
-      chatId: map['chat_id'],
-      senderId: map['sender_id'],
+      messageId: map['messageId'],
+      chatId: map['chatId'],
+      senderId: map['senderId'],
       message: map['message'],
-      createdAt: DateTime.parse(map['created_at']),
+      createdAt: DateTime.parse(map['createdAt']),
     );
   }
 }
