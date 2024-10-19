@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
 import 'package:yeneta_tutor/firebase_options.dart';
+import 'package:yeneta_tutor/screens/splashScreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +37,7 @@ class MyApp extends ConsumerWidget {
       home: userAsyncValue.when(
        data: (user) {
           if (user == null) {
-            return StudentHomePage();///////////
+            return SplashScreen();///////////
           } 
           else {
             if (user.role == 0) {

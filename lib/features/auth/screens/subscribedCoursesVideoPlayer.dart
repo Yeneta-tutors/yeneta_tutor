@@ -31,12 +31,11 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
         setState(() {});
       });
 
-    // Listen for changes in video position
     _controller!.addListener(() {
       if (_controlsVisible) {
         _resetControlsTimer();
       }
-      setState(() {}); // Update the UI to reflect changes
+      setState(() {});
     });
   }
 
@@ -74,6 +73,50 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
     _resetControlsTimer();
   }
 
+  void _showRatingDialog() {
+    double _rating = 0;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Rate this Course"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RatingBar.builder(
+                initialRating: _rating,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemSize: 40.0,
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
+                  _rating = rating;
+                },
+              ),
+              SizedBox(height: 10),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text("Submit"),
+              onPressed: () {
+                // Here you can handle the submitted rating value
+                print("Submitted rating: $_rating");
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,7 +139,7 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
               GestureDetector(
                 onTap: _onVideoTapped,
                 child: Container(
-                  width: MediaQuery.of(context).size.width, // Full width
+                  width: MediaQuery.of(context).size.width,
                   height: _isFullScreen ? MediaQuery.of(context).size.height * 0.75 : 200,
                   alignment: Alignment.center,
                   child: Stack(
@@ -167,7 +210,7 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                         } else {
                           _controller!.play();
                         }
-                        _controlsVisible = true; // Show controls on play
+                        _controlsVisible = true;
                         _resetControlsTimer();
                       });
                     },
@@ -238,11 +281,10 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                     },
                     child: Text('Ask a Question'),
                     style: ElevatedButton.styleFrom(
-                   backgroundColor: const Color.fromARGB(255, 9, 19, 58),
-                  foregroundColor: Colors.white,
-                
-                  textStyle: const TextStyle(fontSize: 12),
-                               ),
+                      backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontSize: 12),
+                    ),
                   ),
                 ],
               ),
@@ -274,7 +316,6 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                     children: [
                       Text('Subject: Physics'),
                       Text('Grade: 11'),
-                      Text('Duration: 35 min'),
                     ],
                   ),
                   Column(
@@ -294,6 +335,16 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                   ),
                 ],
               ),
+              SizedBox(height: 20),
+              // Rate this course button
+              ElevatedButton(
+                onPressed: _showRatingDialog,
+                child: Text("Rate This Course"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                  foregroundColor: Colors.white,
+                ),
+              ),
             ],
           ),
         ),
@@ -302,14 +353,12 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
   }
 }
 
-
-
 class chatWithTeacher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Subscription')),
-      body: Center(child: Text('chat section  Here')),
+      appBar: AppBar(title: Text('Chat with Teacher')),
+      body: Center(child: Text('Chat section Here')),
     );
   }
 }
