@@ -30,15 +30,13 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
   }
 
   Future<void> _loadCourseDetails() async {
-    
     try {
       final course = await ref
           .read(courseControllerProvider)
           .fetchCourseById(widget.courseId);
-           
+
       if (course != null) {
         setState(() {
-         
           _course = course;
           _videoPlayerController =
               VideoPlayerController.networkUrl(Uri.parse(course.demoVideoUrl));
@@ -50,13 +48,6 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
           );
         });
       }
-      print(course?.demoVideoUrl);
-      _videoPlayerController.addListener(() {
-        if (_videoPlayerController.value.hasError) {
-          print(
-              "Video Player Error: ${_videoPlayerController.value.errorDescription}");
-        }
-      });
       await _loadTeacherName(course!.teacherId);
     } catch (e) {
       // Handle failure to fetch course
@@ -79,7 +70,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
         });
       }
     } catch (e) {
-      print('Failed to load teacher details: $e');
+      throw Exception('Failed to load teacher details');
     }
   }
 

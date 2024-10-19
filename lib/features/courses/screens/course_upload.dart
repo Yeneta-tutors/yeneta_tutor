@@ -314,6 +314,7 @@ Future<void> _requestStoragePermission() async {
                       demoVideoUrl: '',
                       price: double.tryParse(_priceController.text) ?? 0.0,
                       thumbnail: '', 
+                      rating: 0.0,
                       createdAt: DateTime.now(),
                       updatedAt: DateTime.now(),
                     );

@@ -11,6 +11,7 @@ class Course {
   String demoVideoUrl;
   double price;
   String? thumbnail; 
+  double? rating;
   DateTime createdAt;
   DateTime updatedAt;
 
@@ -26,6 +27,7 @@ class Course {
     required this.demoVideoUrl,
     required this.price,
     required this.thumbnail,
+    required this.rating,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -44,6 +46,7 @@ class Course {
       'video_url': videoUrl,
       'price': price,
       'thumbnail':thumbnail,
+      'rating': rating,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -56,13 +59,14 @@ class Course {
       teacherId: map['teacher_id'],
       title: map['title'],
       grade: map['grade'], 
-      subject: map['subject'], 
+      subject: map['subject'] ?? '', 
       chapter: map['chapter'], 
       demoVideoUrl: map['demo_video_url'],
       description: map['description'],
       videoUrl: map['video_url'],
       price: map['price'].toDouble(),
       thumbnail: map['thumbnail'],
+      rating: map['rating'] != null ? map['rating'].toDouble() : null,
       createdAt: DateTime.parse(map['created_at']),
       updatedAt: DateTime.parse(map['updated_at']),
        

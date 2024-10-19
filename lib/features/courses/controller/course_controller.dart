@@ -43,7 +43,7 @@ class CourseController {
 
       final newCourse = Course(
         courseId: course.courseId,
-        teacherId: teacher.uid, 
+        teacherId: teacher.uid,
         title: course.title,
         grade: course.grade,
         subject: course.subject,
@@ -53,6 +53,7 @@ class CourseController {
         demoVideoUrl: course.demoVideoUrl,
         price: course.price,
         thumbnail: course.thumbnail,
+        rating: course.rating,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
       );
@@ -80,6 +81,15 @@ class CourseController {
     }
   }
 
+  //Fetch unique subjects
+  Future<List<String>> fetchUniqueSubjects() async {
+    try {
+      return await courseRepository.fetchUniqueSubjects();
+    } catch (e) {
+      throw Exception('Failed to fetch subjects: $e');
+    }
+  }
+
   // Fetch a single course by ID
   Future<Course?> fetchCourseById(String courseId) async {
     try {
@@ -89,8 +99,21 @@ class CourseController {
     }
   }
 
+  // Fetch courses  by subject
+
+  Future<List<Course>> fetchCourseBySubject(String subject) async {
+    try {
+      return await courseRepository.fetchCourseBySubject(subject);
+    } catch (e) {
+      throw Exception('Failed to Fetch course for each suject');
+    }
+  }
+
   // Update a course
-  Future<void> updateCourse(Course course, {required String grade, required String subject, required String chapter}) async {
+  Future<void> updateCourse(Course course,
+      {required String grade,
+      required String subject,
+      required String chapter}) async {
     try {
       await courseRepository.updateCourse(course);
     } catch (e) {
@@ -108,7 +131,8 @@ class CourseController {
   }
 
   // filtered courses
-  Future<List<Course>> fetchFilteredCourses(String grade, String subject, String chapter) async {
+  Future<List<Course>> fetchFilteredCourses(
+      String grade, String subject, String chapter) async {
     try {
       return await courseRepository.fetchFilteredCourses(
         grade: grade,

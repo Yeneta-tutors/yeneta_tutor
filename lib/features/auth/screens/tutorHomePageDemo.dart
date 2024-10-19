@@ -26,37 +26,38 @@ class _TutorHomePageDemoState extends ConsumerState<TutorHomePageDemo> {
     final authcontroller = ref.read(authControllerProvider);
 
     final teacherId = authcontroller.getCurrentUserId();
-    final teacher = authcontroller.getUserData(teacherId);
+    final teacherFuture = authcontroller.getUserData(teacherId);
 
     Future<List<Course>> coursesFuture() async {
       return await courseController.fetchCoursesByTeacherId();
     }
 
-  Future<List<Course>> fetchFilteredCoursesFuture() async {
-  try {
-    if (selectedGrade != null && selectedSubject != null && selectedChapter != null) {
-      final courses = await courseController.fetchFilteredCourses(
-        selectedGrade!, selectedSubject!, selectedChapter!
-      );
-            if (courses.isEmpty) {
-              if(mounted){
-                showSnackBar(context, "No courses found for the selected filters.");
+    Future<List<Course>> fetchFilteredCoursesFuture() async {
+      try {
+        if (selectedGrade != null &&
+            selectedSubject != null &&
+            selectedChapter != null) {
+          final courses = await courseController.fetchFilteredCourses(
+              selectedGrade!, selectedSubject!, selectedChapter!);
+          if (courses.isEmpty) {
+            if (mounted) {
+              showSnackBar(
+                  context, "No courses found for the selected filters.");
+            }
+            return [];
+          }
 
-              }
-        return []; 
+          return courses;
+        } else {
+          print('One or more filters are null');
+          return [];
+        }
+      } catch (e) {
+        print('Error fetching filtered courses: $e');
+        showSnackBar(context, "Error fetching courses.");
+        return [];
       }
-      
-      return courses;
-    } else {
-      print('One or more filters are null');
-      return []; 
     }
-  } catch (e) {
-    print('Error fetching filtered courses: $e');
-    showSnackBar(context, "Error fetching courses.");
-    return []; 
-  }
-}
 
     Future<List<Course>> searchCoursesFuture(String query) async {
       return await courseController.searchCourses(query);
@@ -88,12 +89,38 @@ class _TutorHomePageDemoState extends ConsumerState<TutorHomePageDemo> {
                         radius: 25,
                       ),
                       const SizedBox(width: 10),
-                      Text(
-                        'Welcome, Tutor',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
+                      FutureBuilder<UserModel?>(
+                        future: teacherFuture,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return const Text(
+                              'Error loading user data',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            );
+                          } else if (!snapshot.hasData || snapshot.data == null) {
+                            return const Text(
+                              'User not found',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            );
+                          } else {
+                            final teacher = snapshot.data!;
+                            return Text(
+                              'Welcome ${teacher.firstName}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            );
+                          }
+                        },
                       ),
                       const Spacer(),
                       Stack(
@@ -251,50 +278,50 @@ class _TutorHomePageDemoState extends ConsumerState<TutorHomePageDemo> {
             SizedBox(
               height: 300,
               child: FutureBuilder<List<Course>>(
-                  future: searchQuery.isNotEmpty
-                      ? searchCoursesFuture(searchQuery)
-                      : (selectedGrade != null &&
-                              selectedSubject != null &&
-                              selectedChapter != null)
-                          ? fetchFilteredCoursesFuture()
-                          : coursesFuture(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No courses found.'));
-                    }
-                    return ListView.builder(
-                       shrinkWrap: true, 
-                       physics: NeverScrollableScrollPhysics(), 
-                      scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        final course = snapshot.data![index];
-                        return MyCourseCard(
-                          title: course.title,
-                          subject: course.subject,
-                          grade: course.grade,
-                          chapter: course.chapter,
-                          price: course.price.toString(),
-                          thumbnail: course.thumbnail,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CourseDetailsPage(
-                                  courseId: course.courseId,
-                                ),
+                future: searchQuery.isNotEmpty
+                    ? searchCoursesFuture(searchQuery)
+                    : (selectedGrade != null &&
+                            selectedSubject != null &&
+                            selectedChapter != null)
+                        ? fetchFilteredCoursesFuture()
+                        : coursesFuture(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('No courses found.'));
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final course = snapshot.data![index];
+                      return MyCourseCard(
+                        title: course.title,
+                        subject: course.subject,
+                        grade: course.grade,
+                        chapter: course.chapter,
+                        price: course.price.toString(),
+                        thumbnail: course.thumbnail,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CourseDetailsPage(
+                                courseId: course.courseId,
                               ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -351,13 +378,13 @@ class MyCourseCard extends StatelessWidget {
                       thumbnail!,
                       fit: BoxFit.cover,
                       height: 120,
-                      width: 120,  // Fix the size here
+                      width: 120, // Fix the size here
                     )
                   : Image.asset(
                       'images/yeneta_logo.jpg',
                       fit: BoxFit.cover,
-                      height: 120,  // Provide fixed height and width
-                      width: 120,   // instead of double.infinity
+                      height: 120, // Provide fixed height and width
+                      width: 120, // instead of double.infinity
                     ),
             ),
             SizedBox(width: 12),
