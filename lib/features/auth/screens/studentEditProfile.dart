@@ -22,10 +22,8 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
   String? _email;
   String? _gender;
   String? _phoneNumber;
-  String? _educationalQualification;
   String? _languageSpoken;
-  String? _graduationDepartment;
-  String? _bio;
+  String? _grade;
 
   @override
   void initState() {
@@ -37,10 +35,8 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
       _email = widget.user!.email;
       _gender = widget.user!.gender;
       _phoneNumber = widget.user!.phoneNumber;
-      _educationalQualification = widget.user!.educationalQualification ?? '';
+      _grade = widget.user!.grade;
       // _languageSpoken = (widget.user!.languageSpoken ?? '') as String?;
-      _graduationDepartment = widget.user!.graduationDepartment;
-      _bio = widget.user!.bio;
     }
   }
 
@@ -68,10 +64,8 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
         'email': _email,
         'gender': _gender,
         'phoneNumber': _phoneNumber,
-        'educationalQualification': _educationalQualification,
         'languageSpoken': _languageSpoken,
-        'graduationDepartment': _graduationDepartment,
-        'bio': _bio,
+        'grade':_grade,
       };
       ref.read(authControllerProvider).updateUserProfile(
             uid: widget.user!.uid,
@@ -111,15 +105,13 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                         CircleAvatar(
                           radius: 50.0,
                           backgroundImage: _imageFile != null
-                              ? FileImage(
-                                  _imageFile!) 
+                              ? FileImage(_imageFile!)
                               : (widget.user != null &&
                                       widget.user!.profileImage != null &&
                                       widget.user!.profileImage!.isNotEmpty)
-                                  ? NetworkImage(widget.user!
-                                      .profileImage!) 
+                                  ? NetworkImage(widget.user!.profileImage!)
                                   : NetworkImage(
-                                          "https://via.placeholder.com/150") 
+                                          "https://via.placeholder.com/150")
                                       as ImageProvider,
                         ),
                         IconButton(
@@ -197,17 +189,17 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                             onSaved: (value) => _phoneNumber = value,
                           ),
                           DropdownButtonFormField<String>(
-                            value: _educationalQualification,
+                            value: _grade,
                             decoration: InputDecoration(
-                                labelText: "Educational Qualification"),
-                            items: ["BSc/BA", "MSc/MA", "PhD"]
+                                labelText: "Grade"),
+                            items: ["9", "10", "11", "12"]
                                 .map((qual) => DropdownMenuItem(
                                       child: Text(qual),
                                       value: qual,
                                     ))
                                 .toList(),
                             onChanged: (value) => setState(() {
-                              _educationalQualification = value;
+                              _grade = value;
                             }),
                           ),
                           TextFormField(
@@ -216,18 +208,7 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                                 InputDecoration(labelText: "Language Spoken"),
                             onSaved: (value) => _languageSpoken = value,
                           ),
-                          TextFormField(
-                            initialValue: _graduationDepartment,
-                            decoration: InputDecoration(
-                                labelText: "Graduation Department"),
-                            onSaved: (value) => _graduationDepartment = value,
-                          ),
-                          TextFormField(
-                            initialValue: _bio,
-                            decoration: InputDecoration(labelText: "Bio"),
-                            maxLines: 4,
-                            onSaved: (value) => _bio = value,
-                          ),
+                    
                         ],
                       ),
                     ),
