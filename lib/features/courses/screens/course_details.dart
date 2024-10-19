@@ -6,7 +6,7 @@ import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/courses/screens/course_upload.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
-
+//tutor course details page
 class CourseDetailsPage extends ConsumerStatefulWidget {
   final String courseId;
 

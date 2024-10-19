@@ -59,7 +59,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
             Navigator.pop(context);
           },
         ),
-        title: Text("Yeneta Tutors"),
+        title: Text("Password Reset"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -72,6 +72,9 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                 controller: _oldPasswordController,
                 obscureText: !_oldPasswordVisible,
                 decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                       borderRadius: BorderRadius.circular(10),
+                    ),
                   labelText: "Old Password",
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
@@ -103,6 +106,9 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                 controller: _newPasswordController,
                 obscureText: !_newPasswordVisible,
                 decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                       borderRadius: BorderRadius.circular(10),
+                    ),
                   labelText: "New Password",
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
@@ -137,6 +143,9 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                 controller: _confirmPasswordController,
                 obscureText: !_confirmPasswordVisible,
                 decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                       borderRadius: BorderRadius.circular(10),
+                    ),
                   labelText: "Confirm New Password",
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
@@ -163,10 +172,10 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                 onPressed: _submitForm,
                 child: Text("Submit"),
                 style: ElevatedButton.styleFrom(
+                   backgroundColor: const Color.fromARGB(255, 9, 19, 58),
                   foregroundColor: Colors.white,
-                  backgroundColor: Colors.black,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 32.0, vertical: 12.0), // Text color
+                  minimumSize: const Size(double.infinity, 50), 
+                  textStyle: const TextStyle(fontSize: 18), // Text color
                 ),
               ),
             ],

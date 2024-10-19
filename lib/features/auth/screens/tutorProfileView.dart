@@ -11,7 +11,7 @@ class TutorProfileForStudents extends ConsumerWidget {
     final teacherDataFuture =
         ref.read(authControllerProvider).getUserData(teacherId);
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 9, 19, 58),
         elevation: 0,

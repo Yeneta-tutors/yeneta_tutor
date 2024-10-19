@@ -2,19 +2,14 @@
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:yeneta_tutor/features/auth/screens/studentCourses.dart';
-import 'package:yeneta_tutor/features/auth/screens/studentDetailsPage.dart';
-import 'package:yeneta_tutor/features/auth/screens/studentHomePageDemo.dart';
-import 'package:yeneta_tutor/features/auth/screens/studentProfile.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
+import 'package:yeneta_tutor/features/auth/screens/SubscriptionPlanSelectionPage%20.dart';
+import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
+import 'package:yeneta_tutor/features/auth/screens/studentHome.dart';
+import 'package:yeneta_tutor/features/auth/screens/subscribedCourses.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
-import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorHomePageDemo.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorProfile.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorProfileView.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
 import 'package:yeneta_tutor/firebase_options.dart';
-import 'package:yeneta_tutor/features/auth/screens/studentHome.dart';
 import 'package:yeneta_tutor/screens/splashScreen.dart';
 
 Future<void> main() async {

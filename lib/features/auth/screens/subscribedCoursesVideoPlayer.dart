@@ -1,29 +1,23 @@
 // ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/services.dart';
-import 'package:yeneta_tutor/features/auth/screens/SubscriptionPlanSelectionPage%20.dart';
-import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorProfileView.dart';
-import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
-import 'package:yeneta_tutor/models/course_model.dart';
 
-class CourseDetailsPage extends ConsumerStatefulWidget {
-  String courseId;
-  CourseDetailsPage({required this.courseId});
+class SubscribedCoursesVideoPlayer extends StatefulWidget {
+  final Map<String, dynamic> course;
+
+  SubscribedCoursesVideoPlayer({required this.course});
 
   @override
-  _CourseDetailsPageState createState() => _CourseDetailsPageState();
+  _SubscribedCoursesVideoPlayer createState() => _SubscribedCoursesVideoPlayer();
 }
 
-class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
+class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> {
   VideoPlayerController? _controller;
-  Course? _course;
-  String? _teacherName;
-  String? _profilePic;
   bool _isFullScreen = false;
   bool _controlsVisible = false;
   Timer? _controlsTimer;
@@ -31,52 +25,18 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
   @override
   void initState() {
     super.initState();
-    _loadCourseDetails();
-  }
+    _controller = VideoPlayerController.network(
+      'https://firebasestorage.googleapis.com/v0/b/yeneta-tutor.appspot.com/o/courses%2Fdemo_videos%2F2686c1a7-8164-47b4-834a-a01e6393bae3?alt=media&token=fbd38123-7c3c-48f6-9b78-695203cc428',
+    )..initialize().then((_) {
+        setState(() {});
+      });
 
-  Future<void> _loadCourseDetails() async {
-    try {
-      final course = await ref
-          .read(courseControllerProvider)
-          .fetchCourseById(widget.courseId);
-
-      _course = course!;
-
-      if (_course != null) {
-        _controller = VideoPlayerController.network(_course!.demoVideoUrl)
-          ..initialize().then((_) {
-            setState(() {});
-          });
-
-        _controller!.addListener(() {
-          if (_controlsVisible) {
-            _resetControlsTimer();
-          }
-          setState(() {});
-        });
+    _controller!.addListener(() {
+      if (_controlsVisible) {
+        _resetControlsTimer();
       }
-
-      await _loadTeacherdata(_course!.teacherId);
-    } catch (e) {
-      // Handle the error appropriately
-      print('Failed to load course details: $e');
-    }
-  }
-
-  Future<void> _loadTeacherdata(String teacherId) async {
-    try {
-      final teacher =
-          await ref.read(authControllerProvider).getUserData(teacherId);
-
-      if (teacher != null) {
-        setState(() {
-          _teacherName = teacher.firstName;
-          _profilePic = teacher.profileImage;
-        });
-      }
-    } catch (e) {
-      throw Exception('Failed to load teacher details');
-    }
+      setState(() {});
+    });
   }
 
   void _resetControlsTimer() {
@@ -113,6 +73,50 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
     _resetControlsTimer();
   }
 
+  void _showRatingDialog() {
+    double _rating = 0;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Rate this Course"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RatingBar.builder(
+                initialRating: _rating,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemSize: 40.0,
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
+                  _rating = rating;
+                },
+              ),
+              SizedBox(height: 10),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text("Submit"),
+              onPressed: () {
+                // Here you can handle the submitted rating value
+                print("Submitted rating: $_rating");
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,7 +127,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Course Details'),
+        title: Text('Course Video Player'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -135,10 +139,8 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
               GestureDetector(
                 onTap: _onVideoTapped,
                 child: Container(
-                  width: MediaQuery.of(context).size.width, // Full width
-                  height: _isFullScreen
-                      ? MediaQuery.of(context).size.height * 0.75
-                      : 200,
+                  width: MediaQuery.of(context).size.width,
+                  height: _isFullScreen ? MediaQuery.of(context).size.height * 0.75 : 200,
                   alignment: Alignment.center,
                   child: Stack(
                     alignment: Alignment.center,
@@ -157,19 +159,15 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                           child: Column(
                             children: [
                               Slider(
-                                value: _controller!.value.position.inSeconds
-                                    .toDouble(),
+                                value: _controller!.value.position.inSeconds.toDouble(),
                                 min: 0,
-                                max: _controller!.value.duration.inSeconds
-                                    .toDouble(),
+                                max: _controller!.value.duration.inSeconds.toDouble(),
                                 onChanged: (value) {
-                                  _controller!
-                                      .seekTo(Duration(seconds: value.toInt()));
+                                  _controller!.seekTo(Duration(seconds: value.toInt()));
                                 },
                               ),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "${_controller!.value.position.inMinutes}:${(_controller!.value.position.inSeconds % 60).toString().padLeft(2, '0')}",
@@ -194,11 +192,9 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                   IconButton(
                     icon: Icon(Icons.fast_rewind),
                     onPressed: () {
-                      if (_controller != null) {
-                        _controller!.seekTo(
-                          _controller!.value.position - Duration(seconds: 5),
-                        );
-                      }
+                      _controller!.seekTo(
+                        _controller!.value.position - Duration(seconds: 5),
+                      );
                     },
                   ),
                   IconButton(
@@ -214,7 +210,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                         } else {
                           _controller!.play();
                         }
-                        _controlsVisible = true; // Show controls on play
+                        _controlsVisible = true;
                         _resetControlsTimer();
                       });
                     },
@@ -239,16 +235,16 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage(_profilePic != null
-                        ? '$_profilePic'
-                        : 'images/yeneta_logo.jpg'),
+                    backgroundImage: NetworkImage(
+                      'images/avator_image.png',
+                    ),
                   ),
                   SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _teacherName ?? 'Loading...',
+                        'Esubalew K.',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -259,8 +255,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  TutorProfileForStudents(_course!.teacherId),
+                              builder: (context) => TutorProfileForStudents(),
                             ),
                           );
                         },
@@ -280,11 +275,16 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SubscriptionPlanSelectionPage(),
+                          builder: (context) => chatWithTeacher(),
                         ),
                       );
                     },
-                    child: Text('Subscribe'),
+                    child: Text('Ask a Question'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontSize: 12),
+                    ),
                   ),
                 ],
               ),
@@ -299,7 +299,11 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
               ),
               SizedBox(height: 10),
               Text(
-                 _course?.description ?? 'Loading description...',
+                'Unlock the foundational principles of physics with our '
+                'comprehensive lecture on Chapter 1 of the Ethiopian Grade 11 '
+                'Physics syllabus. This course covers the core topics of Physical '
+                'World and Measurement, providing students with a solid understanding '
+                'of fundamental physics concepts.',
                 style: TextStyle(fontSize: 14),
               ),
               SizedBox(height: 20),
@@ -310,8 +314,8 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_course?.subject?? 'subject'),
-                      Text('Grade: ${_course?.grade??'grade'} '),
+                      Text('Subject: Physics'),
+                      Text('Grade: 11'),
                     ],
                   ),
                   Column(
@@ -331,10 +335,30 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                   ),
                 ],
               ),
+              SizedBox(height: 20),
+              // Rate this course button
+              ElevatedButton(
+                onPressed: _showRatingDialog,
+                child: Text("Rate This Course"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                  foregroundColor: Colors.white,
+                ),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class chatWithTeacher extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Chat with Teacher')),
+      body: Center(child: Text('Chat section Here')),
     );
   }
 }
