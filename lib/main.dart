@@ -1,3 +1,5 @@
+// ignore_for_file: unrelated_type_equality_checks
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/features/auth/screens/studentCourses.dart';
@@ -42,7 +44,7 @@ class MyApp extends ConsumerWidget {
       home: userAsyncValue.when(
        data: (user) {
           if (user == null) {
-            return SplashScreen();///////////
+            return SplashScreen();
           } 
           else {
             if (user.role == 0) {
