@@ -75,15 +75,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - images/maths_thumbnail.jpg
-    - images/english_thumbnail.png
-    - images/physics_thumbnail 5.png
-    - images/chemistry_thumbnail.png
-    - images/biology_thumbnail.png
-    - images/economics_thumbnail.png
-    - images/geography_thumbnail.png
-    - images/history_thumbnail.png
-    - images/ict_thumbnail.png
+    - images/
+   
     
 
   # An image asset can refer to one or more resolution-specific "variants", see
