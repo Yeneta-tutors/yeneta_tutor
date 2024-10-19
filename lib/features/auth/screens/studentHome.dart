@@ -4,6 +4,8 @@ import 'package:yeneta_tutor/features/auth/screens/studentProfile.dart';
 
 
 class StudentHomePage extends StatefulWidget {
+  const StudentHomePage({super.key});
+
   @override
   _StudentHomePageState createState() => _StudentHomePageState();
 }
