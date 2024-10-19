@@ -239,17 +239,20 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                           DropdownButtonFormField<String>(
                             value: _grade,
                             decoration: InputDecoration(
-                                 ))
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              labelText: "Grade",
+                            ),
+                            items: ["9", "10", "11", "12"]
+                                .map((grade) => DropdownMenuItem(
+                                      child: Text(grade),
+                                      value: grade,
+                                    ))
                                 .toList(),
                             onChanged: (value) => setState(() {
-                              _educationalQualification = value;
+                              _grade = value;
                             }),
-                          ),
-                      TextFormField(
-                            initialValue: _languageSpoken,
-                            decoration:
-                                InputDecoration(labelText: "Language Spoken"),
-       
                           ),
                         ],
                       ),
