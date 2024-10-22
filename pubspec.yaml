@@ -55,6 +55,7 @@ dependencies:
   url_launcher: ^6.3.1
   firebase_dynamic_links: ^6.0.8
   chapa_unofficial: ^0.0.5
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
