@@ -126,7 +126,7 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                         builder: (context, teacherSnapshot) {
                           if (teacherSnapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return CircularProgressIndicator(); // Show loading state for teacher data
+                            return Text("Loading"); // Show loading state for teacher data
                           } else if (teacherSnapshot.hasError) {
                             return Text('Error loading teacher data');
                           } else if (!teacherSnapshot.hasData) {
