@@ -280,7 +280,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SubscriptionPlanSelectionPage(),
+                          builder: (context) => SubscriptionPlanSelectionPage(_course!.courseId),
                         ),
                       );
                     },
