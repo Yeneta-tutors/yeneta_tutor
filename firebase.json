@@ -1,1 +1,35 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"yeneta-tutor","appId":"1:962677109525:android:33dbffa6b8af0ed37daf1c","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"yeneta-tutor","configurations":{"android":"1:962677109525:android:33dbffa6b8af0ed37daf1c","ios":"1:962677109525:ios:c986a809387bec6b7daf1c","web":"1:962677109525:web:8426eede421983437daf1c"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "yeneta-tutor",
+          "appId": "1:962677109525:android:33dbffa6b8af0ed37daf1c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "yeneta-tutor",
+          "configurations": {
+            "android": "1:962677109525:android:33dbffa6b8af0ed37daf1c",
+            "ios": "1:962677109525:ios:c986a809387bec6b7daf1c",
+            "web": "1:962677109525:web:8426eede421983437daf1c"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ]
+    }
+  ]
+}
