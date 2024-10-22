@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
+import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 
-class SubscriptionPlanSelectionPage extends StatefulWidget {
+class SubscriptionPlanSelectionPage extends ConsumerStatefulWidget {
+  String courseId;
+  SubscriptionPlanSelectionPage(this.courseId, {super.key});
+
   @override
   _SubscriptionPlanSelectionPageState createState() =>
       _SubscriptionPlanSelectionPageState();
 }
 
 class _SubscriptionPlanSelectionPageState
-    extends State<SubscriptionPlanSelectionPage> {
+    extends ConsumerState<SubscriptionPlanSelectionPage> {
   int selectedPlanIndex = 0;
   double pricePerMonth = 200.0;
   double totalPrice = 200.0;
@@ -23,6 +29,37 @@ class _SubscriptionPlanSelectionPageState
         totalPrice = pricePerMonth * 12;
       }
     });
+  }
+
+  Future<void> _subscribeAndPay() async {
+    final subscriptionController = ref.read(subscriptionControllerProvider);
+    String? studentId = ref.read(authControllerProvider).getCurrentUserId();
+    // Pass the course id accordingly
+    String subscriptionType = selectedPlanIndex == 0
+        ? '1 month'
+        : selectedPlanIndex == 1
+            ? '6 months'
+            : '1 year';
+    DateTime startDate = DateTime.now();
+  
+    DateTime endDate;
+    if (selectedPlanIndex == 0) {
+    endDate = DateTime(startDate.year, startDate.month + 1, startDate.day);
+  } else if (selectedPlanIndex == 1) {
+    endDate = DateTime(startDate.year, startDate.month + 6, startDate.day);
+  } else {
+    endDate = DateTime(startDate.year + 1, startDate.month, startDate.day);
+  }
+
+    await subscriptionController.createSubscriptionAndPay(
+      studentId: studentId,
+      courseId: widget.courseId,
+      subscriptionType: subscriptionType,
+      amount: totalPrice.toString(),
+      startDate: startDate,    // Pass the start date
+      endDate: endDate, 
+      context: context, 
+    );
   }
 
   @override
@@ -41,7 +78,6 @@ class _SubscriptionPlanSelectionPageState
         elevation: 0,
       ),
       body: Padding(
-        
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -141,8 +177,7 @@ class _SubscriptionPlanSelectionPageState
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Implement the navigation to another page here
-                      print("Payment method selected: Chapa");
+                      _subscribeAndPay();
                     },
                     child: Container(
                       margin: EdgeInsets.all(8.0),
