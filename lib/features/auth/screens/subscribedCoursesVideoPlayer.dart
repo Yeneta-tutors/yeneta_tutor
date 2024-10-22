@@ -252,12 +252,12 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TutorProfileForStudents(),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => TutorProfileForStudents(course:course),
+                          //   ),
+                          // );
                         },
                         child: Text(
                           'View Profile',
