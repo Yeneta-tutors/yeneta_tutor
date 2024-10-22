@@ -24,7 +24,6 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
   String? _phoneNumber;
   String? _grade;
 
-
   @override
   void initState() {
     super.initState();
@@ -107,7 +106,7 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                                       widget.user!.profileImage!.isNotEmpty)
                                   ? NetworkImage(widget.user!.profileImage!)
                                   : NetworkImage(
-                                          "https://via.placeholder.com/150") 
+                                          "https://via.placeholder.com/150")
                                       as ImageProvider,
                         ),
                         IconButton(
@@ -121,14 +120,13 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                         
                           TextFormField(
                             initialValue: _firstName,
-                            decoration:
-                                InputDecoration(
-                                  border: OutlineInputBorder(
-                       borderRadius: BorderRadius.circular(10),
-                    ),labelText: "First Name"),
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                labelText: "First Name"),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Please enter first name";
@@ -140,13 +138,12 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                           SizedBox(height: 16.0),
                           TextFormField(
                             initialValue: _middleName,
-                            decoration:
-                                InputDecoration(
-                                  border: OutlineInputBorder(
-                       borderRadius: BorderRadius.circular(10),
-                    )
-                                  ,labelText: "Middle Name"),
-                                validator: (value) {
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                labelText: "Middle Name"),
+                            validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Please enter middle name";
                               }
@@ -158,10 +155,10 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                           TextFormField(
                             initialValue: _lastName,
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                       borderRadius: BorderRadius.circular(10),
-                    )
-                              ,labelText: "Last Name"),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                labelText: "Last Name"),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Please enter last name";
@@ -174,10 +171,10 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                           TextFormField(
                             initialValue: _email,
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                       borderRadius: BorderRadius.circular(10),
-                    )
-                              ,labelText: "Email"),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                labelText: "Email"),
                             validator: (value) {
                               if (value == null ||
                                   value.isEmpty ||
@@ -193,11 +190,11 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                           DropdownButtonFormField<String>(
                             value: _gender,
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                       borderRadius: BorderRadius.circular(10),
-                    )
-                              ,labelText: "Gender"),
-                             validator: (value) {
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                labelText: "Gender"),
+                            validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Please select your gender";
                               }
@@ -216,12 +213,11 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                           SizedBox(height: 16.0),
                           TextFormField(
                             initialValue: _phoneNumber,
-                            decoration:
-                                InputDecoration(
-                                  border: OutlineInputBorder(
-                       borderRadius: BorderRadius.circular(10),
-                    )
-                                  ,labelText: "Phone Number"),
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                labelText: "Phone Number"),
                             keyboardType: TextInputType.phone,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -254,6 +250,18 @@ class _StudentEditProfilePage extends ConsumerState<StudentEditProfilePage> {
                               _grade = value;
                             }),
                           ),
+                          SizedBox(height: 16.0),
+                          ElevatedButton(
+                            onPressed: _saveProfile,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 9, 19, 58),
+                              foregroundColor: Colors.white,
+                              minimumSize: const Size(double.infinity, 50),
+                              textStyle: const TextStyle(fontSize: 18),
+                            ),
+                            child: Text("Save Profile"),
+                          )
                         ],
                       ),
                     ),
