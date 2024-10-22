@@ -153,7 +153,6 @@ class CourseRepository {
     }
   }
 
-// sear
   // Update a course
   Future<void> updateCourse(Course course) async {
     try {
