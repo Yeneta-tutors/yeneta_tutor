@@ -1,4 +1,3 @@
-
 class Subscription {
   String subscriptionId;
   String studentId;
@@ -8,6 +7,8 @@ class Subscription {
   String chapaTransactionId; 
   DateTime startDate;
   DateTime endDate;
+  double price; 
+  String currency; 
 
   Subscription({
     required this.subscriptionId,
@@ -18,9 +19,10 @@ class Subscription {
     required this.chapaTransactionId,
     required this.startDate,
     required this.endDate,
+    required this.price, 
+    required this.currency, 
   });
 
-  // Convert a Subscription instance to a Map
   Map<String, dynamic> toMap() {
     return {
       'subscription_id': subscriptionId,
@@ -31,10 +33,11 @@ class Subscription {
       'chapa_transaction_id': chapaTransactionId,
       'start_date': startDate.toIso8601String(),
       'end_date': endDate.toIso8601String(),
+      'price': price, 
+      'currency': currency, 
     };
   }
 
-  // Convert a Map to a Subscription instance
   factory Subscription.fromMap(Map<String, dynamic> map) {
     return Subscription(
       subscriptionId: map['subscription_id'],
@@ -45,6 +48,8 @@ class Subscription {
       chapaTransactionId: map['chapa_transaction_id'],
       startDate: DateTime.parse(map['start_date']),
       endDate: DateTime.parse(map['end_date']),
+      price: map['price'], 
+      currency: map['currency'],
     );
   }
 }
