@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class PaymentFailedScreen extends StatelessWidget {
   final String errorMessage;
 
-  PaymentFailedScreen({required this.errorMessage});  // Accept error message as a parameter
+  PaymentFailedScreen({required this.errorMessage, required String errorMsg});  // Accept error message as a parameter
 
   @override
   Widget build(BuildContext context) {
