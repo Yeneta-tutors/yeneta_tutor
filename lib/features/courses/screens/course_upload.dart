@@ -315,6 +315,7 @@ Future<void> _requestStoragePermission() async {
                       price: double.tryParse(_priceController.text) ?? 0.0,
                       thumbnail: '', 
                       rating: 0.0,
+                      numRating: 0,
                       createdAt: DateTime.now(),
                       updatedAt: DateTime.now(),
                     );
