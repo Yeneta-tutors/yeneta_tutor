@@ -54,6 +54,7 @@ class CourseController {
         price: course.price,
         thumbnail: course.thumbnail,
         rating: course.rating,
+        numRating: course.numRating,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
       );
@@ -151,6 +152,14 @@ class CourseController {
       return await courseRepository.searchCourses(query);
     } catch (e) {
       throw Exception('Failed to search courses: $e');
+    }
+  }
+
+  Future<void> updateRating(String courseId, double newRating) async {
+    try {
+      await courseRepository.updateCourseRating(courseId, newRating);
+    } catch (e) {
+      throw Exception('Error in updating rating');
     }
   }
 
