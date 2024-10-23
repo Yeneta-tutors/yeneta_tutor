@@ -227,7 +227,7 @@ Future<void> _requestStoragePermission() async {
                 },
                 child: Text('Select Demo Video'),
               ),
-
+              const SizedBox(height: 24),
               // Select Course Video Button
               ElevatedButton(
                 onPressed: () async {
@@ -240,7 +240,7 @@ Future<void> _requestStoragePermission() async {
                 },
                 child: Text('Select Course Video'),
               ),
-
+                   const SizedBox(height: 24),
               // Select Thumbnail Image Button
               ElevatedButton(
                 onPressed: () async {

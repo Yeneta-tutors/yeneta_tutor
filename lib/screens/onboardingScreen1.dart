@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/screens/onboardingScreen2.dart';
 import 'package:yeneta_tutor/screens/onboardingScreen3.dart';
+import 'package:yeneta_tutor/screens/onboardingScreen4.dart';
 
 class OnboardingScreen1 extends StatelessWidget {
   @override
@@ -29,7 +30,7 @@ class OnboardingScreen1 extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              OnboardingScreen3(), // The next screen in the sequence
+                              OnboardingScreen4(), 
                         ),
                       );
                     },
@@ -52,7 +53,7 @@ class OnboardingScreen1 extends StatelessWidget {
 
               // Title and description
               const Text(
-                'Online Learning',
+                'Welcome to Yeneta Tutor',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -61,8 +62,8 @@ class OnboardingScreen1 extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Monitor your progress, receive feedback from students, and '
-                'continuously improve your tutoring skills to achieve exceptional results.',
+                'Join a vibrant learning community where knowledge is shared and skills are built.'
+                ' Whether you are here to teach or to learn, you have come to the right place.',
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),

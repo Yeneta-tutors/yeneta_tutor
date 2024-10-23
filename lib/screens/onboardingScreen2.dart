@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/screens/onboardingScreen1.dart';
 import 'package:yeneta_tutor/screens/onboardingScreen3.dart';
+import 'package:yeneta_tutor/screens/onboardingScreen4.dart';
 
 class OnboardingScreen2 extends StatelessWidget {
   @override
@@ -29,13 +30,13 @@ class OnboardingScreen2 extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Handle skip action
-                  //      Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const Signup(), 
-                  //   ),
-                  // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              OnboardingScreen4(), 
+                        ),
+                      );
                     },
                     child: const Text('Skip'),
                   ),
@@ -56,7 +57,7 @@ class OnboardingScreen2 extends StatelessWidget {
               
               // Title and description
               const Text(
-                'Learn from Anytime',
+                'Teach and Learn, Anytime, Anywhere',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -65,8 +66,8 @@ class OnboardingScreen2 extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Utilize interactive teaching methods, personalized learning plans, '
-                'and innovative resources to create engaging tutoring experiences.',
+                'Access or offer high-quality courses at your own pace. Whether '
+                'you are creating courses or diving into new subjects, flexibility is at your fingertips.',
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),

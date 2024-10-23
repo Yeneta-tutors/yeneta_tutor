@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 
@@ -106,9 +107,13 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
-                    }
-                    return null;
+                                return "Please enter phone number";
+                              }
+                              // Check if the input is a number
+                              if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                                return "Please enter a valid phone number (digits only)";
+                              }
+                              return null;
                   },
                 ),
                 const SizedBox(height: 16),
@@ -299,10 +304,27 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
+                      style: TextButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                 minimumSize: Size(150, 50), // Button background color
+                                foregroundColor: Color.fromRGBO(9, 19, 58, 1), // Text color (blue-black)
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8), // Slightly curved edges
+                                  side: BorderSide(color: Color.fromRGBO(9, 19, 58, 1), width: 2), // Border color and width
+                                ),
+                              ),
                       child: const Text("Back"),
                     ),
                     ElevatedButton(
                       onPressed: _validateAndSubmit,
+                      style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromRGBO(9, 19, 58, 1), // Blue-black background color
+                            foregroundColor: Colors.white, // White text color
+                            minimumSize: Size(150, 50), // Ensures consistent size
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8), // Slightly curved edges
+                            ),
+                          ),
                       child: const Text("Sign Up"),
                     ),
                   ],
@@ -310,7 +332,12 @@ class _TutorSignUpPageTwoState extends ConsumerState<TutorSignUpPage2> {
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: () {
-                    // Navigate to login page
+                     Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
                   },
                   child: const Text("Already have an account? Log in"),
                 ),
