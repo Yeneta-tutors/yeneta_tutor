@@ -167,15 +167,33 @@ class _StudentSignUpPageOneState extends State<StudentSignUpPage1> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Back"),
-                    ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                 minimumSize: Size(150, 50), // Button background color
+                                foregroundColor: Color.fromRGBO(9, 19, 58, 1), // Text color (blue-black)
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8), // Slightly curved edges
+                                  side: BorderSide(color: Color.fromRGBO(9, 19, 58, 1), width: 2), // Border color and width
+                                ),
+                              ),
+                              child: const Text("Back"),
+                            ),
                     ElevatedButton(
-                      onPressed: _validateAndProceed,
-                      child: const Text("NEXT"),
-                    ),
+                          onPressed: _validateAndProceed,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromRGBO(9, 19, 58, 1), // Blue-black background color
+                            foregroundColor: Colors.white, // White text color
+                            minimumSize: Size(150, 50), // Ensures consistent size
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8), // Slightly curved edges
+                            ),
+                          ),
+                          child: const Text("NEXT"),
+                        )
+
                   ],
                 ),
                 const SizedBox(height: 10),

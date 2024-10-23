@@ -3,6 +3,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:yeneta_tutor/features/admin/admin_sidebar.dart';
+import 'package:yeneta_tutor/features/admin/dashboard.dart';
+import 'package:yeneta_tutor/features/admin/userManagement.dart';
+import 'package:yeneta_tutor/features/admin/userProfile.dart';
 import 'package:yeneta_tutor/features/auth/screens/PaymentSuccessScreen.dart';
 import 'package:yeneta_tutor/features/auth/screens/SubscriptionPlanSelectionPage%20.dart';
 import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
@@ -11,6 +15,7 @@ import 'package:yeneta_tutor/features/auth/screens/subscribedCourses.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
+import 'package:yeneta_tutor/features/auth/screens/tutorProfile.dart';
 import 'package:yeneta_tutor/firebase_options.dart';
 import 'package:yeneta_tutor/screens/splashScreen.dart';
 import 'package:chapa_unofficial/chapa_unofficial.dart';
@@ -22,9 +27,11 @@ Future<void> main() async {
   );
   await dotenv.load(fileName: ".env");
   String chapaApiKey = dotenv.env['CHAPA_API_KEY'] ?? '';
-  Chapa.configure(privateKey: chapaApiKey);
+  Chapa.configure(privateKey:  chapaApiKey);
   runApp(const ProviderScope(child: MyApp()));
 }
+
+
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -43,7 +50,7 @@ class MyApp extends ConsumerWidget {
       home: userAsyncValue.when(
         data: (user) {
           if (user == null) {
-            return SplashScreen();
+            return SplashScreen();//
           } else {
             if (user.role == 0) {
               return StudentHomePage();

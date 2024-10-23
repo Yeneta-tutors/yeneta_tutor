@@ -285,6 +285,11 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                       );
                     },
                     child: Text('Subscribe'),
+                    style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                  foregroundColor: Colors.white, 
+                  textStyle: const TextStyle(fontSize: 14),
+                ),
                   ),
                 ],
               ),

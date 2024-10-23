@@ -81,7 +81,7 @@ class _OnboardingScreenThreeState extends State<OnboardingScreen4> {
 
               // Title and description
               const Text(
-                'Join the Tutoring Community',
+                'Get Started with Confidence',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -90,8 +90,8 @@ class _OnboardingScreenThreeState extends State<OnboardingScreen4> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Become part of a vibrant community of passionate tutors, share knowledge, '
-                'and collaborate with like-minded educators.',
+                'Sign up as a tutor to share your expertise, or as a student to'
+                'expand your knowledge. Select your path and begin your journey!',
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
@@ -153,8 +153,10 @@ class _OnboardingScreenThreeState extends State<OnboardingScreen4> {
                 onPressed: navigateToSignUp,
                 child: Text('NEXT'),
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50), // Full-width button
-                  textStyle: TextStyle(fontSize: 18),
+                   backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50), 
+                  textStyle: const TextStyle(fontSize: 18),
                 ),
               ),
 

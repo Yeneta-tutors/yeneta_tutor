@@ -166,10 +166,27 @@ class _TutorSignUpPageOneState extends State<TutortSignUpPage1> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
+                           style: TextButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                 minimumSize: Size(150, 50), // Button background color
+                                foregroundColor: Color.fromRGBO(9, 19, 58, 1), // Text color (blue-black)
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8), // Slightly curved edges
+                                  side: BorderSide(color: Color.fromRGBO(9, 19, 58, 1), width: 2), // Border color and width
+                                ),
+                              ),
                       child: const Text("Back"),
                     ),
                     ElevatedButton(
                       onPressed: _validateAndProceed,
+                      style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromRGBO(9, 19, 58, 1), // Blue-black background color
+                            foregroundColor: Colors.white, // White text color
+                            minimumSize: Size(150, 50), // Ensures consistent size
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8), // Slightly curved edges
+                            ),
+                          ),
                       child: const Text("NEXT"),
                     ),
                   ],

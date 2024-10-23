@@ -68,12 +68,12 @@ class _StudentHomePageState extends State<StudentHomePage> {
         currentIndex: _selectedIndex,
 
         selectedItemColor: Colors.brown, // Icon color when selected
-        unselectedItemColor: Colors.white, // Icon color when not selected
-        backgroundColor: const Color.fromRGBO(9, 15, 44, 1), // Dark blue background
-        selectedFontSize: 14, // Larger text when selected
-        unselectedFontSize: 12, // Smaller text when not selected
+        unselectedItemColor: Colors.white, 
+        backgroundColor: const Color.fromRGBO(9, 15, 44, 1), 
+        selectedFontSize: 14, 
+        unselectedFontSize: 12, 
         iconSize: 30, // Larger icon size
-        onTap: _onItemTapped, // Handle tap on the nav bar
+        onTap: _onItemTapped, 
       ),
     );
   }

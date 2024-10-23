@@ -13,7 +13,7 @@ class OnboardingScreen3 extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Skip button at the top right
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -58,7 +58,7 @@ class OnboardingScreen3 extends StatelessWidget {
               
               // Title and description
               const Text(
-                'Join the Tutoring Community',
+                'Engage and Interact',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -67,8 +67,8 @@ class OnboardingScreen3 extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Utilize interactive teaching methods, personalized learning plans, '
-                'and innovative resources to create engaging tutoring experiences.',
+                'Connect with learners or tutors. As a student, ask questions directly; '
+                'as a tutor, guide your students to success with real-time interactions',
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),

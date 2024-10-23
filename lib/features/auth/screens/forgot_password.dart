@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
 import 'package:yeneta_tutor/widgets/text_field.dart';
 import 'package:yeneta_tutor/widgets/button.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
@@ -71,6 +72,26 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 text: "Send",
                 
               ),
+              ElevatedButton(
+                      onPressed: () {
+                  // Navigate to the next screen or complete onboarding
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(), 
+                    ),
+                  );
+                },
+                      style: ElevatedButton.styleFrom(
+                            backgroundColor: Color.fromRGBO(255, 255, 255, 1), // Blue-black background color
+                            foregroundColor: Color.fromRGBO(9, 19, 58, 1), // White text color
+                            minimumSize: Size(150, 50), // Ensures consistent size
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8), // Slightly curved edges
+                            ),
+                          ),
+                      child: const Text("Log in"),
+                    ),
             ],
           ),
         ),

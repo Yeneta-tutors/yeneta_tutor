@@ -106,9 +106,13 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
-                    }
-                    return null;
+                                return "Please enter phone number";
+                              }
+                              // Check if the input is a number
+                              if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                                return "Please enter a valid phone number (digits only)";
+                              }
+                              return null;
                   },
                 ),
 
@@ -243,6 +247,12 @@ class _StudentSignUpPageTwoState extends ConsumerState<StudentSignUpPage2> {
                 ElevatedButton(
                   onPressed: _validateAndSubmit,
                   child: const Text("Sign Up"),
+                  style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50), // Full-width button
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
                 ),
               ],
             ),

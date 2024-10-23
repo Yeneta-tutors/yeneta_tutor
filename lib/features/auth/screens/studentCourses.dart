@@ -315,6 +315,7 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
 
 // Filter Dialog
 class FilterDialog extends StatefulWidget {
+  
   @override
   _FilterDialogState createState() => _FilterDialogState();
 }

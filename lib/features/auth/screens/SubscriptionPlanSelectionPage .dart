@@ -214,7 +214,7 @@ class _SubscriptionPlanSelectionPageState
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         decoration: BoxDecoration(
-          color: selectedPlanIndex == index ? Colors.blue[900] : Colors.white,
+          color: selectedPlanIndex == index ? const Color.fromARGB(255, 9, 19, 58) : Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
