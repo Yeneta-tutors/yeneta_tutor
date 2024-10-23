@@ -25,11 +25,13 @@ class Message {
 
   factory Message.fromMap(Map<String, dynamic> map) {
     return Message(
-      messageId: map['messageId'],
-      chatId: map['chatId'],
-      senderId: map['senderId'],
-      message: map['message'],
-      createdAt: DateTime.parse(map['createdAt']),
+      messageId: map['messageId'] ?? 'unknown', 
+      chatId: map['chatId'] ?? 'unknown', 
+      senderId: map['senderId'] ?? 'unknown', 
+      message: map['message'] ?? 'No message', 
+      createdAt: map['createdAt'] != null
+          ? DateTime.parse(map['createdAt'])
+          : DateTime.now(), 
     );
   }
 }
