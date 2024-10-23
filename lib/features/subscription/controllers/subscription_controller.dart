@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
+import 'package:yeneta_tutor/features/auth/screens/PaymentFailedScreen.dart';
+import 'package:yeneta_tutor/features/auth/screens/PaymentSuccessScreen.dart';
 import 'package:yeneta_tutor/features/subscription/repository/subscription_repositoy.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 import 'package:yeneta_tutor/models/subscription_model.dart';
@@ -74,26 +76,29 @@ class SubscriptionController {
           txRef: txRef,
           email: "ephremhabtmu@gmail.com",
           onInAppPaymentSuccess: (successMsg) {
-            print('Payment successful: $successMsg');
-            // Show success message in snackbar
-            showSnackBar(context, successMsg);
-            // Proceed with payment success handling (e.g., update Firestore)
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    PaymentSuccessScreen(),
+              ),
+            );
             _handlePaymentSuccess(txRef);
           },
           onInAppPaymentError: (errorMsg) {
-            print('Raw Payment Error Response: $errorMsg');
-
-            print('Payment error: $errorMsg');
-            // Show error message in snackbar
-            showSnackBar(context, errorMsg);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                         PaymentFailedScreen(errorMessage: errorMsg, errorMsg: '',)));
           });
     } catch (e) {
       if (e is NetworkException) {
-        print('Network error: $e'); // Just print the exception directly.
+        print('Network error: $e');
         showSnackBar(context,
             'Network error: Please check your connection and try again.');
       } else {
-        print('Unexpected error: $e'); // Catch any other unexpected exceptions.
+        print('Unexpected error: $e');
         showSnackBar(
             context, 'An unexpected error occurred. Please try again.');
       }
