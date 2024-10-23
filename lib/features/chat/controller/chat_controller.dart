@@ -24,9 +24,8 @@ class ChatController {
     required this.ref,
   });
 
-  Future<String> createChat(String tutorId) async {
-    final String studentId = authRepository.getCurrentUserId();
-    
+  Future<String> createChat(String tutorId, String studentId) async {
+        
     return await chatRepository.createChat(studentId, tutorId);
   }
 
@@ -40,10 +39,9 @@ class ChatController {
     await chatRepository.sendMessage(chatId, senderId, message);
   }
 
-  Stream<List<Chat>> getUserChats() {
+  Stream<List<Chat>> getAllChats() {
     final String userId = authRepository.getCurrentUserId();
-
-    return chatRepository.getUserChats(userId);
+    return chatRepository.getAllChats(userId); 
   }
 
   Stream<List<Message>> getMessages(String chatId) {

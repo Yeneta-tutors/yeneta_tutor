@@ -1,29 +1,26 @@
 // ignore_for_file: deprecated_member_use
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/services.dart';
+import 'package:yeneta_tutor/features/student/SubscriptionPlanSelectionPage%20.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorProfileView.dart';
-import 'package:yeneta_tutor/features/chat/screens/chat_screen.dart';
+import 'package:yeneta_tutor/features/tutor/tutorProfileView.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 
-class SubscribedCoursesVideoPlayer extends ConsumerStatefulWidget {
-  final String courseId;
-  SubscribedCoursesVideoPlayer({required this.courseId});
+class CourseDetailsPage extends ConsumerStatefulWidget {
+  String courseId;
+  CourseDetailsPage({required this.courseId});
 
   @override
-  _SubscribedCoursesVideoPlayer createState() =>
-      _SubscribedCoursesVideoPlayer();
+  _CourseDetailsPageState createState() => _CourseDetailsPageState();
 }
 
-class _SubscribedCoursesVideoPlayer
-    extends ConsumerState<SubscribedCoursesVideoPlayer> {
+class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
   VideoPlayerController? _controller;
   Course? _course;
   String? _teacherName;
@@ -47,7 +44,7 @@ class _SubscribedCoursesVideoPlayer
       _course = course!;
 
       if (_course != null) {
-        _controller = VideoPlayerController.network(_course!.videoUrl)
+        _controller = VideoPlayerController.network(_course!.demoVideoUrl)
           ..initialize().then((_) {
             setState(() {});
           });
@@ -117,60 +114,6 @@ class _SubscribedCoursesVideoPlayer
     _resetControlsTimer();
   }
 
-  void _showRatingDialog() {
-    double _rating = 0;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Rate this Course"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RatingBar.builder(
-                initialRating: _rating,
-                minRating: 1,
-                direction: Axis.horizontal,
-                allowHalfRating: true,
-                itemCount: 5,
-                itemSize: 40.0,
-                itemBuilder: (context, _) => Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                ),
-                onRatingUpdate: (rating) {
-                  _rating = rating;
-                },
-              ),
-              SizedBox(height: 10),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: Text("Submit"),
-              onPressed: () {
-                _updateCourseRating(_rating);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _updateCourseRating(double rating) async {
-    try {
-      await ref
-          .read(courseControllerProvider)
-          .updateRating(widget.courseId, rating);
-      print('Rating updated successfully');
-    } catch (e) {
-      throw Exception('Error in update reating');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,7 +124,7 @@ class _SubscribedCoursesVideoPlayer
             Navigator.pop(context);
           },
         ),
-        title: Text('Course Video Player'),
+        title: Text('Course Details'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -193,7 +136,7 @@ class _SubscribedCoursesVideoPlayer
               GestureDetector(
                 onTap: _onVideoTapped,
                 child: Container(
-                  width: MediaQuery.of(context).size.width,
+                  width: MediaQuery.of(context).size.width, // Full width
                   height: _isFullScreen
                       ? MediaQuery.of(context).size.height * 0.75
                       : 200,
@@ -252,9 +195,11 @@ class _SubscribedCoursesVideoPlayer
                   IconButton(
                     icon: Icon(Icons.fast_rewind),
                     onPressed: () {
-                      _controller!.seekTo(
-                        _controller!.value.position - Duration(seconds: 5),
-                      );
+                      if (_controller != null) {
+                        _controller!.seekTo(
+                          _controller!.value.position - Duration(seconds: 5),
+                        );
+                      }
                     },
                   ),
                   IconButton(
@@ -270,7 +215,7 @@ class _SubscribedCoursesVideoPlayer
                         } else {
                           _controller!.play();
                         }
-                        _controlsVisible = true;
+                        _controlsVisible = true; // Show controls on play
                         _resetControlsTimer();
                       });
                     },
@@ -304,7 +249,7 @@ class _SubscribedCoursesVideoPlayer
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _teacherName ?? '',
+                        _teacherName ?? 'Loading...',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -336,16 +281,12 @@ class _SubscribedCoursesVideoPlayer
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ChatScreen(tutorId: _course!.teacherId,),
+                          builder: (context) =>
+                              SubscriptionPlanSelectionPage(_course!.courseId),
                         ),
                       );
                     },
-                    child: Text('Ask a Question'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 9, 19, 58),
-                      foregroundColor: Colors.white,
-                      textStyle: const TextStyle(fontSize: 12),
-                    ),
+                    child: Text('Subscribe'),
                   ),
                 ],
               ),
@@ -414,30 +355,10 @@ class _SubscribedCoursesVideoPlayer
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              // Rate this course button
-              ElevatedButton(
-                onPressed: _showRatingDialog,
-                child: Text("Rate This Course"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 9, 19, 58),
-                  foregroundColor: Colors.white,
-                ),
-              ),
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-class chatWithTeacher extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Chat with Teacher')),
-      body: Center(child: Text('Chat section Here')),
     );
   }
 }

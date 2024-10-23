@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:yeneta_tutor/features/auth/screens/studentHomePageDemo.dart';
-import 'package:yeneta_tutor/features/auth/screens/studentProfile.dart';
-import 'package:yeneta_tutor/features/auth/screens/subscribedCourses.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
+import 'package:yeneta_tutor/features/student/studentHomePageDemo.dart';
+import 'package:yeneta_tutor/features/student/studentProfile.dart';
+import 'package:yeneta_tutor/features/student/subscribedCourses.dart';
 import 'package:yeneta_tutor/features/chat/screens/chat_screen.dart';
 
 
-class StudentHomePage extends StatefulWidget {
+class StudentHomePage extends ConsumerStatefulWidget {
   const StudentHomePage({super.key});
 
   @override
   _StudentHomePageState createState() => _StudentHomePageState();
 }
 
-class _StudentHomePageState extends State<StudentHomePage> {
+class _StudentHomePageState extends ConsumerState<StudentHomePage> {
   int _selectedIndex = 0; 
-
-  final List<Widget> _pages = [
-    StudentHomePageDemo(),
-    SubscribedCourses(),  
-    studentProfile(), 
-    ChatScreen(tutorId: '',), 
-    Center(child: Text('studnet Earnings Page')), // Earnings
-  ];
+ 
+ final List<Widget>  _pages = [
+      StudentHomePageDemo(),
+      SubscribedCourses(),  
+      studentProfile(), 
+      ChatScreen(tutorId: '', studentId: ''), // Messages
+      Center(child: Text('studnet Earnings Page')), // Earnings
+    ];
+  
 
   // Method to handle when an icon is tapped
   void _onItemTapped(int index) {

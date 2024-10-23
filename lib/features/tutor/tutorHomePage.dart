@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorCoursesPage.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorHomePageDemo.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorProfile.dart';
+import 'package:yeneta_tutor/features/tutor/tutorCoursesPage.dart';
+import 'package:yeneta_tutor/features/tutor/tutorHomePageDemo.dart';
+import 'package:yeneta_tutor/features/tutor/tutorProfile.dart';
 import 'package:yeneta_tutor/features/chat/screens/chat_screen.dart';
 
 class TutorHomePage extends ConsumerStatefulWidget {
@@ -13,23 +13,19 @@ class TutorHomePage extends ConsumerStatefulWidget {
 
 class _TutorHomePageState extends ConsumerState<TutorHomePage> {
   int _selectedIndex = 0;
-  late final String tutorId;
-  late final List<Widget> _pages;
 
-  @override
-  void initState() {
-    super.initState();
-    tutorId = ref.read(authControllerProvider).getCurrentUserId();
-    _pages = [
+
+ final List<Widget>  _pages = [
       TutorHomePageDemo(), // Home
       CoursesPage(), // Courses
       ProfilePage(), // Profile
       ChatScreen(
-        tutorId: tutorId,
+        tutorId: '',
+        studentId: '',
       ), // Messages
       Center(child: Text('Earnings Page')), // Earnings
     ];
-  }
+  
 
   // Method to handle when an icon is tapped
   void _onItemTapped(int index) {

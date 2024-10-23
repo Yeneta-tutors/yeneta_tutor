@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
-import 'package:yeneta_tutor/features/auth/screens/PaymentFailedScreen.dart';
-import 'package:yeneta_tutor/features/auth/screens/PaymentSuccessScreen.dart';
+import 'package:yeneta_tutor/features/common/PaymentFailedScreen.dart';
+import 'package:yeneta_tutor/features/common/PaymentSuccessScreen.dart';
 import 'package:yeneta_tutor/features/subscription/repository/subscription_repositoy.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 import 'package:yeneta_tutor/models/subscription_model.dart';
@@ -94,11 +94,9 @@ class SubscriptionController {
           });
     } catch (e) {
       if (e is NetworkException) {
-        print('Network error: $e');
         showSnackBar(context,
             'Network error: Please check your connection and try again.');
       } else {
-        print('Unexpected error: $e');
         showSnackBar(
             context, 'An unexpected error occurred. Please try again.');
       }

@@ -5,8 +5,9 @@ import 'package:yeneta_tutor/models/message_model.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final String tutorId;
+  final String studentId;
 
-  ChatScreen({required this.tutorId});
+  ChatScreen({required this.tutorId, required this.studentId});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -24,7 +25,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Future<void> initChat() async {
     chatId = await ref.read(chatControllerProvider).createChat(
-          widget.tutorId,
+          widget.tutorId, widget.studentId
         );
     setState(() {});
   }

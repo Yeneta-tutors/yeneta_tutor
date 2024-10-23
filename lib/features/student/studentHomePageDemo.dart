@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yeneta_tutor/features/auth/screens/studentCourses.dart';
+import 'package:yeneta_tutor/features/student/studentCourses.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 

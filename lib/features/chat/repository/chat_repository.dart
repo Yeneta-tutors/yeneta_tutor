@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:yeneta_tutor/features/auth/repository/auth_repository.dart';
 import 'package:yeneta_tutor/models/chat_model.dart';
 import 'package:yeneta_tutor/models/message_model.dart';
@@ -75,23 +76,22 @@ class ChatRepository {
             snapshot.docs.map((doc) => Message.fromMap(doc.data())).toList());
   }
 
-  Stream<List<Chat>> getUserChats(String userId) {
-    final chatsRef = firestore.collection('chats');
+Stream<List<Chat>> getAllChats(String userId) {
+  final studentChats = firestore
+      .collection('chats')
+      .where('studentId', isEqualTo: userId)
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => Chat.fromMap(doc.data())).toList());
 
-    return chatsRef
-        .where('studentId', isEqualTo: userId)
-        .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Chat.fromMap(doc.data())).toList());
-  }
+  final tutorChats = firestore
+      .collection('chats')
+      .where('tutorId', isEqualTo: userId)
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => Chat.fromMap(doc.data())).toList());
 
-  Stream<List<Chat>> getTutorChats(String tutorId) {
-    final chatsRef = firestore.collection('chats');
+  return Rx.combineLatest2(studentChats, tutorChats, (a, b) => [...a, ...b]);
+}
 
-    return chatsRef
-        .where('tutorId', isEqualTo: tutorId)
-        .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Chat.fromMap(doc.data())).toList());
-  }
 }

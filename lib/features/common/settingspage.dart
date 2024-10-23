@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
-import 'package:yeneta_tutor/features/auth/screens/privacyPolicy.dart';
-import 'package:yeneta_tutor/features/auth/screens/termsAndConditions.dart';
+import 'package:yeneta_tutor/features/common/privacyPolicy.dart';
+import 'package:yeneta_tutor/features/common/termsAndConditions.dart';
 import 'package:yeneta_tutor/screens/onboardingScreen4.dart';
 
 class SettingsPage extends ConsumerWidget {

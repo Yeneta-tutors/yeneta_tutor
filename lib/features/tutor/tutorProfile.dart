@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
-import 'package:yeneta_tutor/features/auth/screens/settingspage.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorEditProfile.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorPasswordReset.dart';
+import 'package:yeneta_tutor/features/common/settingspage.dart';
+import 'package:yeneta_tutor/features/tutor/tutorEditProfile.dart';
+import 'package:yeneta_tutor/features/common/tutorPasswordReset.dart';
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({Key? key}) : super(key: key);

@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
-import 'package:yeneta_tutor/features/auth/screens/studentDetailsPage.dart';
-import 'package:yeneta_tutor/features/auth/screens/subscribedCoursesVideoPlayer.dart';
+import 'package:yeneta_tutor/features/student/studentDetailsPage.dart';
+import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
 
-class SubscribedCourses extends ConsumerWidget {
-  SubscribedCourses();
+class CoursesPage extends ConsumerStatefulWidget {
+  final String subject;
+
+  const CoursesPage({super.key, required this.subject});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final subscriptonController = ref.watch(subscriptionControllerProvider);
-    final studentId = ref.watch(authControllerProvider).getCurrentUserId();
+  ConsumerState<CoursesPage> createState() => _CoursesPageState();
+}
 
-    Future<List<Course>> fetchSubscribedCourses(String studentId) async {
+class _CoursesPageState extends ConsumerState<CoursesPage> {
+  @override
+  Widget build(BuildContext context) {
+    final courseControler = ref.watch(courseControllerProvider);
+
+    Future<List<Course>> fetchCourseBySubject() async {
       try {
-        final courses =
-            await subscriptonController.fetchSubscribedCourses(studentId);
-        return courses;
-      } catch (error) {
-        throw Exception('Failed to fetch subscribed courses');
+        return await courseControler.fetchCourseBySubject(widget.subject);
+      } catch (e) {
+        throw Exception('Error getting course by  subject');
       }
     }
 
@@ -37,7 +41,7 @@ class SubscribedCourses extends ConsumerWidget {
           },
         ),
         title: Text(
-          'Subscribed Courses',
+          'Courses',
           style: TextStyle(color: Colors.black),
         ),
         centerTitle: true,
@@ -46,6 +50,7 @@ class SubscribedCourses extends ConsumerWidget {
             icon: Icon(Icons.filter_alt),
             color: const Color.fromARGB(255, 0, 0, 0),
             onPressed: () {
+              // Open filter dialog
               showDialog(
                 context: context,
                 builder: (_) => FilterDialog(),
@@ -54,64 +59,62 @@ class SubscribedCourses extends ConsumerWidget {
           ),
         ],
       ),
-      body: FutureBuilder<List<Course>>(
-        future: fetchSubscribedCourses(studentId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // Show a loading spinner while fetching data
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            // Show an error message if fetching fails
-            return Center(child: Text('Failed to load courses'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            // Show a message if no courses are found
-            return Center(child: Text('No subscribed courses found'));
-          }
-
-          // Courses are successfully fetched
-          final courses = snapshot.data!;
-
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
+      body: Column(
+        children: [
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    spreadRadius: 2,
                   ),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                      hintText: 'Filter my courses',
-                      prefixIcon: Icon(Icons.search),
-                    ),
+                ],
+              ),
+              child: TextField(
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
                   ),
+                  hintText: 'Filter my courses',
+                  prefixIcon: Icon(Icons.search),
                 ),
               ),
-              SizedBox(height: 10),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: GridView.builder(
+            ),
+          ),
+          SizedBox(height: 10),
+
+          // Course cards grid
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: FutureBuilder<List<Course>>(
+                future: fetchCourseBySubject(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No subjects found'));
+                  }
+
+                  final courses = snapshot.data!;
+                  return GridView.builder(
                     itemCount: courses.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 10,
                       crossAxisSpacing: 10,
-                      childAspectRatio: 0.8,
+                      childAspectRatio: 0.7,
                     ),
                     itemBuilder: (context, index) {
                       final course = courses[index];
@@ -133,14 +136,15 @@ class SubscribedCourses extends ConsumerWidget {
                           }
 
                           final teacher = teacherSnapshot.data!;
+
                           return GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      SubscribedCoursesVideoPlayer(
-                                          courseId: course.courseId),
+                                  builder: (context) => CourseDetailsPage(
+                                    courseId: course.courseId,
+                                  ),
                                 ),
                               );
                             },
@@ -155,6 +159,7 @@ class SubscribedCourses extends ConsumerWidget {
                                   children: [
                                     Stack(
                                       children: [
+                                        // Course image with rounded corners
                                         ClipRRect(
                                           borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(15),
@@ -175,6 +180,7 @@ class SubscribedCourses extends ConsumerWidget {
                                                   fit: BoxFit.cover,
                                                 ),
                                         ),
+                                        // Grade text (bottom left corner)
                                         Positioned(
                                           bottom: 5,
                                           left: 5,
@@ -182,19 +188,20 @@ class SubscribedCourses extends ConsumerWidget {
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 8, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color:
-                                                  Colors.black.withOpacity(0.7),
+                                              color: Colors.black.withOpacity(
+                                                  0.7), // Black background with opacity
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                             ),
                                             child: Text(
-                                              'Grade ${course.grade}',
+                                              'Grade ${course.grade}', // Dynamic grade text
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 12),
                                             ),
                                           ),
                                         ),
+                                        // Chapter text (bottom right corner)
                                         Positioned(
                                           bottom: 5,
                                           right: 5,
@@ -202,13 +209,13 @@ class SubscribedCourses extends ConsumerWidget {
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 8, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color:
-                                                  Colors.black.withOpacity(0.7),
+                                              color: Colors.black.withOpacity(
+                                                  0.7), // Black background with opacity
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                             ),
                                             child: Text(
-                                              'Chapter ${course.chapter}',
+                                              'Chapter ${course.chapter}', // Dynamic chapter text
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 12),
@@ -224,24 +231,26 @@ class SubscribedCourses extends ConsumerWidget {
                                             CrossAxisAlignment.end,
                                         children: [
                                           Text(
-                                            course.title, // Course title
+                                            course.title,
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                           SizedBox(height: 10),
                                           Row(
                                             children: [
                                               CircleAvatar(
-                                                backgroundImage: NetworkImage(
-                                                    teacher.profileImage!),
+                                                backgroundImage: AssetImage(
+                                                    'images/maths_thumbnail.jpg'), // Tutor profile image
                                                 radius: 12,
                                               ),
                                               SizedBox(width: 5),
                                               Text(
-                                                teacher
-                                                    .firstName, // Instructor name
+                                                teacher.firstName,
                                                 style: TextStyle(
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   color: Colors.grey[700],
                                                 ),
                                               ),
@@ -251,8 +260,10 @@ class SubscribedCourses extends ConsumerWidget {
                                                   size: 16),
                                               SizedBox(width: 3),
                                               Text(
-                                                '${course.rating ?? 0}',
+                                                ' ${course.rating ?? 0}',
                                                 style: TextStyle(
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   color: Colors.grey[700],
                                                 ),
                                               ),
@@ -294,6 +305,8 @@ class SubscribedCourses extends ConsumerWidget {
                                               Text(
                                                 '${course.price} Birr',
                                                 style: TextStyle(
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   color: Colors.blue,
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -311,12 +324,12 @@ class SubscribedCourses extends ConsumerWidget {
                         },
                       );
                     },
-                  ),
-                ),
+                  );
+                },
               ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -331,7 +344,8 @@ class FilterDialog extends StatefulWidget {
 class _FilterDialogState extends State<FilterDialog> {
   int selectedGrade = 9;
   int selectedChapter = 1;
-  String selectedSubject = 'Maths';
+  // String priceOrder = 'Cheaper to Expensive';
+  // bool mostSold = false;
 
   @override
   Widget build(BuildContext context) {
@@ -341,35 +355,6 @@ class _FilterDialogState extends State<FilterDialog> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Subject'),
-            DropdownButton<String>(
-              value: selectedSubject,
-              hint: const Text('Select Subject'),
-              items: [
-                'Maths',
-                'English',
-                'Physics',
-                'Biology',
-                'Chemistry',
-                'Economics',
-                'Information Technology'
-              ].map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  // selectedSubject = newValue; // Update the selected value
-                });
-              },
-              isExpanded: false,
-              dropdownColor: Colors.grey[200],
-              icon: Icon(Icons.arrow_drop_down),
-              iconSize: 20,
-              menuMaxHeight: 200,
-            ),
             // Grade Filter
             Text('Grade'),
             DropdownButton<int>(
@@ -403,11 +388,41 @@ class _FilterDialogState extends State<FilterDialog> {
                 });
               },
               isExpanded: false,
-              dropdownColor: Colors.grey[200],
-              icon: Icon(Icons.arrow_drop_down),
+              dropdownColor:
+                  Colors.grey[200], // Customize dropdown background color
+              icon:
+                  Icon(Icons.arrow_drop_down), // Customize dropdown arrow icon
               iconSize: 20,
               menuMaxHeight: 200,
             ),
+
+            // Price Filter
+            // Text('Price'),
+            // DropdownButton<String>(
+            //   value: priceOrder,
+            //   items: ['Cheaper to Expensive', 'Expensive to Cheaper'].map((String value) {
+            //     return DropdownMenuItem<String>(
+            //       value: value,
+            //       child: Text(value),
+            //     );
+            //   }).toList(),
+            //   onChanged: (value) {
+            //     setState(() {
+            //       priceOrder = value!;
+            //     });
+            //   },
+            // ),
+
+            // Most Sold Filter
+            // CheckboxListTile(
+            //   title: Text('Most Sold'),
+            //   value: mostSold,
+            //   onChanged: (value) {
+            //     setState(() {
+            //       mostSold = value!;
+            //     });
+            //   },
+            // ),
           ],
         ),
       ),
@@ -424,4 +439,31 @@ class _FilterDialogState extends State<FilterDialog> {
   }
 }
 
-// Note: Make sure CourseDetailsPage is defined somewhere else in your code.
+
+
+
+
+
+
+
+// // Dummy CourseDetail Page
+// class CourseDetail extends StatelessWidget {
+//   final Map<String, dynamic> course;
+
+//   CourseDetail({required this.course});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(course['title']),
+//       ),
+//       body: Center(
+//         child: Text(
+//           'Details for ${course['title']}',
+//           style: TextStyle(fontSize: 24),
+//         ),
+//       ),
+//     );
+//   }
+// }

@@ -1,26 +1,29 @@
 // ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/services.dart';
-import 'package:yeneta_tutor/features/auth/screens/SubscriptionPlanSelectionPage%20.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorProfileView.dart';
+import 'package:yeneta_tutor/features/tutor/tutorProfileView.dart';
+import 'package:yeneta_tutor/features/chat/screens/chat_screen.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 
-class CourseDetailsPage extends ConsumerStatefulWidget {
-  String courseId;
-  CourseDetailsPage({required this.courseId});
+class SubscribedCoursesVideoPlayer extends ConsumerStatefulWidget {
+  final String courseId;
+  SubscribedCoursesVideoPlayer({required this.courseId});
 
   @override
-  _CourseDetailsPageState createState() => _CourseDetailsPageState();
+  _SubscribedCoursesVideoPlayer createState() =>
+      _SubscribedCoursesVideoPlayer();
 }
 
-class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
+class _SubscribedCoursesVideoPlayer
+    extends ConsumerState<SubscribedCoursesVideoPlayer> {
   VideoPlayerController? _controller;
   Course? _course;
   String? _teacherName;
@@ -44,7 +47,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
       _course = course!;
 
       if (_course != null) {
-        _controller = VideoPlayerController.network(_course!.demoVideoUrl)
+        _controller = VideoPlayerController.network(_course!.videoUrl)
           ..initialize().then((_) {
             setState(() {});
           });
@@ -114,8 +117,63 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
     _resetControlsTimer();
   }
 
+  void _showRatingDialog() {
+    double _rating = 0;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Rate this Course"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RatingBar.builder(
+                initialRating: _rating,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemSize: 40.0,
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
+                  _rating = rating;
+                },
+              ),
+              SizedBox(height: 10),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text("Submit"),
+              onPressed: () {
+                _updateCourseRating(_rating);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _updateCourseRating(double rating) async {
+    try {
+      await ref
+          .read(courseControllerProvider)
+          .updateRating(widget.courseId, rating);
+      print('Rating updated successfully');
+    } catch (e) {
+      throw Exception('Error in update reating');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final studentId = ref.read(authControllerProvider).getCurrentUserId();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -124,7 +182,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
             Navigator.pop(context);
           },
         ),
-        title: Text('Course Details'),
+        title: Text('Course Video Player'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -136,7 +194,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
               GestureDetector(
                 onTap: _onVideoTapped,
                 child: Container(
-                  width: MediaQuery.of(context).size.width, // Full width
+                  width: MediaQuery.of(context).size.width,
                   height: _isFullScreen
                       ? MediaQuery.of(context).size.height * 0.75
                       : 200,
@@ -195,11 +253,9 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                   IconButton(
                     icon: Icon(Icons.fast_rewind),
                     onPressed: () {
-                      if (_controller != null) {
-                        _controller!.seekTo(
-                          _controller!.value.position - Duration(seconds: 5),
-                        );
-                      }
+                      _controller!.seekTo(
+                        _controller!.value.position - Duration(seconds: 5),
+                      );
                     },
                   ),
                   IconButton(
@@ -215,7 +271,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                         } else {
                           _controller!.play();
                         }
-                        _controlsVisible = true; // Show controls on play
+                        _controlsVisible = true;
                         _resetControlsTimer();
                       });
                     },
@@ -249,7 +305,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _teacherName ?? 'Loading...',
+                        _teacherName ?? '',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -281,12 +337,16 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              SubscriptionPlanSelectionPage(_course!.courseId),
+                          builder: (context) => ChatScreen(tutorId: _course!.teacherId, studentId: studentId),
                         ),
                       );
                     },
-                    child: Text('Subscribe'),
+                    child: Text('Ask a Question'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontSize: 12),
+                    ),
                   ),
                 ],
               ),
@@ -355,10 +415,30 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                   ),
                 ],
               ),
+              SizedBox(height: 20),
+              // Rate this course button
+              ElevatedButton(
+                onPressed: _showRatingDialog,
+                child: Text("Rate This Course"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                  foregroundColor: Colors.white,
+                ),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class chatWithTeacher extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Chat with Teacher')),
+      body: Center(child: Text('Chat section Here')),
     );
   }
 }

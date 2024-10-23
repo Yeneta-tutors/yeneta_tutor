@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:yeneta_tutor/features/auth/screens/PaymentFailedScreen.dart';
+import 'package:yeneta_tutor/features/common/PaymentFailedScreen.dart';
+import 'package:yeneta_tutor/features/student/subscribedCourses.dart';
 
 
 class PaymentSuccessScreen extends StatelessWidget {
@@ -50,21 +51,14 @@ class PaymentSuccessScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   
-                    //           Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => LoginScreen(),// route sisera enchemrewalen
-                    //   ),
-                    // );
-
-             Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PaymentFailedScreen(
-                        errorMessage: 'Payment Declined: Check your balance', errorMsg: '',
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SubscribedCourses(),// route sisera enchemrewalen
                       ),
-                    ),
-                  );
+                    );
+
+
 
                 },
                 style: ElevatedButton.styleFrom(

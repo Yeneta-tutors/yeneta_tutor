@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/courses/screens/course_details.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
 import 'package:yeneta_tutor/features/courses/screens/course_upload.dart';
+import 'package:yeneta_tutor/features/tutor/tutorHomePage.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 
 class CoursesPage extends ConsumerWidget {

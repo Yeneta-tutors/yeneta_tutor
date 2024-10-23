@@ -63,8 +63,7 @@ class PaymentFailedScreen extends StatelessWidget {
               width: 200,
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle Try Again action (e.g., re-initiate payment)
-                  Navigator.pop(context);  // Example: Navigate back for retry
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentFailedScreen(errorMessage: 'Payment Declined: Check your balance', errorMsg: ''))); 
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,  // Red to indicate failure
