@@ -61,7 +61,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => PaymentFailedScreen(
-                        errorMessage: 'Payment Declined: Check your balance',
+                        errorMessage: 'Payment Declined: Check your balance', errorMsg: '',
                       ),
                     ),
                   );
