@@ -9,6 +9,7 @@ import 'package:yeneta_tutor/features/auth/screens/SubscriptionPlanSelectionPage
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorProfileView.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
+import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 
 class CourseDetailsPage extends ConsumerStatefulWidget {
@@ -280,7 +281,8 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SubscriptionPlanSelectionPage(_course!.courseId),
+                          builder: (context) =>
+                              SubscriptionPlanSelectionPage(_course!.courseId),
                         ),
                       );
                     },
@@ -299,7 +301,7 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
               ),
               SizedBox(height: 10),
               Text(
-                 _course?.description ?? 'Loading description...',
+                _course?.description ?? '',
                 style: TextStyle(fontSize: 14),
               ),
               SizedBox(height: 20),
@@ -310,14 +312,14 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_course?.subject?? 'subject'),
-                      Text('Grade: ${_course?.grade??'grade'} '),
+                      Text(_course?.subject ?? 'subject'),
+                      Text('Grade: ${_course?.grade ?? 'grade'} '),
                     ],
                   ),
                   Column(
                     children: [
                       RatingBarIndicator(
-                        rating: 4.2,
+                        rating: _course?.rating ?? 0,
                         itemBuilder: (context, index) => Icon(
                           Icons.star,
                           color: Colors.amber,
@@ -326,7 +328,29 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                         itemSize: 20.0,
                         direction: Axis.horizontal,
                       ),
-                      Text('7830 Students'),
+                      FutureBuilder<int>(
+                        future: ref
+                            .read(subscriptionControllerProvider)
+                            .getTotalSubscribersForCourse(_course!.courseId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Text('Loading...');
+                          } else if (snapshot.hasError) {
+                            return Text('Error');
+                          } else if (snapshot.hasData) {
+                            return Text(
+                              ' ${snapshot.data} students',
+                              style: TextStyle(
+                                overflow: TextOverflow.ellipsis,
+                                color: Colors.grey[700],
+                              ),
+                            );
+                          } else {
+                            return Text('No data');
+                          }
+                        },
+                      ),
                     ],
                   ),
                 ],
