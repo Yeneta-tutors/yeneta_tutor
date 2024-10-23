@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/features/auth/screens/studentHomePageDemo.dart';
 import 'package:yeneta_tutor/features/auth/screens/studentProfile.dart';
 import 'package:yeneta_tutor/features/auth/screens/subscribedCourses.dart';
+import 'package:yeneta_tutor/features/chat/screens/chat_screen.dart';
 
 
 class StudentHomePage extends StatefulWidget {
@@ -12,14 +13,13 @@ class StudentHomePage extends StatefulWidget {
 }
 
 class _StudentHomePageState extends State<StudentHomePage> {
-  int _selectedIndex = 0; // Track the selected index in the bottom nav bar
+  int _selectedIndex = 0; 
 
-  // List of pages to navigate between
   final List<Widget> _pages = [
-    StudentHomePageDemo(), // Home
-    Subscribedcourses(),  
-    studentProfile(), // Profile
-    Center(child: Text('studnet Messages Page')), // Messages
+    StudentHomePageDemo(),
+    SubscribedCourses(),  
+    studentProfile(), 
+    ChatScreen(tutorId: '',), 
     Center(child: Text('studnet Earnings Page')), // Earnings
   ];
 

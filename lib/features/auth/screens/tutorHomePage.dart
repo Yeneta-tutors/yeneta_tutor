@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorCoursesPage.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorHomePageDemo.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorProfile.dart';
+import 'package:yeneta_tutor/features/chat/screens/chat_screen.dart';
 
-class TutorHomePage extends StatefulWidget {
+class TutorHomePage extends ConsumerStatefulWidget {
   @override
   _TutorHomePageState createState() => _TutorHomePageState();
 }
 
-class _TutorHomePageState extends State<TutorHomePage> {
-  int _selectedIndex = 0; // Track the selected index in the bottom nav bar
+class _TutorHomePageState extends ConsumerState<TutorHomePage> {
+  int _selectedIndex = 0;
+  late final String tutorId;
+  late final List<Widget> _pages;
 
-  // List of pages to navigate between
-  final List<Widget> _pages = [
-    TutorHomePageDemo(), // Home
-    CoursesPage(), // Courses
-    ProfilePage(), // Profile
-    Center(child: Text('Chat'),),
-    Center(child: Text('Earnings Page')), // Earnings
-  ];
+  @override
+  void initState() {
+    super.initState();
+    tutorId = ref.read(authControllerProvider).getCurrentUserId();
+    _pages = [
+      TutorHomePageDemo(), // Home
+      CoursesPage(), // Courses
+      ProfilePage(), // Profile
+      ChatScreen(
+        tutorId: tutorId,
+      ), // Messages
+      Center(child: Text('Earnings Page')), // Earnings
+    ];
+  }
 
   // Method to handle when an icon is tapped
   void _onItemTapped(int index) {
@@ -28,7 +39,6 @@ class _TutorHomePageState extends State<TutorHomePage> {
   }
 
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
       // appBar: AppBar(
@@ -64,9 +74,10 @@ class _TutorHomePageState extends State<TutorHomePage> {
         ],
         currentIndex: _selectedIndex,
 
-        selectedItemColor: Colors.brown, 
-        unselectedItemColor: Colors.white, 
-        backgroundColor: const Color.fromRGBO(9, 15, 44, 1), // Dark blue background
+        selectedItemColor: Colors.brown,
+        unselectedItemColor: Colors.white,
+        backgroundColor:
+            const Color.fromRGBO(9, 15, 44, 1), // Dark blue background
         selectedFontSize: 14, // Larger text when selected
         unselectedFontSize: 12, // Smaller text when not selected
         iconSize: 30, // Larger icon size
@@ -75,34 +86,3 @@ class _TutorHomePageState extends State<TutorHomePage> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

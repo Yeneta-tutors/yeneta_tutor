@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/studentDetailsPage.dart';
 import 'package:yeneta_tutor/features/auth/screens/subscribedCoursesVideoPlayer.dart';
+import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
+import 'package:yeneta_tutor/models/course_model.dart';
+import 'package:yeneta_tutor/models/user_model.dart';
 
-class Subscribedcourses extends StatelessWidget {
-  // Dummy data for course cards
-  final List<Map<String, dynamic>> courses = [
-    {
-      "videourl": "https://www.youtube.com/watch?v=QGqfLpXVJn0",
-      "demoVideoUrl": "https://www.youtube.com/watch?v=QGqfLpXVJn0",
-      "title": "Measurements",
-      "instructor": "John",
-      "rating": 4.2,
-      "students": 7830,
-      "price": 28,
-      "image": 'images/maths_thumbnail.jpg',
-      "grade": "8",
-      "chapter": "1",
-    },
-    // Add more course entries here...
-  ];
+class SubscribedCourses extends ConsumerWidget {
+  SubscribedCourses();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final subscriptonController = ref.watch(subscriptionControllerProvider);
+    final studentId = ref.watch(authControllerProvider).getCurrentUserId();
+
+    Future<List<Course>> fetchSubscribedCourses(String studentId) async {
+      try {
+        final courses =
+            await subscriptonController.fetchSubscribedCourses(studentId);
+        return courses;
+      } catch (error) {
+        throw Exception('Failed to fetch subscribed courses');
+      }
+    }
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -43,7 +46,6 @@ class Subscribedcourses extends StatelessWidget {
             icon: Icon(Icons.filter_alt),
             color: const Color.fromARGB(255, 0, 0, 0),
             onPressed: () {
-              // Open filter dialog
               showDialog(
                 context: context,
                 builder: (_) => FilterDialog(),
@@ -52,182 +54,269 @@ class Subscribedcourses extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: 'Filter my courses',
-                  prefixIcon: Icon(Icons.search),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
+      body: FutureBuilder<List<Course>>(
+        future: fetchSubscribedCourses(studentId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Show a loading spinner while fetching data
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            // Show an error message if fetching fails
+            return Center(child: Text('Failed to load courses'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            // Show a message if no courses are found
+            return Center(child: Text('No subscribed courses found'));
+          }
 
-          // Course cards grid
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: GridView.builder(
-                itemCount: courses.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  childAspectRatio: 0.8,
+          // Courses are successfully fetched
+          final courses = snapshot.data!;
+
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      hintText: 'Filter my courses',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                  ),
                 ),
-                itemBuilder: (context, index) {
-                  final course = courses[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SubscribedCoursesVideoPlayer(course: course),
-                        ),
+              ),
+              SizedBox(height: 10),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: GridView.builder(
+                    itemCount: courses.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                      childAspectRatio: 0.8,
+                    ),
+                    itemBuilder: (context, index) {
+                      final course = courses[index];
+                      final teacherFuture = ref
+                          .read(authControllerProvider)
+                          .getUserData(course.teacherId);
+
+                      return FutureBuilder<UserModel?>(
+                        future: teacherFuture,
+                        builder: (context, teacherSnapshot) {
+                          if (teacherSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Text(
+                                "Loading"); // Show loading state for teacher data
+                          } else if (teacherSnapshot.hasError) {
+                            return Text('Error loading teacher data');
+                          } else if (!teacherSnapshot.hasData) {
+                            return Text('No teacher data available');
+                          }
+
+                          final teacher = teacherSnapshot.data!;
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      SubscribedCoursesVideoPlayer(
+                                          courseId: course.courseId),
+                                ),
+                              );
+                            },
+                            child: Card(
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(15),
+                                            topRight: Radius.circular(15),
+                                          ),
+                                          child: course.thumbnail != null &&
+                                                  course.thumbnail!.isNotEmpty
+                                              ? Image.asset(
+                                                  course.thumbnail!,
+                                                  height: 120,
+                                                  width: double.infinity,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.asset(
+                                                  'images/yeneta_logo.jpg',
+                                                  height: 120,
+                                                  width: double.infinity,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                        ),
+                                        Positioned(
+                                          bottom: 5,
+                                          left: 5,
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(0.7),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: Text(
+                                              'Grade ${course.grade}',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          bottom: 5,
+                                          right: 5,
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(0.7),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: Text(
+                                              'Chapter ${course.chapter}',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            course.title, // Course title
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                    teacher.profileImage!),
+                                                radius: 12,
+                                              ),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                teacher
+                                                    .firstName, // Instructor name
+                                                style: TextStyle(
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              Icon(Icons.star,
+                                                  color: Colors.yellow[700],
+                                                  size: 16),
+                                              SizedBox(width: 3),
+                                              Text(
+                                                '${course.rating ?? 0}',
+                                                style: TextStyle(
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 20),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              FutureBuilder<int>(
+                                                future: ref
+                                                    .read(
+                                                        subscriptionControllerProvider)
+                                                    .getTotalSubscribersForCourse(
+                                                        course.courseId),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return Text('Loading...');
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Text('Error');
+                                                  } else if (snapshot.hasData) {
+                                                    return Text(
+                                                      ' ${snapshot.data} students',
+                                                      style: TextStyle(
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        color: Colors.grey[700],
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    return Text('No data');
+                                                  }
+                                                },
+                                              ),
+                                              Text(
+                                                '${course.price} Birr',
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
-                    child: Card(
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(15),
-                                  topRight: Radius.circular(15),
-                                ),
-                                child: Image.asset(
-                                  course['image'],
-                                  height: 120,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 5,
-                                left: 5,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.7),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Text(
-                                    'Grade ${course['grade']}',
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 5,
-                                right: 5,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.7),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Text(
-                                    'Chapter ${course['chapter']}',
-                                    style: TextStyle(color: Colors.white, fontSize: 12),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  course['title'],
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage:
-                                          AssetImage('images/avator_image.png'),
-                                      radius: 12,
-                                    ),
-                                    SizedBox(width: 5),
-                                    Text(
-                                      course['instructor'],
-                                      style: TextStyle(
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                    Spacer(),
-                                    Icon(Icons.star, color: Colors.yellow[700], size: 16),
-                                    SizedBox(width: 3),
-                                    Text(
-                                      course['rating'].toString(),
-                                      style: TextStyle(
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 20),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      '${course['students']} Std',
-                                      style: TextStyle(color: Colors.grey[700]),
-                                    ),
-                                    Text(
-                                      '${course['price']} Birr',
-                                      style: TextStyle(
-                                        color: Colors.blue,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -252,18 +341,19 @@ class _FilterDialogState extends State<FilterDialog> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-              const Text('Subject'),
+            const Text('Subject'),
             DropdownButton<String>(
               value: selectedSubject,
               hint: const Text('Select Subject'),
-              items: ['Maths',
-                    'English',
-                    'Physics',
-                    'Biology',
-                    'Chemistry',
-                    'Economics',
-                    'Information Technology']
-                  .map((String value) {
+              items: [
+                'Maths',
+                'English',
+                'Physics',
+                'Biology',
+                'Chemistry',
+                'Economics',
+                'Information Technology'
+              ].map((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),

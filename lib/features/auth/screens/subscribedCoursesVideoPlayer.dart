@@ -2,22 +2,32 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/services.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/tutorProfileView.dart';
+import 'package:yeneta_tutor/features/chat/screens/chat_screen.dart';
+import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
+import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
+import 'package:yeneta_tutor/models/course_model.dart';
 
-class SubscribedCoursesVideoPlayer extends StatefulWidget {
-  final Map<String, dynamic> course;
-
-  SubscribedCoursesVideoPlayer({required this.course});
+class SubscribedCoursesVideoPlayer extends ConsumerStatefulWidget {
+  final String courseId;
+  SubscribedCoursesVideoPlayer({required this.courseId});
 
   @override
-  _SubscribedCoursesVideoPlayer createState() => _SubscribedCoursesVideoPlayer();
+  _SubscribedCoursesVideoPlayer createState() =>
+      _SubscribedCoursesVideoPlayer();
 }
 
-class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> {
+class _SubscribedCoursesVideoPlayer
+    extends ConsumerState<SubscribedCoursesVideoPlayer> {
   VideoPlayerController? _controller;
+  Course? _course;
+  String? _teacherName;
+  String? _profilePic;
   bool _isFullScreen = false;
   bool _controlsVisible = false;
   Timer? _controlsTimer;
@@ -25,18 +35,52 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-      'https://firebasestorage.googleapis.com/v0/b/yeneta-tutor.appspot.com/o/courses%2Fdemo_videos%2F2686c1a7-8164-47b4-834a-a01e6393bae3?alt=media&token=fbd38123-7c3c-48f6-9b78-695203cc428',
-    )..initialize().then((_) {
-        setState(() {});
-      });
+    _loadCourseDetails();
+  }
 
-    _controller!.addListener(() {
-      if (_controlsVisible) {
-        _resetControlsTimer();
+  Future<void> _loadCourseDetails() async {
+    try {
+      final course = await ref
+          .read(courseControllerProvider)
+          .fetchCourseById(widget.courseId);
+
+      _course = course!;
+
+      if (_course != null) {
+        _controller = VideoPlayerController.network(_course!.videoUrl)
+          ..initialize().then((_) {
+            setState(() {});
+          });
+
+        _controller!.addListener(() {
+          if (_controlsVisible) {
+            _resetControlsTimer();
+          }
+          setState(() {});
+        });
       }
-      setState(() {});
-    });
+
+      await _loadTeacherdata(_course!.teacherId);
+    } catch (e) {
+      // Handle the error appropriately
+      print('Failed to load course details: $e');
+    }
+  }
+
+  Future<void> _loadTeacherdata(String teacherId) async {
+    try {
+      final teacher =
+          await ref.read(authControllerProvider).getUserData(teacherId);
+
+      if (teacher != null) {
+        setState(() {
+          _teacherName = teacher.firstName;
+          _profilePic = teacher.profileImage;
+        });
+      }
+    } catch (e) {
+      throw Exception('Failed to load teacher details');
+    }
   }
 
   void _resetControlsTimer() {
@@ -106,8 +150,7 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
             TextButton(
               child: Text("Submit"),
               onPressed: () {
-                // Here you can handle the submitted rating value
-                print("Submitted rating: $_rating");
+                _updateCourseRating(_rating);
                 Navigator.of(context).pop();
               },
             ),
@@ -115,6 +158,17 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
         );
       },
     );
+  }
+
+  Future<void> _updateCourseRating(double rating) async {
+    try {
+      await ref
+          .read(courseControllerProvider)
+          .updateRating(widget.courseId, rating);
+      print('Rating updated successfully');
+    } catch (e) {
+      throw Exception('Error in update reating');
+    }
   }
 
   @override
@@ -140,7 +194,9 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                 onTap: _onVideoTapped,
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  height: _isFullScreen ? MediaQuery.of(context).size.height * 0.75 : 200,
+                  height: _isFullScreen
+                      ? MediaQuery.of(context).size.height * 0.75
+                      : 200,
                   alignment: Alignment.center,
                   child: Stack(
                     alignment: Alignment.center,
@@ -159,15 +215,19 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                           child: Column(
                             children: [
                               Slider(
-                                value: _controller!.value.position.inSeconds.toDouble(),
+                                value: _controller!.value.position.inSeconds
+                                    .toDouble(),
                                 min: 0,
-                                max: _controller!.value.duration.inSeconds.toDouble(),
+                                max: _controller!.value.duration.inSeconds
+                                    .toDouble(),
                                 onChanged: (value) {
-                                  _controller!.seekTo(Duration(seconds: value.toInt()));
+                                  _controller!
+                                      .seekTo(Duration(seconds: value.toInt()));
                                 },
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "${_controller!.value.position.inMinutes}:${(_controller!.value.position.inSeconds % 60).toString().padLeft(2, '0')}",
@@ -235,16 +295,16 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage(
-                      'images/avator_image.png',
-                    ),
+                    backgroundImage: NetworkImage(_profilePic != null
+                        ? '$_profilePic'
+                        : 'images/yeneta_logo.jpg'),
                   ),
                   SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Esubalew K.',
+                        _teacherName ?? '',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -252,12 +312,13 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                       ),
                       GestureDetector(
                         onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => TutorProfileForStudents(course:course),
-                          //   ),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TutorProfileForStudents(_course!.teacherId),
+                            ),
+                          );
                         },
                         child: Text(
                           'View Profile',
@@ -275,7 +336,7 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => chatWithTeacher(),
+                          builder: (context) => ChatScreen(tutorId: _course!.teacherId,),
                         ),
                       );
                     },
@@ -299,11 +360,7 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
               ),
               SizedBox(height: 10),
               Text(
-                'Unlock the foundational principles of physics with our '
-                'comprehensive lecture on Chapter 1 of the Ethiopian Grade 11 '
-                'Physics syllabus. This course covers the core topics of Physical '
-                'World and Measurement, providing students with a solid understanding '
-                'of fundamental physics concepts.',
+                _course?.description ?? '',
                 style: TextStyle(fontSize: 14),
               ),
               SizedBox(height: 20),
@@ -314,14 +371,14 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Subject: Physics'),
-                      Text('Grade: 11'),
+                      Text(_course?.subject ?? 'subject'),
+                      Text('Grade: ${_course?.grade ?? 'grade'} '),
                     ],
                   ),
                   Column(
                     children: [
                       RatingBarIndicator(
-                        rating: 4.2,
+                        rating: _course?.rating ?? 0,
                         itemBuilder: (context, index) => Icon(
                           Icons.star,
                           color: Colors.amber,
@@ -330,7 +387,29 @@ class _SubscribedCoursesVideoPlayer extends State<SubscribedCoursesVideoPlayer> 
                         itemSize: 20.0,
                         direction: Axis.horizontal,
                       ),
-                      Text('7830 Students'),
+                      FutureBuilder<int>(
+                        future: ref
+                            .read(subscriptionControllerProvider)
+                            .getTotalSubscribersForCourse(_course!.courseId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Text('Loading...');
+                          } else if (snapshot.hasError) {
+                            return Text('Error');
+                          } else if (snapshot.hasData) {
+                            return Text(
+                              ' ${snapshot.data} students',
+                              style: TextStyle(
+                                overflow: TextOverflow.ellipsis,
+                                color: Colors.grey[700],
+                              ),
+                            );
+                          } else {
+                            return Text('No data');
+                          }
+                        },
+                      ),
                     ],
                   ),
                 ],

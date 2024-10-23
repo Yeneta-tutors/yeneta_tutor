@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/subscription/repository/subscription_repositoy.dart';
+import 'package:yeneta_tutor/models/course_model.dart';
 import 'package:yeneta_tutor/models/subscription_model.dart';
 import 'package:yeneta_tutor/widgets/snackbar.dart';
 
@@ -86,15 +87,17 @@ class SubscriptionController {
             // Show error message in snackbar
             showSnackBar(context, errorMsg);
           });
-    }catch (e) {
-  if (e is NetworkException) {
-    print('Network error: $e'); // Just print the exception directly.
-    showSnackBar(context, 'Network error: Please check your connection and try again.');
-  } else {
-    print('Unexpected error: $e'); // Catch any other unexpected exceptions.
-    showSnackBar(context, 'An unexpected error occurred. Please try again.');
-  }
-}
+    } catch (e) {
+      if (e is NetworkException) {
+        print('Network error: $e'); // Just print the exception directly.
+        showSnackBar(context,
+            'Network error: Please check your connection and try again.');
+      } else {
+        print('Unexpected error: $e'); // Catch any other unexpected exceptions.
+        showSnackBar(
+            context, 'An unexpected error occurred. Please try again.');
+      }
+    }
   }
 
   Future<void> _handlePaymentSuccess(String txRef) async {
@@ -106,5 +109,26 @@ class SubscriptionController {
       },
     );
     print('Subscription updated successfully.');
+  }
+
+  Future<List<Course>> fetchSubscribedCourses(String studentId) async {
+    try {
+      final courses =
+          await subscriptionRepository.getSubscribedCourses(studentId);
+      return courses;
+    } catch (error) {
+      throw Exception('Failed to fetch subscribed courses');
+    }
+  }
+
+  Future<int> getTotalSubscribersForCourse(String courseId) async {
+    try {
+      final numOfStudents =
+          await subscriptionRepository.getTotalSubscribersForCourse(courseId);
+
+      return numOfStudents;
+    } catch (e) {
+      throw Exception("Error in calculating the total number");
+    }
   }
 }
