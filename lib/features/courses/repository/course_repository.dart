@@ -62,6 +62,7 @@ class CourseRepository {
         price: course.price,
         thumbnail: thumbnailUrl ?? '',
         rating: course.rating ?? 0.0,
+        numRating: course.numRating ?? 0,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
       );
@@ -219,6 +220,32 @@ class CourseRepository {
       throw Exception('Failed to fetch courses: $e');
     }
   }
+
+    // Update course rating
+  Future<void> updateCourseRating(String courseId, double newRating) async {
+    try {
+
+      final course = await fetchCourseById(courseId);
+      if (course == null) {
+        throw Exception('Course not found');
+      }
+      double totalRating = (course.rating ?? 0.0) * (course.numRating ?? 0);
+      totalRating += newRating;
+      int updatedNumRating = (course.numRating ?? 0) + 1;
+      double updatedRating = totalRating / updatedNumRating;
+
+      course.rating = updatedRating;
+      course.numRating = updatedNumRating;
+
+      // Update the course in Firestore
+      await updateCourse(course);
+
+      print('Course rating updated successfully.');
+    } catch (e) {
+      throw Exception('Failed to update course rating: $e');
+    }
+  }
+
 
   // Delete a course
   Future<void> deleteCourse(String courseId) async {
