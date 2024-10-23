@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/auth/screens/studentDetailsPage.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
+import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
 
@@ -126,7 +127,8 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                         builder: (context, teacherSnapshot) {
                           if (teacherSnapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Text("Loading"); // Show loading state for teacher data
+                            return Text(
+                                "Loading"); // Show loading state for teacher data
                           } else if (teacherSnapshot.hasError) {
                             return Text('Error loading teacher data');
                           } else if (!teacherSnapshot.hasData) {
@@ -258,8 +260,7 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                                                   size: 16),
                                               SizedBox(width: 3),
                                               Text(
-                                                course.rating.toString() ??
-                                                    '0.0',
+                                                ' ${course.rating ?? 0}',
                                                 style: TextStyle(
                                                   overflow:
                                                       TextOverflow.ellipsis,
@@ -273,12 +274,33 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
-                                                'Num of Std',
-                                                style: TextStyle(
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    color: Colors.grey[700]),
+                                              FutureBuilder<int>(
+                                                future: ref
+                                                    .read(
+                                                        subscriptionControllerProvider)
+                                                    .getTotalSubscribersForCourse(
+                                                        course.courseId),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return Text('Loading...');
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Text('Error');
+                                                  } else if (snapshot.hasData) {
+                                                    return Text(
+                                                      ' ${snapshot.data} students',
+                                                      style: TextStyle(
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        color: Colors.grey[700],
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    return Text('No data');
+                                                  }
+                                                },
                                               ),
                                               Text(
                                                 '${course.price} Birr',
