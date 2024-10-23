@@ -57,44 +57,75 @@ class SubscriptionRepository {
     return null;
   }
 
-  //get subscription by student id  
-Future<List<Subscription>> getSubscriptionsByStudentId(String studentId) async {
+  Future<List<Subscription>> getCompletedSubscriptionsByStudentId(
+      String studentId) async {
+    try {
+      final QuerySnapshot snapshot = await firestore
+          .collection('subscriptions')
+          .where('student_id', isEqualTo: studentId)
+          .where('payment_status', isEqualTo: 'completed')
+          .get();
+
+      return snapshot.docs
+          .map(
+              (doc) => Subscription.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      print('Error fetching completed subscriptions: $e');
+      return [];
+    }
+  }
+
+  Future<List<Course>> getCoursesByIds(List<String> courseIds) async {
+    try {
+      final List<Course> courses = [];
+
+      for (String courseId in courseIds) {
+        final DocumentSnapshot doc = await FirebaseFirestore.instance
+            .collection('courses')
+            .doc(courseId)
+            .get();
+
+        if (doc.exists) {
+          courses.add(Course.fromMap(doc.data() as Map<String, dynamic>));
+        }
+      }
+      print(courses);
+      return courses;
+    } catch (e) {
+      print('Error fetching courses: $e');
+      return [];
+    }
+  }
+
+  Future<List<Course>> getSubscribedCourses(String studentId) async {
+    try {
+      List<Subscription> subscriptions =
+          await getCompletedSubscriptionsByStudentId(studentId);
+
+      List<String> courseIds =
+          subscriptions.map((sub) => sub.courseId).toList();
+     
+      return await getCoursesByIds(courseIds);
+    } catch (e) {
+      print('Error fetching subscribed courses: $e');
+      return [];
+    }
+  }
+
+  Future<int> getTotalSubscribersForCourse(String courseId) async {
   try {
     final QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('subscriptions')
-        .where('studentId', isEqualTo: studentId) // Filter by studentId
+        .where('course_id', isEqualTo: courseId)
         .get();
+    int totalSubscribers = snapshot.docs.length;
 
-    return snapshot.docs.map((doc) => Subscription.fromMap(doc.data() as Map<String, dynamic>)).toList();
+    return totalSubscribers;
   } catch (e) {
-    print('Error fetching subscriptions: $e');
-    return []; // Return an empty list on error
+    print('Error fetching total subscribers: $e');
+    return 0; 
   }
 }
-
-Future<List<Course>> getCoursesByIds(List<String> courseIds) async {
-  try {
-    final List<Course> courses = [];
-
-    for (String courseId in courseIds) {
-
-      final DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('courses')
-          .doc(courseId)
-          .get();
-
-      if (doc.exists) {
-        courses.add(Course.fromMap(doc.data() as Map<String, dynamic>));
-      }
-    }
-
-    return courses; 
-  } catch (e) {
-    print('Error fetching courses: $e');
-    return []; 
-  }
-}
-
-
 
 }
