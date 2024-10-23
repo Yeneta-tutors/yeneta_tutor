@@ -24,22 +24,14 @@ class ChatController {
     required this.ref,
   });
 
-  // Create a new chat between student and tutor
   Future<String> createChat(String tutorId) async {
-    // Fetch the current logged-in user's ID (studentId)
-    final String? studentId = authRepository.getCurrentUserId();
-
-    if (studentId == null) {
-      throw Exception('Student not signed in');
-    }
-
+    final String studentId = authRepository.getCurrentUserId();
+    
     return await chatRepository.createChat(studentId, tutorId);
   }
 
-  // Send a message in a chat
   Future<void> sendMessage(String chatId, String message) async {
-    // Fetch the current logged-in user's ID (senderId)
-    final String? senderId = authRepository.getCurrentUserId();
+    final String senderId = authRepository.getCurrentUserId();
 
     if (senderId == null) {
       throw Exception('User not signed in');
@@ -48,18 +40,12 @@ class ChatController {
     await chatRepository.sendMessage(chatId, senderId, message);
   }
 
-  // Fetch all chats for the current logged-in user
   Stream<List<Chat>> getUserChats() {
-    final String? userId = authRepository.getCurrentUserId();
-
-    if (userId == null) {
-      throw Exception('User not signed in');
-    }
+    final String userId = authRepository.getCurrentUserId();
 
     return chatRepository.getUserChats(userId);
   }
 
-  // Fetch all messages for a specific chat
   Stream<List<Message>> getMessages(String chatId) {
     return chatRepository.getMessages(chatId);
   }
