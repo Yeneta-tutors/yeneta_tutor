@@ -1,4 +1,3 @@
-
 class Course {
   String courseId;
   String teacherId;
@@ -10,8 +9,9 @@ class Course {
   String videoUrl;
   String demoVideoUrl;
   double price;
-  String? thumbnail; 
+  String? thumbnail;
   double? rating;
+  int? numRating;
   DateTime createdAt;
   DateTime updatedAt;
 
@@ -28,6 +28,7 @@ class Course {
     required this.price,
     required this.thumbnail,
     required this.rating,
+    required this.numRating,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -40,13 +41,14 @@ class Course {
       'title': title,
       'grade': grade,
       'subject': subject,
-      'chapter':chapter,
-      'demo_video_url':demoVideoUrl,
+      'chapter': chapter,
+      'demo_video_url': demoVideoUrl,
       'description': description,
       'video_url': videoUrl,
       'price': price,
-      'thumbnail':thumbnail,
+      'thumbnail': thumbnail,
       'rating': rating,
+      'num_rating':numRating,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -58,18 +60,18 @@ class Course {
       courseId: map['course_id'],
       teacherId: map['teacher_id'],
       title: map['title'],
-      grade: map['grade'], 
-      subject: map['subject'] ?? '', 
-      chapter: map['chapter'], 
+      grade: map['grade'],
+      subject: map['subject'] ?? '',
+      chapter: map['chapter'],
       demoVideoUrl: map['demo_video_url'],
       description: map['description'],
       videoUrl: map['video_url'],
       price: map['price'].toDouble(),
       thumbnail: map['thumbnail'],
-      rating: map['rating'] != null ? map['rating'].toDouble() : null,
+      rating: map['rating']?.toDouble(), 
+      numRating: map['num_rating'] != null ? map['num_rating'] as int : null, 
       createdAt: DateTime.parse(map['created_at']),
       updatedAt: DateTime.parse(map['updated_at']),
-       
     );
   }
 
