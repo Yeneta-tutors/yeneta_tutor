@@ -7,18 +7,21 @@ import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
 import 'package:yeneta_tutor/features/student/studentHome.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
-import 'package:yeneta_tutor/features/auth/screens/tutorHomePage.dart';
+import 'package:yeneta_tutor/features/tutor/tutorHomePage.dart';
 import 'package:yeneta_tutor/firebase_options.dart';
 import 'package:yeneta_tutor/screens/splashScreen.dart';
 import 'package:chapa_unofficial/chapa_unofficial.dart';
+
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await dotenv.load(fileName: ".env");
   String chapaApiKey = dotenv.env['CHAPA_API_KEY'] ?? '';
   Chapa.configure(privateKey: chapaApiKey);
   runApp(const ProviderScope(child: MyApp()));
 }
-
-
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -37,7 +40,7 @@ class MyApp extends ConsumerWidget {
       home: userAsyncValue.when(
         data: (user) {
           if (user == null) {
-            return SplashScreen();//
+            return SplashScreen(); //
           } else {
             if (user.role == 0) {
               return StudentHomePage();
