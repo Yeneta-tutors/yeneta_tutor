@@ -1,8 +1,10 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
-import 'package:yeneta_tutor/features/student/studentDetailsPage.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
+import 'package:yeneta_tutor/features/student/studentDetailsPage.dart';
 import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
@@ -17,18 +19,69 @@ class CoursesPage extends ConsumerStatefulWidget {
 }
 
 class _CoursesPageState extends ConsumerState<CoursesPage> {
+  late Future<List<Course>> _coursesFuture;
+  List<Course> _filteredCourses = [];
+  String _searchQuery = '';
+  int? _selectedGrade;
+  int? _selectedChapter;
+  bool _isFirstBuild = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isFirstBuild) {
+      _coursesFuture = fetchCourseBySubject();
+      _isFirstBuild = false;
+    }
+  }
+
+  Future<List<Course>> fetchCourseBySubject() async {
+    try {
+      final courses = await ref
+          .watch(courseControllerProvider)
+          .fetchCourseBySubject(widget.subject);
+      setState(() {
+        _filteredCourses = _applyFiltersAndSearch(courses);
+      });
+      return courses;
+    } catch (e) {
+      print(e);
+      throw Exception('Error getting courses by subject $e');
+    }
+  }
+
+  List<Course> _applyFiltersAndSearch(List<Course> courses) {
+    _filteredCourses = courses.where((course) {
+      final matchesGrade =
+          _selectedGrade == null || course.grade == _selectedGrade;
+      final matchesChapter =
+          _selectedChapter == null || course.chapter == _selectedChapter;
+      final matchesSearch = _searchQuery.isEmpty ||
+          course.title.toLowerCase().contains(_searchQuery.toLowerCase());
+      return matchesGrade && matchesChapter && matchesSearch;
+    }).toList();
+    return _filteredCourses;
+  }
+
+  void _openFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => FilterDialog(
+        selectedGrade: _selectedGrade,
+        selectedChapter: _selectedChapter,
+        onApplyFilters: (grade, chapter) {
+          setState(() {
+            _selectedGrade = grade;
+            _selectedChapter = chapter;
+          });
+          _applyFiltersAndSearch(_filteredCourses);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final courseControler = ref.watch(courseControllerProvider);
-
-    Future<List<Course>> fetchCourseBySubject() async {
-      try {
-        return await courseControler.fetchCourseBySubject(widget.subject);
-      } catch (e) {
-        throw Exception('Error getting course by  subject');
-      }
-    }
-
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -36,9 +89,7 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
         elevation: 1,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Courses',
@@ -48,20 +99,13 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.filter_alt),
-            color: const Color.fromARGB(255, 0, 0, 0),
-            onPressed: () {
-              // Open filter dialog
-              showDialog(
-                context: context,
-                builder: (_) => FilterDialog(),
-              );
-            },
+            color: Colors.black,
+            onPressed: _openFilterDialog,
           ),
         ],
       ),
       body: Column(
         children: [
-          // Search bar
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Container(
@@ -77,6 +121,12 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                 ],
               ),
               child: TextField(
+                onChanged: (query) {
+                  setState(() {
+                    _searchQuery = query;
+                    _applyFiltersAndSearch(_filteredCourses);
+                  });
+                },
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -91,25 +141,22 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
             ),
           ),
           SizedBox(height: 10),
-
-          // Course cards grid
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: FutureBuilder<List<Course>>(
-                future: fetchCourseBySubject(),
+                future: _coursesFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No subjects found'));
+                  } else if (_filteredCourses.isEmpty) {
+                    return Center(child: Text('No courses found'));
                   }
 
-                  final courses = snapshot.data!;
                   return GridView.builder(
-                    itemCount: courses.length,
+                    itemCount: _filteredCourses.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 10,
@@ -117,7 +164,7 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                       childAspectRatio: 0.7,
                     ),
                     itemBuilder: (context, index) {
-                      final course = courses[index];
+                      final course = _filteredCourses[index];
                       final teacherFuture = ref
                           .read(authControllerProvider)
                           .getUserData(course.teacherId);
@@ -127,14 +174,11 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                         builder: (context, teacherSnapshot) {
                           if (teacherSnapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Text(
-                                "Loading"); // Show loading state for teacher data
-                          } else if (teacherSnapshot.hasError) {
-                            return Text('Error loading teacher data');
-                          } else if (!teacherSnapshot.hasData) {
-                            return Text('No teacher data available');
+                            return Center(child: CircularProgressIndicator());
+                          } else if (teacherSnapshot.hasError ||
+                              !teacherSnapshot.hasData) {
+                            return SizedBox.shrink();
                           }
-
                           final teacher = teacherSnapshot.data!;
 
                           return GestureDetector(
@@ -159,7 +203,6 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                                   children: [
                                     Stack(
                                       children: [
-                                        // Course image with rounded corners
                                         ClipRRect(
                                           borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(15),
@@ -180,7 +223,6 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                                                   fit: BoxFit.cover,
                                                 ),
                                         ),
-                                        // Grade text (bottom left corner)
                                         Positioned(
                                           bottom: 5,
                                           left: 5,
@@ -188,20 +230,19 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 8, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(
-                                                  0.7), // Black background with opacity
+                                              color:
+                                                  Colors.black.withOpacity(0.7),
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                             ),
                                             child: Text(
-                                              'Grade ${course.grade}', // Dynamic grade text
+                                              'Grade ${course.grade}',
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 12),
                                             ),
                                           ),
                                         ),
-                                        // Chapter text (bottom right corner)
                                         Positioned(
                                           bottom: 5,
                                           right: 5,
@@ -209,13 +250,13 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 8, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(
-                                                  0.7), // Black background with opacity
+                                              color:
+                                                  Colors.black.withOpacity(0.7),
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                             ),
                                             child: Text(
-                                              'Chapter ${course.chapter}', // Dynamic chapter text
+                                              'Chapter ${course.chapter}',
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 12),
@@ -242,7 +283,7 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                                             children: [
                                               CircleAvatar(
                                                 backgroundImage: AssetImage(
-                                                    'images/maths_thumbnail.jpg'), // Tutor profile image
+                                                    'images/maths_thumbnail.jpg'),
                                                 radius: 12,
                                               ),
                                               SizedBox(width: 5),
@@ -260,56 +301,11 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                                                   size: 16),
                                               SizedBox(width: 3),
                                               Text(
-                                                ' ${course.rating ?? 0}',
+                                                '${course.rating}',
                                                 style: TextStyle(
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  color: Colors.grey[700],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 20),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              FutureBuilder<int>(
-                                                future: ref
-                                                    .read(
-                                                        subscriptionControllerProvider)
-                                                    .getTotalSubscribersForCourse(
-                                                        course.courseId),
-                                                builder: (context, snapshot) {
-                                                  if (snapshot
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return Text('Loading...');
-                                                  } else if (snapshot
-                                                      .hasError) {
-                                                    return Text('Error');
-                                                  } else if (snapshot.hasData) {
-                                                    return Text(
-                                                      ' ${snapshot.data} students',
-                                                      style: TextStyle(
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        color: Colors.grey[700],
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    return Text('No data');
-                                                  }
-                                                },
-                                              ),
-                                              Text(
-                                                '${course.price} Birr',
-                                                style: TextStyle(
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  color: Colors.blue,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
                                             ],
                                           ),
@@ -335,18 +331,28 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
   }
 }
 
-// Filter Dialog
 class FilterDialog extends StatefulWidget {
-  
+  final int? selectedGrade;
+  final int? selectedChapter;
+  final Function(int?, int?) onApplyFilters;
+
+  FilterDialog(
+      {this.selectedGrade, this.selectedChapter, required this.onApplyFilters});
+
   @override
   _FilterDialogState createState() => _FilterDialogState();
 }
 
 class _FilterDialogState extends State<FilterDialog> {
-  int selectedGrade = 9;
-  int selectedChapter = 1;
-  // String priceOrder = 'Cheaper to Expensive';
-  // bool mostSold = false;
+  int? selectedGrade;
+  int? selectedChapter;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedGrade = widget.selectedGrade;
+    selectedChapter = widget.selectedChapter;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -360,111 +366,48 @@ class _FilterDialogState extends State<FilterDialog> {
             Text('Grade'),
             DropdownButton<int>(
               value: selectedGrade,
-              items: [9, 10, 11, 12].map((int value) {
+              items: [null, 9, 10, 11, 12].map((int? value) {
                 return DropdownMenuItem<int>(
                   value: value,
-                  child: Text('Grade $value'),
+                  child: Text(value == null ? 'All Grades' : 'Grade $value'),
                 );
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  selectedGrade = value!;
+                  selectedGrade = value;
                 });
               },
             ),
-
             // Chapter Filter
             Text('Chapter'),
             DropdownButton<int>(
               value: selectedChapter,
-              items: List.generate(12, (index) => index + 1).map((int value) {
+              items: [null, ...List.generate(12, (index) => index + 1)]
+                  .map((int? value) {
                 return DropdownMenuItem<int>(
                   value: value,
-                  child: Text('Chapter $value'),
+                  child:
+                      Text(value == null ? 'All Chapters' : 'Chapter $value'),
                 );
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  selectedChapter = value!;
+                  selectedChapter = value;
                 });
               },
-              isExpanded: false,
-              dropdownColor:
-                  Colors.grey[200], // Customize dropdown background color
-              icon:
-                  Icon(Icons.arrow_drop_down), // Customize dropdown arrow icon
-              iconSize: 20,
-              menuMaxHeight: 200,
             ),
-
-            // Price Filter
-            // Text('Price'),
-            // DropdownButton<String>(
-            //   value: priceOrder,
-            //   items: ['Cheaper to Expensive', 'Expensive to Cheaper'].map((String value) {
-            //     return DropdownMenuItem<String>(
-            //       value: value,
-            //       child: Text(value),
-            //     );
-            //   }).toList(),
-            //   onChanged: (value) {
-            //     setState(() {
-            //       priceOrder = value!;
-            //     });
-            //   },
-            // ),
-
-            // Most Sold Filter
-            // CheckboxListTile(
-            //   title: Text('Most Sold'),
-            //   value: mostSold,
-            //   onChanged: (value) {
-            //     setState(() {
-            //       mostSold = value!;
-            //     });
-            //   },
-            // ),
           ],
         ),
       ),
       actions: [
         TextButton(
           onPressed: () {
-            // Apply filter logic and close dialog
+            widget.onApplyFilters(selectedGrade, selectedChapter);
             Navigator.of(context).pop();
           },
-          child: Text('Search'),
+          child: Text('Apply'),
         ),
       ],
     );
   }
 }
-
-
-
-
-
-
-
-
-// // Dummy CourseDetail Page
-// class CourseDetail extends StatelessWidget {
-//   final Map<String, dynamic> course;
-
-//   CourseDetail({required this.course});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(course['title']),
-//       ),
-//       body: Center(
-//         child: Text(
-//           'Details for ${course['title']}',
-//           style: TextStyle(fontSize: 24),
-//         ),
-//       ),
-//     );
-//   }
-// }
