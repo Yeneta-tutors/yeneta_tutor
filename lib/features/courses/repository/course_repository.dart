@@ -181,8 +181,7 @@ class CourseRepository {
           .where('subject', isEqualTo: subject)
           .get();
 
-      print(
-          'Found ${querySnapshot.docs.length} courses for filters: Grade=$grade, Chapter=$chapter, Subject=$subject');
+      print('Found ${querySnapshot.docs.length} courses for filters: Grade=$grade, Chapter=$chapter, Subject=$subject');
 
       if (querySnapshot.docs.isEmpty) {
         print('No courses found for the selected filters');
