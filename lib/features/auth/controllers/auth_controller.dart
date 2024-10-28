@@ -21,7 +21,20 @@ final userDataAuthProvider = StreamProvider<UserModel?>((ref) async* {
     }
   }
 });
+final allUsersProvider = FutureProvider<List<UserModel>>((ref) async {
+  final authController = ref.watch(authControllerProvider);
+  return await authController.getAllUsers();
+});
 
+final userStatisticsProvider = FutureProvider<Map<UserRole, int>>((ref) async {
+  final users = await ref.watch(allUsersProvider.future);
+  final roleCounts = {
+    UserRole.student: users.where((user) => user.role == UserRole.student).length,
+    UserRole.tutor: users.where((user) => user.role == UserRole.tutor).length,
+    UserRole.admin: users.where((user) => user.role == UserRole.admin).length,
+  };
+  return roleCounts;
+});
 class AuthController {
   final AuthRepository authRepository;
   final ProviderRef ref;
@@ -128,6 +141,12 @@ class AuthController {
       profilePic: profilePic,
     );
   }
+
+
+
+Future<List<UserModel>> getAllUsers() async {
+  return await authRepository.getAllUsers();
+}
 
   void updateUser({
     required String uid,
