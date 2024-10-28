@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
+import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
+import 'package:yeneta_tutor/models/course_model.dart';
 
 class SubscriptionPlanSelectionPage extends ConsumerStatefulWidget {
   String courseId;
@@ -15,8 +17,29 @@ class SubscriptionPlanSelectionPage extends ConsumerStatefulWidget {
 class _SubscriptionPlanSelectionPageState
     extends ConsumerState<SubscriptionPlanSelectionPage> {
   int selectedPlanIndex = 0;
-  double pricePerMonth = 200.0;
-  double totalPrice = 200.0;
+  double pricePerMonth = 0.0;
+  double totalPrice = 0.0;
+  @override
+  void initState() {
+    super.initState();
+    _fetchCourseData();
+  }
+
+  Future<void> _fetchCourseData() async {
+    try {
+      Course? course = await ref
+          .read(courseControllerProvider)
+          .fetchCourseById(widget.courseId);
+      if (course != null) {
+        setState(() {
+          pricePerMonth = course.price;
+          totalPrice = pricePerMonth;
+        });
+      }
+    } catch (e) {
+      print('Error fetching course: $e');
+    }
+  }
 
   void updatePrice(int index) {
     setState(() {
@@ -41,24 +64,24 @@ class _SubscriptionPlanSelectionPageState
             ? '6 months'
             : '1 year';
     DateTime startDate = DateTime.now();
-  
+
     DateTime endDate;
     if (selectedPlanIndex == 0) {
-    endDate = DateTime(startDate.year, startDate.month + 1, startDate.day);
-  } else if (selectedPlanIndex == 1) {
-    endDate = DateTime(startDate.year, startDate.month + 6, startDate.day);
-  } else {
-    endDate = DateTime(startDate.year + 1, startDate.month, startDate.day);
-  }
+      endDate = DateTime(startDate.year, startDate.month + 1, startDate.day);
+    } else if (selectedPlanIndex == 1) {
+      endDate = DateTime(startDate.year, startDate.month + 6, startDate.day);
+    } else {
+      endDate = DateTime(startDate.year + 1, startDate.month, startDate.day);
+    }
 
     await subscriptionController.createSubscriptionAndPay(
       studentId: studentId,
       courseId: widget.courseId,
       subscriptionType: subscriptionType,
       amount: totalPrice.toString(),
-      startDate: startDate,    // Pass the start date
-      endDate: endDate, 
-      context: context, 
+      startDate: startDate, // Pass the start date
+      endDate: endDate,
+      context: context,
     );
   }
 
@@ -214,7 +237,9 @@ class _SubscriptionPlanSelectionPageState
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         decoration: BoxDecoration(
-          color: selectedPlanIndex == index ? const Color.fromARGB(255, 9, 19, 58) : Colors.white,
+          color: selectedPlanIndex == index
+              ? const Color.fromARGB(255, 9, 19, 58)
+              : Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
