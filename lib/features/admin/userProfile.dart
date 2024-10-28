@@ -1,225 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 
-class UserProfile extends StatelessWidget {
+class UserProfile extends ConsumerWidget {
+  String userId;
+  UserProfile({super.key, required this.userId});
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userDataFuture = ref.read(authControllerProvider).getUserData(userId);
+
     return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        title: Text('User Management > Profile student'),
-        backgroundColor: Colors.grey[850],
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Center(
-              child: Row(
-              children: [
-                Text('Hello, Esubalew', style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255))),
-                SizedBox(width: 10),
-                CircleAvatar(
-                  backgroundImage: AssetImage('images/avator_image.png'), // Admin image
-                ),
-              ],
-            ),
-            ),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile Details Container
-            Expanded(
-              flex: 2,
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
+        backgroundColor: Colors.grey[200],
+        appBar: AppBar(
+          title: Text('User Management > Profile student'),
+          backgroundColor: Colors.grey[850],
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Center(
+                child: Row(
                   children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundImage: AssetImage('images/avator_image.png'), // User image here
-                        ),
-                        Positioned(
-                          bottom: -20,
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.transparent,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 30),
-                    Text(
-                      'Name: Abebe Kebede',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      'Gender: Female',
-                      style: TextStyle(fontSize: 16),
-                    ),SizedBox(height: 5),
-                    Text(
-                      'Email: abc@gmail.com',
-                      style: TextStyle(fontSize: 16),
-                    ),SizedBox(height: 5),
-                    Text(
-                      'Phone: 0912545848',
-                      style: TextStyle(fontSize: 16),
-                    ),SizedBox(height: 5),
-                    Text(
-                      'Grade: 11',
-                      style: TextStyle(fontSize: 16),
-                    ),SizedBox(height: 5),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                        onPressed: () {
-                          // Block user functionality
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red, // Button background color
-                          minimumSize: Size(200, 50), // Set minimum width and height
-                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15), // Padding inside the button
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5), // Small border radius for rectangular shape
-                          ),
-                        ),
-                        child: Text(
-                          'Block User',
-                          style: TextStyle(fontSize: 18,color: Colors.white), // Larger font size for the button text
-                        ),
-                      )
-
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(width: 16),
-            // Subscribed Courses Container
-            Expanded(
-              flex: 3,
-              child: Column(
-                children: [
-                  // Search bar and filter
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 10,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Search here',
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        Icon(Icons.filter_list),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  // Scrollable courses
-                  Expanded(
-  child: Container(
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black26,
-          blurRadius: 10,
-          offset: Offset(0, 5),
-        ),
-      ],
-    ),
-    child: LayoutBuilder(
-      builder: (context, constraints) {
-        double cardAspectRatio = (constraints.maxWidth < 400) ? 0.7 : 1.0; // Adjust based on screen width
-        return GridView.builder(
-          padding: EdgeInsets.all(16),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // Two cards per row
-            crossAxisSpacing: 16, // Spacing between cards
-            mainAxisSpacing: 16, // Spacing between rows
-            childAspectRatio: cardAspectRatio, // Adjust card height based on width
-          ),
-          itemCount: 6, // Number of courses
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                // Redirect to course details
-              },
-              child: CourseCard(),
-            );
-          },
-        );
-      },
-    ),
-  ),
-),
-
-                ],
-              ),
-            ),
-            SizedBox(width: 16),
-            // Bar Chart Container
-            Expanded(
-              flex: 2,
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Center(
-                        child: Placeholder(), // Replace with actual chart widget
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        SubjectIndicator(color: Colors.blue, subject: 'Math', count: 2),
-                        SubjectIndicator(color: Colors.green, subject: 'Physics', count: 4),
-                        SubjectIndicator(color: Colors.pink, subject: 'Biology', count: 2),
-                        SubjectIndicator(color: Colors.orange, subject: 'Chemistry', count: 2),
-                      ],
+                    Text('Hello, Esubalew',
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 255, 255, 255))),
+                    SizedBox(width: 10),
+                    CircleAvatar(
+                      backgroundImage:
+                          AssetImage('images/avator_image.png'), // Admin image
                     ),
                   ],
                 ),
@@ -227,8 +34,253 @@ class UserProfile extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
+        body: FutureBuilder(
+          future: userDataFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (snapshot.hasData) {
+              final user = snapshot.data;
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Profile Details Container
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage: AssetImage(user!.profileImage ??
+                                      'images/avator_image.png'), // User image here
+                                ),
+                                Positioned(
+                                  bottom: -20,
+                                  child: CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Colors.transparent,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 30),
+                            Text(
+                              'Name: ${user.firstName} ${user.fatherName}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Gender: ${user.gender}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Email: ${user.email}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Phone: 0${user.phoneNumber}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'Grade: ${user.grade ?? 'Not specified'}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 5),
+                            SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Block user functionality
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Colors.red, // Button background color
+                                minimumSize: Size(
+                                    200, 50), // Set minimum width and height
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 15), // Padding inside the button
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      5), // Small border radius for rectangular shape
+                                ),
+                              ),
+                              child: Text(
+                                'Block User',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors
+                                        .white), // Larger font size for the button text
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    // Subscribed Courses Container
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        children: [
+                          // Search bar and filter
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                      hintText: 'Search here',
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                                Icon(Icons.filter_list),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          // Scrollable courses
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  double cardAspectRatio =
+                                      (constraints.maxWidth < 400)
+                                          ? 0.7
+                                          : 1.0; // Adjust based on screen width
+                                  return GridView.builder(
+                                    padding: EdgeInsets.all(16),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2, // Two cards per row
+                                      crossAxisSpacing:
+                                          16, // Spacing between cards
+                                      mainAxisSpacing:
+                                          16, // Spacing between rows
+                                      childAspectRatio:
+                                          cardAspectRatio, // Adjust card height based on width
+                                    ),
+                                    itemCount: 6, // Number of courses
+                                    itemBuilder: (context, index) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          // Redirect to course details
+                                        },
+                                        child: CourseCard(),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    // Bar Chart Container
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Center(
+                                child:
+                                    Placeholder(), // Replace with actual chart widget
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                SubjectIndicator(
+                                    color: Colors.blue,
+                                    subject: 'Math',
+                                    count: 2),
+                                SubjectIndicator(
+                                    color: Colors.green,
+                                    subject: 'Physics',
+                                    count: 4),
+                                SubjectIndicator(
+                                    color: Colors.pink,
+                                    subject: 'Biology',
+                                    count: 2),
+                                SubjectIndicator(
+                                    color: Colors.orange,
+                                    subject: 'Chemistry',
+                                    count: 2),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return Center(child: Text('No data available'));
+          },
+        ));
   }
 }
 
@@ -326,7 +378,8 @@ class CourseCard extends StatelessWidget {
               children: [
                 // Tutor Image
                 CircleAvatar(
-                  backgroundImage: AssetImage('images/avator_image.png'), // Replace with the tutor image
+                  backgroundImage: AssetImage(
+                      'images/avator_image.png'), // Replace with the tutor image
                   radius: 20,
                 ),
                 SizedBox(width: 4),
@@ -456,8 +509,8 @@ class CourseCard extends StatelessWidget {
 //     Row(
 //       children: [
 //         CircleAvatar(
-//           radius: 12, 
-//           backgroundImage: AssetImage('images/avator_image.png'), 
+//           radius: 12,
+//           backgroundImage: AssetImage('images/avator_image.png'),
 //         ),
 //         SizedBox(width: 8), // Space between avatar and text
 //         Column(
@@ -491,15 +544,13 @@ class CourseCard extends StatelessWidget {
 //   }
 // }
 
-
-
-
 class SubjectIndicator extends StatelessWidget {
   final Color color;
   final String subject;
   final int count;
 
-  SubjectIndicator({required this.color, required this.subject, required this.count});
+  SubjectIndicator(
+      {required this.color, required this.subject, required this.count});
 
   @override
   Widget build(BuildContext context) {
