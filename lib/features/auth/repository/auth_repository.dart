@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/common/repositories/common_firebase_storage_repository.dart';
+import 'package:yeneta_tutor/features/admin/admin_sidebar.dart';
 import 'package:yeneta_tutor/features/tutor/tutorHomePage.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
 import 'package:yeneta_tutor/features/student/studentHome.dart';
@@ -118,6 +119,9 @@ class AuthRepository {
               builder: (context) => TutorHomePage(),
             ),
           );
+        } else if (role == UserRole.admin) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => Sidebar()));
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -171,6 +175,9 @@ class AuthRepository {
                   builder: (context) => TutorHomePage(),
                 ),
               );
+            } else if (userModel.role == UserRole.admin) {
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => Sidebar()));
             }
           } else {
             showSnackBar(context, "User document is null.");
@@ -250,35 +257,42 @@ class AuthRepository {
     }
   }
 
+  // get all users
+  Future<List<UserModel>> getAllUsers() async {
+    try {
+      QuerySnapshot users = await firestore.collection('users').get();
+      return users.docs
+          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get users: $e');
+    }
+  }
+
   // Update user data
   Future<void> updateUser({
-  required String uid,
-  required Map<String, dynamic> updatedData,
-  required File? profilePic,
-  required ProviderRef ref,
-  required BuildContext context,
-}) async {
-  try {
-  
-    if (profilePic != null) {
+    required String uid,
+    required Map<String, dynamic> updatedData,
+    required File? profilePic,
+    required ProviderRef ref,
+    required BuildContext context,
+  }) async {
+    try {
+      if (profilePic != null) {
+        String imageRef = 'profilePics/$uid';
 
-      String imageRef = 'profilePics/$uid';  
+        String photoUrl = await ref
+            .read(commonFirebaseStorageRepositoryProvider)
+            .storeFileToFirebase(imageRef, profilePic);
 
-      String photoUrl = await ref
-          .read(commonFirebaseStorageRepositoryProvider)
-          .storeFileToFirebase(imageRef, profilePic);
+        updatedData['profile_image'] = photoUrl;
+      }
 
-
-      updatedData['profile_image'] = photoUrl;
+      await firestore.collection('users').doc(uid).update(updatedData);
+    } catch (e) {
+      showSnackBar(context, 'Failed to update user profile: $e');
     }
-
-    await firestore.collection('users').doc(uid).update(updatedData);
-
-  } catch (e) {
-    showSnackBar(context, 'Failed to update user profile: $e');
-   
   }
-}
 
   // Get current user ID
   String getCurrentUserId() {
@@ -295,28 +309,23 @@ class AuthRepository {
       }
     });
   }
-  Future<void> signOut() async {
 
+  Future<void> signOut() async {
     try {
       await auth.signOut();
     } catch (e) {
       throw Exception('Could not sign out: $e');
     }
-    
   }
 
   Future<void> deleteAccount() async {
-       try {
+    try {
       User? user = auth.currentUser;
       if (user != null) {
-        await user.delete(); 
+        await user.delete();
       }
     } catch (e) {
       throw Exception('Could not delete user: $e');
     }
   }
-
-
 }
-
-
