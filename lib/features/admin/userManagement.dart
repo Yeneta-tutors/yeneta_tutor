@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/admin/dashboard_provider.dart';
 import 'package:yeneta_tutor/features/admin/userProfile.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
@@ -376,92 +377,83 @@ class _UserManagementState extends ConsumerState<UserManagement>
 
   // Widget for Grade Chart with animation
   Widget _buildGradeChart() {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        return Container(
-          padding: EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 5,
-                offset: Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Pie chart section
-              SizedBox(
-                width: 200, // Adjust width as needed
-                height: 200,
-                child: PieChart(
-                  PieChartData(
-                    sections: [
-                      PieChartSectionData(
-                        color: Colors.blueAccent,
-                        value: 30 *
-                            _animation.value, // Multiply by animation value
-                        title: '${(30 * _animation.value).toStringAsFixed(1)}%',
-                        radius: 30,
-                      ),
-                      PieChartSectionData(
-                        color: Colors.orangeAccent,
-                        value: 25 * _animation.value,
-                        title: '${(25 * _animation.value).toStringAsFixed(1)}%',
-                        radius: 30,
-                      ),
-                      PieChartSectionData(
-                        color: Colors.greenAccent,
-                        value: 45 * _animation.value,
-                        title: '${(45 * _animation.value).toStringAsFixed(1)}%',
-                        radius: 30,
-                      ),
-                      PieChartSectionData(
-                        color: const Color.fromARGB(255, 136, 255, 0),
-                        value: 45 * _animation.value,
-                        title: '${(45 * _animation.value).toStringAsFixed(1)}%',
-                        radius: 30,
-                      ),
-                    ],
+  final gradeStudents = ref.watch(gradeStudentsProvider);
+
+  return AnimatedBuilder(
+    animation: _animationController,
+    builder: (context, child) {
+      return Container(
+        padding: EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 5,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: gradeStudents.when(
+          data: (gradeData) {
+            int totalStudents = gradeData.values.fold(0, (a, b) => a + b);
+            return Column(
+              children: [
+                Text(
+                  'Students by Grade',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  height: 200,
+                  child: PieChart(
+                    PieChartData(
+                      sections: gradeData.entries.map((entry) {
+                        final grade = entry.key;
+                        final count = entry.value;
+                        final percentage = (count / totalStudents) * 100;
+
+                        return PieChartSectionData(
+                          color: Colors.primaries[grade.hashCode % Colors.primaries.length],
+                          value: percentage,
+                          title: '$grade: $count',
+                          radius: 40 * _animation.value,
+                          titleStyle: TextStyle(
+                            fontSize: 12 * _animation.value,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
-              ),
-              // Legend section
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildIndicator(
-                      color: Colors.blueAccent,
-                      text: 'Grade 9',
-                      percentage: '30%'),
-                  SizedBox(height: 10),
-                  _buildIndicator(
-                      color: Colors.orangeAccent,
-                      text: 'Grade 10',
-                      percentage: '25%'),
-                  SizedBox(height: 10),
-                  _buildIndicator(
-                      color: Colors.greenAccent,
-                      text: 'Grade 11',
-                      percentage: '45%'),
-                  SizedBox(height: 10),
-                  _buildIndicator(
-                      color: Color.fromARGB(255, 136, 255, 0),
-                      text: 'Grade 12',
-                      percentage: '45%'),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: gradeData.entries.map((entry) {
+                    final grade = entry.key;
+                    final percentage = ((entry.value / totalStudents) * 100).toStringAsFixed(1);
+                    return _buildIndicator(
+                      color: Colors.primaries[grade.hashCode % Colors.primaries.length],
+                      text: 'Grade $grade',
+                      percentage: '$percentage%',
+                    );
+                  }).toList(),
+                ),
+              ],
+            );
+          },
+          loading: () => Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(child: Text('Error loading grade data')),
+        ),
+      );
+    },
+  );
+}
+
 
   // Helper widget to build chart indicators
   Widget _buildIndicator(
