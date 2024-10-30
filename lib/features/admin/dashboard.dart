@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:yeneta_tutor/features/admin/admin_sidebar.dart';
+import 'package:yeneta_tutor/features/admin/dashboard_provider.dart';
 
-class AdminDashboard extends StatelessWidget {
+class AdminDashboard extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+
     return Scaffold(
       backgroundColor: Color.fromRGBO(243, 242, 247, 1),
       appBar: AppBar(
@@ -90,65 +94,50 @@ class SearchBar extends StatelessWidget {
   }
 }
 
-// class Sidebar extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Drawer(
-//       child: ListView(
-//         padding: EdgeInsets.zero,
-//         children: [
-//           DrawerHeader(
-//             decoration: BoxDecoration(
-//               color: const Color.fromRGBO(9, 19, 58, 1),
-//             ),
-//             child: Text(
-//               'Yeneta Admin',
-//               style: TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 24,
-//               ),
-//             ),
-//           ),
-//           SidebarItem(title: 'Dashboard', icon: Icons.dashboard),
-//           SidebarItem(title: 'User Management', icon: Icons.people,),
-//           SidebarItem(title: 'Content Management', icon: Icons.video_library),
-//           SidebarItem(title: 'Financial Management', icon: Icons.attach_money),
-//           SidebarItem(title: 'Reports', icon: Icons.bar_chart),
-//           SidebarItem(title: 'Add Admin', icon: Icons.add),
-//         ],
-//       ),
-//     );
-//   }
-// }
+class StatisticsGrid extends ConsumerWidget {
 
-// // class SidebarItem extends StatelessWidget {
-// //   final String title;
-// //   final IconData icon;
-
-// //   SidebarItem({required this.title, required this.icon});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListTile(
-//       leading: Icon(icon),
-//       title: Text(title),
-//       onTap: () {
-        
-//       },
-//     );
-//   }
-// }
-
-class StatisticsGrid extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+  final totalStudents = ref.watch(totalStudentsProvider);
+   final totalTutors = ref.watch(totalTutorsProvider);
+   final totalCourses = ref.watch(totalCoursesProvider);
+   final totalRevenue = ref.watch(totalIncomeProvider);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        StatsBox(title: 'Total Students', count: '75', icon: FontAwesomeIcons.graduationCap),
-        StatsBox(title: 'Total Tutors', count: '15', icon: FontAwesomeIcons.user),
-        StatsBox(title: 'Total Courses', count: '15', icon: FontAwesomeIcons.book),
-        StatsBox(title: 'Total Revenue', count: '128 Birr', icon: FontAwesomeIcons.dollarSign),
+        StatsBox(
+          title: 'Total Students',
+          count: totalStudents.when(
+              data: (data) => '$data',
+              loading: () => '...',
+              error: (err, stack) => 'Error'),
+          icon: FontAwesomeIcons.graduationCap,
+        ),
+        StatsBox(
+          title: 'Total Tutors',
+          count: totalTutors.when(
+              data: (data) => '$data',
+              loading: () => '...',
+              error: (err, stack) => 'Error'),
+          icon: FontAwesomeIcons.user,
+        ),
+        StatsBox(
+          title: 'Total Courses',
+          count: totalCourses.when(
+              data: (data) => '$data',
+              loading: () => '...',
+              error: (err, stack) => 'Error'),
+          icon: FontAwesomeIcons.book,
+        ),
+        StatsBox(
+          title: 'Total Revenue',
+          count: totalRevenue.when(
+              data: (data) => '\$${data.toStringAsFixed(2)}',
+              loading: () => '...',
+              error: (err, stack) => 'Error'),
+          icon: FontAwesomeIcons.dollarSign,
+        ),
       ],
     );
   }
@@ -190,12 +179,12 @@ class StatsBox extends StatelessWidget {
   }
 }
 
-class PieChartWidget extends StatefulWidget {
+class PieChartWidget extends ConsumerStatefulWidget {
   @override
   _PieChartWidgetState createState() => _PieChartWidgetState();
 }
 
-class _PieChartWidgetState extends State<PieChartWidget>
+class _PieChartWidgetState extends ConsumerState<PieChartWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   double _angle = 0.0;
@@ -225,82 +214,102 @@ class _PieChartWidgetState extends State<PieChartWidget>
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.6, // Control the width here
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              blurRadius: 8,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text(
-                  'Users',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: PieChart(
-                PieChartData(
-                  startDegreeOffset: _angle, // Add animation effect here
-                  sections: [
-                    PieChartSectionData(
-                      value: 63,
-                      color: Colors.blue,
-                      title: '63%',
-                      radius: 50,
-                      titleStyle: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    PieChartSectionData(
-                      value: 25,
-                      color: Colors.green,
-                      title: '25%',
-                      radius: 50,
-                      titleStyle: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
+    final totalStudents = ref.watch(totalStudentsProvider);
+    final totalTutors = ref.watch(totalTutorsProvider);
+
+    return totalStudents.when(
+      data: (students) {
+        return totalTutors.when(
+          data: (tutors) {
+            final totalUsers = students + tutors;
+            final studentPercentage = totalUsers > 0 ? (students / totalUsers) * 100 : 0;
+            final tutorPercentage = totalUsers > 0 ? (tutors / totalUsers) * 100 : 0;
+
+            return Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.6, // Control the width here
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: Offset(0, 3),
                     ),
                   ],
-                  pieTouchData: PieTouchData(
-                    touchCallback: (touchEvent, response) {
-                      if (touchEvent.isInterestedForInteractions &&
-                          response != null &&
-                          response.touchedSection != null) {
-                        // Add more interactions if needed
-                      }
-                    },
-                  ),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          'Users',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: PieChart(
+                        PieChartData(
+                          startDegreeOffset: _angle, // Add animation effect here
+                          sections: [
+                            PieChartSectionData(
+                              value: studentPercentage.toDouble(),
+                              color: Colors.blue,
+                              title: '${studentPercentage.toStringAsFixed(1)}%',
+                              radius: 50,
+                              titleStyle: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                            PieChartSectionData(
+                              value: tutorPercentage.toDouble(),
+                              color: Colors.green,
+                              title: '${tutorPercentage.toStringAsFixed(1)}%',
+                              radius: 50,
+                              titleStyle: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                          pieTouchData: PieTouchData(
+                            touchCallback: (touchEvent, response) {
+                              if (touchEvent.isInterestedForInteractions &&
+                                  response != null &&
+                                  response.touchedSection != null) {
+                                // Add more interactions if needed
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Indicator(color: Colors.blue, text: 'Students'),
+                        SizedBox(width: 20),
+                        Indicator(color: Colors.green, text: 'Tutors'),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Indicator(color: Colors.blue, text: 'Students'),
-                SizedBox(width: 20),
-                Indicator(color: Colors.green, text: 'Tutors'),
-              ],
-            ),
-          ],
-        ),
-      ),
+            );
+          },
+          loading: () => CircularProgressIndicator(),
+          error: (err, stack) => Text('Error loading tutors'),
+        );
+      },
+      loading: () => CircularProgressIndicator(),
+      error: (err, stack) => Text('Error loading students'),
     );
   }
 }
+
 
 // Custom Indicator widget
 class Indicator extends StatelessWidget {
@@ -347,101 +356,109 @@ class PieIndicator extends StatelessWidget {
   }
 }
 
-
-class BarChartWidget extends StatelessWidget {
+class BarChartWidget extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            blurRadius: 8,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          const Text(
-            'New Users',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: BarChart(
-              BarChartData(
-                barGroups: [
-                  makeGroupData(0, 5, 9),
-                  makeGroupData(1, 7, 6),
-                  makeGroupData(2, 5, 7),
-                  makeGroupData(3, 6, 8),
-                  makeGroupData(4, 2, 3),
-                  makeGroupData(5, 4, 5),
-                  makeGroupData(6, 9, 6),
-                ],
-                titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: true), // Remove left axis
-                  ),
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false), 
-                  ),
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false), 
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (double value, TitleMeta meta) {
-                        switch (value.toInt()) {
-                          case 0:
-                            return const Text('Mon');
-                          case 1:
-                            return const Text('Tue');
-                          case 2:
-                            return const Text('Wed');
-                          case 3:
-                            return const Text('Thu');
-                          case 4:
-                            return const Text('Fri');
-                          case 5:
-                            return const Text('Sat');
-                          case 6:
-                            return const Text('Sun');
-                          default:
-                            return const Text('');
-                        }
-                      },
-                      reservedSize: 28, // Ensures enough space for the labels
+  Widget build(BuildContext context, WidgetRef ref) {
+    final weeklyStudentsAsync = ref.watch(weeklyStudentsProvider);
+    final weeklyTutorsAsync = ref.watch(weeklyTutorsProvider);
+
+    return weeklyStudentsAsync.when(
+      data: (weeklyStudents) => weeklyTutorsAsync.when(
+        data: (weeklyTutors) {
+          // Determine maxY based on the larger of the two values to set the y-axis scale
+          final maxY = (weeklyStudents > weeklyTutors ? weeklyStudents : weeklyTutors).toDouble();
+          final interval = (maxY / 5).ceilToDouble(); // Setting interval to a fixed scale based on maxY
+
+          return Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                const Text(
+                  'New Users (Weekly)',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: BarChart(
+                    BarChartData(
+                      maxY: maxY + interval, // Adjusting maxY for padding on top
+                      barGroups: [
+                        makeGroupData(0, weeklyStudents.toDouble(), weeklyTutors.toDouble()),
+                        makeGroupData(1, weeklyStudents.toDouble(), weeklyTutors.toDouble()),
+                        makeGroupData(2, weeklyStudents.toDouble(), weeklyTutors.toDouble()),
+                        makeGroupData(3, weeklyStudents.toDouble(), weeklyTutors.toDouble()),
+                        makeGroupData(4, weeklyStudents.toDouble(), weeklyTutors.toDouble()),
+                        makeGroupData(5, weeklyStudents.toDouble(), weeklyTutors.toDouble()),
+                        makeGroupData(6, weeklyStudents.toDouble(), weeklyTutors.toDouble()),
+                      ],
+                      titlesData: FlTitlesData(
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            interval: interval, // Fixed interval for consistent labels
+                            getTitlesWidget: (double value, TitleMeta meta) {
+                              // Only display whole numbers
+                              return Text(value % 1 == 0 ? value.toInt().toString() : '');
+                            },
+                          ),
+                        ),
+                        rightTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        topTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: false),
+                        ),
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            getTitlesWidget: (double value, TitleMeta meta) {
+                              const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                              return Text(days[value.toInt()]);
+                            },
+                            reservedSize: 28,
+                          ),
+                        ),
+                      ),
+                      gridData: FlGridData(show: false),
+                      borderData: FlBorderData(
+                        show: true,
+                        border: const Border(
+                          bottom: BorderSide(color: Colors.black, width: 1),
+                          left: BorderSide(color: Colors.black, width: 1),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                gridData: FlGridData(show: false), // Remove grid lines
-                borderData: FlBorderData(
-                  show: true,
-                  border: const Border(
-                    bottom: BorderSide(color: Colors.black, width: 1),
-                    left: BorderSide(color: Colors.black, width: 1),
-                  ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Indicator(color: Colors.blue, text: 'Students'),
+                    const SizedBox(width: 20),
+                    Indicator(color: Colors.green, text: 'Tutors'),
+                  ],
                 ),
-              ),
+              ],
             ),
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Indicator(color: Colors.blue, text: 'Students'),
-              const SizedBox(width: 20),
-              Indicator(color: Colors.green, text: 'Tutors'),
-            ],
-          ),
-        ],
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(child: Text('Error loading tutor data')),
       ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text('Error loading student data')),
     );
   }
 

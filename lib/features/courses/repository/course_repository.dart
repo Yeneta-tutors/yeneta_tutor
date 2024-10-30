@@ -137,10 +137,7 @@ class CourseRepository {
   }
 
   // fetchCoursesForTutor
-  Future<List<Course>> fetchCoursesForTutor() async {
-    final teacherId = authRepository.getCurrentUserId();
-    print(teacherId);
-
+  Future<List<Course>> fetchCoursesForTutor(String teacherId) async {
     try {
       final querySnapshot = await firestore
           .collection('courses')

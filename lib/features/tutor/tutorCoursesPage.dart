@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/courses/screens/course_details.dart';
 import 'package:yeneta_tutor/features/courses/screens/course_upload.dart';
@@ -10,6 +11,7 @@ class CoursesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final courseController = ref.watch(courseControllerProvider);
+    final teacherId = ref.watch(authControllerProvider).getCurrentUserId();
 
     return Scaffold(
       appBar: AppBar(
@@ -25,7 +27,7 @@ class CoursesPage extends ConsumerWidget {
         ),
       ),
       body: FutureBuilder<List<Course>>(
-        future: courseController.fetchCoursesByTeacherId(),
+        future: courseController.fetchCoursesByTeacherId(teacherId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -148,7 +150,6 @@ class CourseCard extends StatelessWidget {
                     width: double.infinity,
                   ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(

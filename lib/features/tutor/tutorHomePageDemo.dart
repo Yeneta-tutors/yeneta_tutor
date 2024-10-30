@@ -24,12 +24,11 @@ class _TutorHomePageDemoState extends ConsumerState<TutorHomePageDemo> {
   Widget build(BuildContext context) {
     final courseController = ref.watch(courseControllerProvider);
     final authcontroller = ref.read(authControllerProvider);
-
     final teacherId = authcontroller.getCurrentUserId();
     final teacherFuture = authcontroller.getUserData(teacherId);
 
     Future<List<Course>> coursesFuture() async {
-      return await courseController.fetchCoursesByTeacherId();
+      return await courseController.fetchCoursesByTeacherId(teacherId);
     }
 
     Future<List<Course>> fetchFilteredCoursesFuture() async {
@@ -92,7 +91,8 @@ class _TutorHomePageDemoState extends ConsumerState<TutorHomePageDemo> {
                       FutureBuilder<UserModel?>(
                         future: teacherFuture,
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return const CircularProgressIndicator();
                           } else if (snapshot.hasError) {
                             return const Text(
@@ -102,7 +102,8 @@ class _TutorHomePageDemoState extends ConsumerState<TutorHomePageDemo> {
                                 fontSize: 18,
                               ),
                             );
-                          } else if (!snapshot.hasData || snapshot.data == null) {
+                          } else if (!snapshot.hasData ||
+                              snapshot.data == null) {
                             return const Text(
                               'User not found',
                               style: TextStyle(

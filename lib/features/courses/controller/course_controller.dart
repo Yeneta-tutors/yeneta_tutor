@@ -123,9 +123,9 @@ class CourseController {
   }
 
   // Fetch courses by teacher ID
-  Future<List<Course>> fetchCoursesByTeacherId() async {
+  Future<List<Course>> fetchCoursesByTeacherId(String teacherID) async {
     try {
-      return await courseRepository.fetchCoursesForTutor();
+      return await courseRepository.fetchCoursesForTutor(teacherID);
     } catch (e) {
       throw Exception('Failed to fetch courses: $e');
     }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
+import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
+import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
+import 'package:yeneta_tutor/models/course_model.dart';
 
 class UserProfile extends ConsumerWidget {
   String userId;
@@ -8,6 +11,9 @@ class UserProfile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userDataFuture = ref.read(authControllerProvider).getUserData(userId);
+    final userStream = ref.watch(userDataAuthProvider);
+    final courseController = ref.watch(courseControllerProvider);
+    final subscriptionController = ref.watch(subscriptionControllerProvider);
 
     return Scaffold(
         backgroundColor: Colors.grey[200],
@@ -15,22 +21,28 @@ class UserProfile extends ConsumerWidget {
           title: Text('User Management > Profile student'),
           backgroundColor: Colors.grey[850],
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Center(
-                child: Row(
-                  children: [
-                    Text('Hello, Esubalew',
-                        style: TextStyle(
-                            color: const Color.fromARGB(255, 255, 255, 255))),
-                    SizedBox(width: 10),
-                    CircleAvatar(
-                      backgroundImage:
-                          AssetImage('images/avator_image.png'), // Admin image
-                    ),
-                  ],
+            userStream.when(
+              data: (user) => Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Center(
+                  child: Row(
+                    children: [
+                      Text('Hello, ${user!.firstName}',
+                          style: TextStyle(
+                              color: const Color.fromARGB(255, 255, 255, 255))),
+                      SizedBox(width: 10),
+                      CircleAvatar(
+                        backgroundImage: user.profileImage != null
+                            ? NetworkImage(user.profileImage!)
+                            : AssetImage('images/avatar_image.png')
+                                as ImageProvider, // Admin image
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              loading: () => CircularProgressIndicator(),
+              error: (error, stack) => Text('Error: $error'),
             ),
           ],
         ),
@@ -71,7 +83,8 @@ class UserProfile extends ConsumerWidget {
                               children: [
                                 CircleAvatar(
                                   radius: 50,
-                                  backgroundImage: AssetImage(user!.profileImage ??
+                                  backgroundImage: AssetImage(user!
+                                          .profileImage ??
                                       'images/avator_image.png'), // User image here
                                 ),
                                 Positioned(
@@ -153,10 +166,9 @@ class UserProfile extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 10,
-                                  offset: Offset(0, 5),
-                                ),
+                                    color: Colors.black26,
+                                    blurRadius: 10,
+                                    offset: Offset(0, 5))
                               ],
                             ),
                             child: Row(
@@ -174,50 +186,48 @@ class UserProfile extends ConsumerWidget {
                             ),
                           ),
                           SizedBox(height: 16),
-                          // Scrollable courses
+                          // Fetch and display courses based on user role
                           Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black26,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              child: LayoutBuilder(
-                                builder: (context, constraints) {
-                                  double cardAspectRatio =
-                                      (constraints.maxWidth < 400)
-                                          ? 0.7
-                                          : 1.0; // Adjust based on screen width
+                            child: FutureBuilder(
+                              future: user.role == 'student'
+                                  ? subscriptionController
+                                      .fetchSubscribedCourses(userId)
+                                  : courseController
+                                      .fetchCoursesByTeacherId(userId),
+                              builder: (context, courseSnapshot) {
+                                if (courseSnapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                } else if (courseSnapshot.hasError) {
+                                  return Center(
+                                      child: Text(
+                                          'Error: ${courseSnapshot.error}'));
+                                } else if (courseSnapshot.hasData) {
+                                  final courses = courseSnapshot.data;
                                   return GridView.builder(
                                     padding: EdgeInsets.all(16),
                                     gridDelegate:
                                         SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2, // Two cards per row
-                                      crossAxisSpacing:
-                                          16, // Spacing between cards
-                                      mainAxisSpacing:
-                                          16, // Spacing between rows
-                                      childAspectRatio:
-                                          cardAspectRatio, // Adjust card height based on width
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 16,
+                                      mainAxisSpacing: 16,
                                     ),
-                                    itemCount: 6, // Number of courses
+                                    itemCount: courses!.length,
                                     itemBuilder: (context, index) {
                                       return GestureDetector(
                                         onTap: () {
                                           // Redirect to course details
                                         },
-                                        child: CourseCard(),
+                                        child:
+                                            CourseCard(course: courses[index]),
                                       );
                                     },
                                   );
-                                },
-                              ),
+                                }
+                                return Center(
+                                    child: Text('No courses available'));
+                              },
                             ),
                           ),
                         ],
@@ -285,6 +295,10 @@ class UserProfile extends ConsumerWidget {
 }
 
 class CourseCard extends StatelessWidget {
+  final Course course; // Add this line
+
+  CourseCard({required this.course}); // Add this line
+
   @override
   Widget build(BuildContext context) {
     return Container(
