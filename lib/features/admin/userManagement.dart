@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/admin/admin_sidebar.dart';
 import 'package:yeneta_tutor/features/admin/dashboard_provider.dart';
 import 'package:yeneta_tutor/features/admin/userProfile.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
@@ -64,7 +65,7 @@ class _UserManagementState extends ConsumerState<UserManagement>
       appBar: AppBar(
         iconTheme:
             IconThemeData(color: const Color.fromARGB(255, 255, 255, 255)),
-        title: Text('User Management'),
+        title: Text('User Management',style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255)),),
         actions: [
           userStream.when(
             data: (user) => Row(
@@ -85,9 +86,10 @@ class _UserManagementState extends ConsumerState<UserManagement>
             error: (error, stack) => Text('Error: $error'),
           ),
         ],
-        backgroundColor: Colors.transparent,
+        backgroundColor:Color.fromRGBO(9, 19, 58, 1),
         elevation: 0,
       ),
+      drawer: Sidebar(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -126,12 +128,14 @@ class _UserManagementState extends ConsumerState<UserManagement>
                     // Right section: Charts
                     Expanded(
                       flex: 1,
-                      child: Column(
+                      child: SingleChildScrollView(
+                        child: Column(
                         children: [
                           _buildDonutChart(userStatistics), // Users chart
                           SizedBox(height: 20),
                           _buildGradeChart(), // Students chart with animation
                         ],
+                      ),
                       ),
                     ),
                   ],
