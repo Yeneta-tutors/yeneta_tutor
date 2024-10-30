@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
+import 'package:yeneta_tutor/features/tutor/earningsPage.dart';
 import 'package:yeneta_tutor/features/tutor/tutorCoursesPage.dart';
 import 'package:yeneta_tutor/features/tutor/tutorHomePageDemo.dart';
 import 'package:yeneta_tutor/features/tutor/tutorProfile.dart';
@@ -23,7 +24,7 @@ class _TutorHomePageState extends ConsumerState<TutorHomePage> {
         tutorId: '',
         studentId: '',
       ), // Messages
-      Center(child: Text('Earnings Page')), // Earnings
+      EarningsPage(), // Earnings
     ];
   
 

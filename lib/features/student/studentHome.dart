@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
+import 'package:yeneta_tutor/features/student/paymentsPage.dart';
 import 'package:yeneta_tutor/features/student/studentHomePageDemo.dart';
 import 'package:yeneta_tutor/features/student/studentProfile.dart';
 import 'package:yeneta_tutor/features/student/subscribedCourses.dart';
@@ -22,7 +23,7 @@ class _StudentHomePageState extends ConsumerState<StudentHomePage> {
       SubscribedCourses(),  
       studentProfile(), 
       ChatScreen(tutorId: '', studentId: ''), // Messages
-      Center(child: Text('studnet Earnings Page')), // Earnings
+      PaymentHistoryPage(), // Earnings
     ];
   
 
