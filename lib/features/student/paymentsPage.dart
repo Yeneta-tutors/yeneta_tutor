@@ -1,23 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
+import 'package:yeneta_tutor/models/course_model.dart';
+import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 
-class PaymentHistoryPage extends StatelessWidget {
+class PaymentHistoryPage extends ConsumerWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final subscriptionController = ref.watch(subscriptionControllerProvider);
+    final authController = ref.watch(authControllerProvider);
+
+    // Get the logged-in student ID from authController
+    final studentId = authController.getCurrentUserId();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Payments'),
-        // leading: IconButton(
-        //   icon: Icon(Icons.arrow_back),
-        //   onPressed: () {
-        //     Navigator.pop(context);
-        //   },
-        // ),
       ),
-      body: ListView.builder(
-        padding: EdgeInsets.all(16),
-        itemCount: paymentData.length,
-        itemBuilder: (context, index) {
-          return PaymentCard(payment: paymentData[index]);
+      body: FutureBuilder<List<Course>>(
+        future: subscriptionController.fetchSubscribedCourses(studentId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error fetching payment history'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No payments found'));
+          }
+
+          final courses = snapshot.data!;
+
+          return ListView.builder(
+            padding: EdgeInsets.all(16),
+            itemCount: courses.length,
+            itemBuilder: (context, index) {
+              return PaymentCard(course: courses[index]);
+            },
+          );
         },
       ),
     );
@@ -25,12 +44,11 @@ class PaymentHistoryPage extends StatelessWidget {
 }
 
 class PaymentCard extends StatelessWidget {
-  final Payment payment;
+  final Course course;
 
-  PaymentCard({required this.payment});
+  PaymentCard({required this.course});
 
   @override
-
   Widget build(BuildContext context) {
     return Card(
       elevation: 5,
@@ -45,15 +63,13 @@ class PaymentCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextRow(label: 'Grade', value: payment.grade.toString()),
+            TextRow(label: 'Grade', value: course.grade.toString()),
             Divider(thickness: 1),
-            TextRow(label: 'Subject', value: payment.subject),
+            TextRow(label: 'Subject', value: course.subject),
             Divider(thickness: 1),
-            TextRow(label: 'Chapter', value: payment.chapter.toString()),
+            TextRow(label: 'Chapter', value: course.chapter.toString()),
             Divider(thickness: 1),
-            TextRow(label: 'Date', value: payment.date),
-            Divider(thickness: 1),
-            TextRow(label: 'Price', value: '${payment.price} Birr'),
+            TextRow(label: 'Price', value: '${course.price} Birr'),
           ],
         ),
       ),
@@ -78,27 +94,3 @@ class TextRow extends StatelessWidget {
     );
   }
 }
-
-class Payment {
-  final int grade;
-  final String subject;
-  final int chapter;
-  final String date;
-  final int price;
-
-  Payment({
-    required this.grade,
-    required this.subject,
-    required this.chapter,
-    required this.date,
-    required this.price,
-  });
-}
-
-// Sample data for demonstration
-final List<Payment> paymentData = [
-  Payment(grade: 11, subject: 'Chemistry', chapter: 1, date: '12/8/2024 - 8:21 pm', price: 99),
-  Payment(grade: 11, subject: 'Physics', chapter: 1, date: '12/8/2024 - 8:21 pm', price: 71),
-  Payment(grade: 11, subject: 'Biology', chapter: 1, date: '12/8/2024 - 8:21 pm', price: 69),
-  Payment(grade: 11, subject: 'Physics', chapter: 1, date: '12/8/2024 - 8:21 pm', price: 79),
-];

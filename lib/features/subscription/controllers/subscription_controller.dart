@@ -143,4 +143,16 @@ class SubscriptionController {
       throw Exception("Error in calculating the total number");
     }
   }
+
+// getSubscribedCoursesByTeacherId
+
+Future<List<Map<String, dynamic>>> getSubscribedCoursesByTeacherId(String teacherId) async {
+    try {
+      final courses =
+          await subscriptionRepository.getSubscribedCoursesByTeacherId(teacherId);
+      return courses;
+    } catch (error) {
+      throw Exception('Failed to fetch subscribed courses');
+    }
+  }
 }

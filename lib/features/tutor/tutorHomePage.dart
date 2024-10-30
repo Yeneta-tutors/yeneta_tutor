@@ -24,7 +24,7 @@ class _TutorHomePageState extends ConsumerState<TutorHomePage> {
         tutorId: '',
         studentId: '',
       ), // Messages
-      EarningsPage(), // Earnings
+      EarningsPage(teacherId: '',), // Earnings
     ];
   
 
