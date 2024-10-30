@@ -3,8 +3,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:yeneta_tutor/features/admin/addAdmin.dart';
 import 'package:yeneta_tutor/features/admin/admin_sidebar.dart';
 import 'package:yeneta_tutor/features/admin/courseDetail.dart';
+import 'package:yeneta_tutor/features/admin/dashboard.dart';
 import 'package:yeneta_tutor/features/auth/screens/login_screen.dart';
 import 'package:yeneta_tutor/features/student/studentHome.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,11 +21,12 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await dotenv.load(fileName: ".env");
-  String chapaApiKey = dotenv.env['CHAPA_API_KEY'] ?? '';
-  Chapa.configure(privateKey: chapaApiKey);
+  // await dotenv.load(fileName: ".env");
+  // String chapaApiKey = dotenv.env['CHAPA_API_KEY'] ?? '';
+  Chapa.configure(privateKey: 'CHASECK_TEST-zpSrRnBkLTE28RteRDogXHMCrN0xqZYu');
   runApp(const ProviderScope(child: MyApp()));
 }
+
 
 
 class MyApp extends ConsumerWidget {
