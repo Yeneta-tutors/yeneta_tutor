@@ -114,6 +114,15 @@ class SubscriptionController {
     print('Subscription updated successfully.');
   }
 
+//  fetch all subscriptions
+  Future<List<Subscription>> fetchSubscriptions() async {
+    try {
+      return await subscriptionRepository.getAllSubscriptions();
+    } catch (e) {
+      throw Exception('Failed to fetch subscriptions: $e');
+    }
+  }
+  
   Future<List<Course>> fetchSubscribedCourses(String studentId) async {
     try {
       final courses =
