@@ -76,6 +76,19 @@ class SubscriptionRepository {
     }
   }
 
+ 
+//  fetch all subscriptions
+
+  Future<List<Subscription>> getAllSubscriptions() async {
+    try {
+      final QuerySnapshot snapshot = await firestore.collection('subscriptions').get();
+      return snapshot.docs.map((doc) => Subscription.fromMap(doc.data() as Map<String, dynamic>)).toList();
+    } catch (e) {
+      print('Error fetching subscriptions: $e');
+      return [];
+    }
+  }  
+  
   Future<List<Course>> getCoursesByIds(List<String> courseIds) async {
     try {
       final List<Course> courses = [];
