@@ -13,6 +13,12 @@ final totalStudentsProvider = FutureProvider<int>((ref) async {
   
 });
 
+// total admins provider
+final totalAdminsProvider = FutureProvider<int>((ref) async {
+  final users = await ref.watch(allUsersProvider.future);
+  final admins = users.where((user) => user.role == UserRole.admin).length;
+  return admins;
+});
 
 // count students for each grade
 final gradeStudentsProvider = FutureProvider<Map<String, int>>((ref) async {
