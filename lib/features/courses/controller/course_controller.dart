@@ -16,6 +16,27 @@ final courseControllerProvider = Provider((ref) {
   );
 });
 
+// fetch all course provider
+final allCoursesProvider = FutureProvider<List<Course>>((ref) async {
+  final courseController = ref.watch(courseControllerProvider);
+  return await courseController.fetchCourses();
+});
+
+// count course by grade provider
+final courseCountByGradeProvider = FutureProvider<Map<String, int>>((ref) async {
+  final courseController = ref.watch(courseControllerProvider);
+  final courses = await courseController.fetchCourses();
+  final courseCountByGrade = <String, int>{};
+  for (var course in courses) {
+    courseCountByGrade.update(
+      course.grade,
+      (value) => value + 1,
+      ifAbsent: () => 1,
+    );
+  }
+  return courseCountByGrade;
+});
+
 class CourseController {
   final CourseRepository courseRepository;
   final AuthController authController;

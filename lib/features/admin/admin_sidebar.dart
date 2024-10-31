@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yeneta_tutor/features/admin/dashboard.dart';
 import 'package:yeneta_tutor/features/admin/userManagement.dart';
+import 'package:yeneta_tutor/features/admin/contentManagement.dart';
 
 class Sidebar extends StatelessWidget {
   @override
@@ -28,7 +29,7 @@ class Sidebar extends StatelessWidget {
             Navigator.push(context, MaterialPageRoute(builder: (context) => UserManagement()));
           }),
           SidebarItem(title: 'Content Management', icon: Icons.video_library, onTap: () {
-            // Navigator.push(context, MaterialPageRoute(builder: (context) => ContentManagementPage()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ContentManagementPage()));
           }),
           SidebarItem(title: 'Financial Management', icon: Icons.attach_money, onTap: () {
             // Navigator.push(context, MaterialPageRoute(builder: (context) => FinancialManagementPage()));

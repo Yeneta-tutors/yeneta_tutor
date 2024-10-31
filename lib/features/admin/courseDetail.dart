@@ -1,41 +1,86 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:intl/intl.dart';
+import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:animated_snack_bar/animated_snack_bar.dart';
+import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
+import 'package:yeneta_tutor/models/course_model.dart';
 
-class AdminCourseDetails extends StatefulWidget {
+class AdminCourseDetails extends ConsumerStatefulWidget {
+  final String courseId;
+
+  AdminCourseDetails({required this.courseId});
+
   @override
   _AdminCourseDetailsState createState() => _AdminCourseDetailsState();
 }
 
-class _AdminCourseDetailsState extends State<AdminCourseDetails> {
-  late VideoPlayerController _mainController;
-  late VideoPlayerController _demoController;
+class _AdminCourseDetailsState extends ConsumerState<AdminCourseDetails> {
+  Course? _course;
+  String? _teacherName;
+  VideoPlayerController? _mainController; // Nullable
+  VideoPlayerController? _demoController; // Nullable
   bool _mainControlsVisible = false;
   bool _demoControlsVisible = false;
 
   @override
   void initState() {
     super.initState();
-    _mainController = VideoPlayerController.network('https://firebasestorage.googleapis.com/v0/b/yeneta-tutor.appspot.com/o/courses%2Fdemo_videos%2F2686c1a7-8164-47b4-834a-a01e6393bae3?alt=media&token=fbd38123-7c3c-48f6-9b78-695203cc428')
-      ..initialize().then((_) {
-        setState(() {});
-      })
-      ..addListener(() {
-        setState(() {}); // Update slider and time indicators
-      });
-    _demoController = VideoPlayerController.network('https://firebasestorage.googleapis.com/v0/b/yeneta-tutor.appspot.com/o/courses%2Fdemo_videos%2F2686c1a7-8164-47b4-834a-a01e6393bae3?alt=media&token=fbd38123-7c3c-48f6-9b78-695203cc428')
-      ..initialize().then((_) {
-        setState(() {});
-      });
+    _loadCourseDetails();
+  }
+
+  Future<void> _loadCourseDetails() async {
+    try {
+      final course = await ref
+          .read(courseControllerProvider)
+          .fetchCourseById(widget.courseId);
+
+      _course = course;
+
+      if (_course != null) {
+        // Initialize controllers only if the video URLs are not null or empty
+        if (_course!.videoUrl.isNotEmpty) {
+          _mainController = VideoPlayerController.network(_course!.videoUrl)
+            ..initialize().then((_) {
+              setState(() {});
+            });
+        }
+
+        if (_course!.demoVideoUrl.isNotEmpty) {
+          _demoController = VideoPlayerController.network(_course!.demoVideoUrl)
+            ..initialize().then((_) {
+              setState(() {});
+            });
+        }
+      }
+      await _loadTeacherdata(_course!.teacherId);
+    } catch (e) {
+      print('Failed to load course details: $e');
+    }
+  }
+  
+  Future<void> _loadTeacherdata(String teacherId) async {
+    try {
+      final teacher =
+          await ref.read(authControllerProvider).getUserData(teacherId);
+
+      if (teacher != null) {
+        setState(() {
+          _teacherName = teacher.firstName;
+        });
+      }
+    } catch (e) {
+      throw Exception('Failed to load teacher details');
+    }
   }
 
   @override
   void dispose() {
-    _mainController.dispose();
-    _demoController.dispose();
+    _mainController?.dispose();
+    _demoController?.dispose();
     super.dispose();
   }
 
@@ -47,7 +92,10 @@ class _AdminCourseDetailsState extends State<AdminCourseDetails> {
     return hours > 0 ? "$hours:$minutes:$seconds" : "$minutes:$seconds";
   }
 
-  Widget _buildVideoPlayer(VideoPlayerController controller, bool isMain) {
+  Widget _buildVideoPlayer(VideoPlayerController? controller, bool isMain) {
+    if (controller == null || !controller.value.isInitialized) {
+      return Center(child: CircularProgressIndicator()); // Show loading indicator
+    }
     return MouseRegion(
       onEnter: (_) => setState(() {
         if (isMain) {
@@ -66,10 +114,13 @@ class _AdminCourseDetailsState extends State<AdminCourseDetails> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          AspectRatio(
+        Container(
+          constraints: BoxConstraints(maxHeight: 200), 
+          child: AspectRatio(
             aspectRatio: controller.value.aspectRatio,
             child: VideoPlayer(controller),
           ),
+        ),
           if ((isMain && _mainControlsVisible) || (!isMain && _demoControlsVisible))
             Positioned.fill(
               child: Container(
@@ -175,7 +226,7 @@ class _AdminCourseDetailsState extends State<AdminCourseDetails> {
                       SizedBox(height: 16),
                       Text('Demo Video', style: TextStyle(color: Colors.grey[600])),
                       SizedBox(height: 8),
-                      _buildVideoPlayer(_demoController, false ),
+                      _buildVideoPlayer(_demoController, false),
                     ],
                   ),
                 ),
@@ -186,17 +237,17 @@ class _AdminCourseDetailsState extends State<AdminCourseDetails> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Title: Introduction to Physics',
+                        'Title: ${_course?.title ?? ''}',
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blueGrey[800]),
                       ),
                       SizedBox(height: 8),
-                      Text('Chapter: 1', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Subject: Physics', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Instructor: Esubalew', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Price: 120 Birr', style: TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Chapter: ${_course?.chapter ?? ''}', style: TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Subject: ${_course?.subject ?? ''}', style: TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Instructor: ${_teacherName ?? ''}', style: TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Price: ${_course?.price ?? ''} Birr', style: TextStyle(fontSize: 22, color: Colors.black87)),
                       Text('Subscribers: 7830 Std', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Rating: 4.2', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Grade: 11', style: TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Rating: ${_course?.rating ?? 0.0}', style: TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Grade: ${_course?.grade ?? ''}', style: TextStyle(fontSize: 22, color: Colors.black87)),
                       Text('Published on: 11 May, 2023', style: TextStyle(fontSize: 22, color: Colors.black87)),
                       SizedBox(height: 16),
                       Text(
@@ -205,28 +256,19 @@ class _AdminCourseDetailsState extends State<AdminCourseDetails> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'The Ethiopian Grade 11 Physics syllabus. This course covers the core topics of Physical '
-                        'World and Measurement, providing students with a solid understanding of fundamental physics concepts.',
+                        _course?.description ?? '',
                         style: TextStyle(fontSize: 16, color: Colors.grey[700], height: 1.5),
                       ),
                       SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: () {
                           // Unpublish button action
-                         AnimatedSnackBar.material(
-                          'Course unpublished',              
-                          type: AnimatedSnackBarType.info,  
-                          mobileSnackBarPosition: MobileSnackBarPosition.top, 
-                          desktopSnackBarPosition: DesktopSnackBarPosition.topCenter, 
-                          duration: Duration(seconds: 3),  
-                        ).show(context);
+                          AnimatedSnackBar.material(
+                            'Course unpublished',              
+                            type: AnimatedSnackBarType.info, 
+                          ).show(context);
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 9, 19, 58),
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                        child: Text('Unpublish', style: TextStyle(fontSize: 16, color: Colors.white)),
+                        child: Text('Unpublish Course'),
                       ),
                     ],
                   ),

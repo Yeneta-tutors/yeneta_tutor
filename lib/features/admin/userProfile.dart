@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/admin/courseDetail.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
+import 'package:yeneta_tutor/models/user_model.dart';
 
 class UserProfile extends ConsumerWidget {
   String userId;
@@ -189,7 +191,7 @@ class UserProfile extends ConsumerWidget {
                           // Fetch and display courses based on user role
                           Expanded(
                             child: FutureBuilder(
-                              future: user.role == 'student'
+                              future: user.role == UserRole.student
                                   ? subscriptionController
                                       .fetchSubscribedCourses(userId)
                                   : courseController
@@ -217,7 +219,15 @@ class UserProfile extends ConsumerWidget {
                                     itemBuilder: (context, index) {
                                       return GestureDetector(
                                         onTap: () {
-                                          // Redirect to course details
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AdminCourseDetails(
+                                                      courseId: courses[index]
+                                                          .courseId), // Pass the courseId
+                                            ),
+                                          );
                                         },
                                         child:
                                             CourseCard(course: courses[index]),
