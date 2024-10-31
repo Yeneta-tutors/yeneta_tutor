@@ -63,6 +63,7 @@ class CourseRepository {
         thumbnail: thumbnailUrl ?? '',
         rating: course.rating ?? 0.0,
         numRating: course.numRating ?? 0,
+        isPublished: course.isPublished,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
       );
@@ -80,7 +81,10 @@ class CourseRepository {
   // Fetch all courses
   Future<List<Course>> fetchCourses() async {
     try {
-      final querySnapshot = await firestore.collection('courses').get();
+      final querySnapshot = await firestore
+          .collection('courses')
+          .where('is_published', isEqualTo: true)
+          .get();
       return querySnapshot.docs
           .map((doc) => Course.fromMap(doc.data()))
           .toList();
@@ -108,14 +112,15 @@ class CourseRepository {
 
   // Fetch courses  by subject
 
-  Future<List<Course>> fetchCourseBySubject(String subject) async{
+  Future<List<Course>> fetchCourseBySubject(String subject) async {
     try {
-          final querySnapshot = await firestore
+      final querySnapshot = await firestore
           .collection('courses')
           .where('subject', isEqualTo: subject)
+          .where('is_published', isEqualTo: true)
           .get();
-          
-          return querySnapshot.docs
+
+      return querySnapshot.docs
           .map((doc) => Course.fromMap(doc.data()))
           .toList();
     } catch (e) {
@@ -176,9 +181,11 @@ class CourseRepository {
           .where('grade', isEqualTo: grade)
           .where('chapter', isEqualTo: chapter)
           .where('subject', isEqualTo: subject)
+          .where('is_published', isEqualTo: true)
           .get();
 
-      print('Found ${querySnapshot.docs.length} courses for filters: Grade=$grade, Chapter=$chapter, Subject=$subject');
+      print(
+          'Found ${querySnapshot.docs.length} courses for filters: Grade=$grade, Chapter=$chapter, Subject=$subject');
 
       if (querySnapshot.docs.isEmpty) {
         print('No courses found for the selected filters');
@@ -217,10 +224,9 @@ class CourseRepository {
     }
   }
 
-    // Update course rating
+  // Update course rating
   Future<void> updateCourseRating(String courseId, double newRating) async {
     try {
-
       final course = await fetchCourseById(courseId);
       if (course == null) {
         throw Exception('Course not found');
@@ -242,13 +248,23 @@ class CourseRepository {
     }
   }
 
-
   // Delete a course
   Future<void> deleteCourse(String courseId) async {
     try {
       await firestore.collection('courses').doc(courseId).delete();
     } catch (e) {
       throw Exception('Failed to delete course: $e');
+    }
+  }
+
+  //unpublish a course by admin
+  Future<void> unpublishCourse(String courseId) async {
+    try {
+      await firestore.collection('courses').doc(courseId).update({
+        'is_Published': false,
+      });
+    } catch (e) {
+      throw Exception('Failed to unpublish course: $e');
     }
   }
 }

@@ -61,7 +61,7 @@ class _AdminCourseDetailsState extends ConsumerState<AdminCourseDetails> {
       print('Failed to load course details: $e');
     }
   }
-  
+
   Future<void> _loadTeacherdata(String teacherId) async {
     try {
       final teacher =
@@ -94,7 +94,8 @@ class _AdminCourseDetailsState extends ConsumerState<AdminCourseDetails> {
 
   Widget _buildVideoPlayer(VideoPlayerController? controller, bool isMain) {
     if (controller == null || !controller.value.isInitialized) {
-      return Center(child: CircularProgressIndicator()); // Show loading indicator
+      return Center(
+          child: CircularProgressIndicator()); // Show loading indicator
     }
     return MouseRegion(
       onEnter: (_) => setState(() {
@@ -114,14 +115,15 @@ class _AdminCourseDetailsState extends ConsumerState<AdminCourseDetails> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-        Container(
-          constraints: BoxConstraints(maxHeight: 200), 
-          child: AspectRatio(
-            aspectRatio: controller.value.aspectRatio,
-            child: VideoPlayer(controller),
+          Container(
+            constraints: BoxConstraints(maxHeight: 200),
+            child: AspectRatio(
+              aspectRatio: controller.value.aspectRatio,
+              child: VideoPlayer(controller),
+            ),
           ),
-        ),
-          if ((isMain && _mainControlsVisible) || (!isMain && _demoControlsVisible))
+          if ((isMain && _mainControlsVisible) ||
+              (!isMain && _demoControlsVisible))
             Positioned.fill(
               child: Container(
                 color: Colors.black38,
@@ -133,20 +135,33 @@ class _AdminCourseDetailsState extends ConsumerState<AdminCourseDetails> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.replay_10, color: Colors.white, size: 30),
-                          onPressed: () => controller.seekTo(controller.value.position - Duration(seconds: 10)),
+                          icon: Icon(Icons.replay_10,
+                              color: Colors.white, size: 30),
+                          onPressed: () => controller.seekTo(
+                              controller.value.position -
+                                  Duration(seconds: 10)),
                         ),
                         IconButton(
-                          icon: Icon(controller.value.isPlaying ? Icons.pause : Icons.play_arrow, color: Colors.white, size: 40),
+                          icon: Icon(
+                              controller.value.isPlaying
+                                  ? Icons.pause
+                                  : Icons.play_arrow,
+                              color: Colors.white,
+                              size: 40),
                           onPressed: () {
                             setState(() {
-                              controller.value.isPlaying ? controller.pause() : controller.play();
+                              controller.value.isPlaying
+                                  ? controller.pause()
+                                  : controller.play();
                             });
                           },
                         ),
                         IconButton(
-                          icon: Icon(Icons.forward_10, color: Colors.white, size: 30),
-                          onPressed: () => controller.seekTo(controller.value.position + Duration(seconds: 10)),
+                          icon: Icon(Icons.forward_10,
+                              color: Colors.white, size: 30),
+                          onPressed: () => controller.seekTo(
+                              controller.value.position +
+                                  Duration(seconds: 10)),
                         ),
                       ],
                     ),
@@ -167,18 +182,22 @@ class _AdminCourseDetailsState extends ConsumerState<AdminCourseDetails> {
                                 child: Slider(
                                   activeColor: Colors.white,
                                   inactiveColor: Colors.grey,
-                                  value: controller.value.position.inSeconds.toDouble(),
+                                  value: controller.value.position.inSeconds
+                                      .toDouble(),
                                   min: 0,
-                                  max: controller.value.duration.inSeconds.toDouble(),
+                                  max: controller.value.duration.inSeconds
+                                      .toDouble(),
                                   onChanged: (value) {
                                     setState(() {
-                                      controller.seekTo(Duration(seconds: value.toInt()));
+                                      controller.seekTo(
+                                          Duration(seconds: value.toInt()));
                                     });
                                   },
                                 ),
                               ),
                               Text(
-                                _formatDuration(controller.value.duration - controller.value.position),
+                                _formatDuration(controller.value.duration -
+                                    controller.value.position),
                                 style: TextStyle(color: Colors.white),
                               ),
                             ],
@@ -220,11 +239,13 @@ class _AdminCourseDetailsState extends ConsumerState<AdminCourseDetails> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Main Course', style: TextStyle(color: Colors.grey[600])),
+                      Text('Main Course',
+                          style: TextStyle(color: Colors.grey[600])),
                       SizedBox(height: 8),
                       _buildVideoPlayer(_mainController, true),
                       SizedBox(height: 16),
-                      Text('Demo Video', style: TextStyle(color: Colors.grey[600])),
+                      Text('Demo Video',
+                          style: TextStyle(color: Colors.grey[600])),
                       SizedBox(height: 8),
                       _buildVideoPlayer(_demoController, false),
                     ],
@@ -238,35 +259,56 @@ class _AdminCourseDetailsState extends ConsumerState<AdminCourseDetails> {
                     children: [
                       Text(
                         'Title: ${_course?.title ?? ''}',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blueGrey[800]),
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey[800]),
                       ),
                       SizedBox(height: 8),
-                      Text('Chapter: ${_course?.chapter ?? ''}', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Subject: ${_course?.subject ?? ''}', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Instructor: ${_teacherName ?? ''}', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Price: ${_course?.price ?? ''} Birr', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Subscribers: 7830 Std', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Rating: ${_course?.rating ?? 0.0}', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Grade: ${_course?.grade ?? ''}', style: TextStyle(fontSize: 22, color: Colors.black87)),
-                      Text('Published on: 11 May, 2023', style: TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Chapter: ${_course?.chapter ?? ''}',
+                          style:
+                              TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Subject: ${_course?.subject ?? ''}',
+                          style:
+                              TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Instructor: ${_teacherName ?? ''}',
+                          style:
+                              TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Price: ${_course?.price ?? ''} Birr',
+                          style:
+                              TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Subscribers: 7830 Std',
+                          style:
+                              TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Rating: ${_course?.rating ?? 0.0}',
+                          style:
+                              TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Grade: ${_course?.grade ?? ''}',
+                          style:
+                              TextStyle(fontSize: 22, color: Colors.black87)),
+                      Text('Published on: 11 May, 2023',
+                          style:
+                              TextStyle(fontSize: 22, color: Colors.black87)),
                       SizedBox(height: 16),
                       Text(
                         'DESCRIPTION',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueGrey[700]),
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey[700]),
                       ),
                       SizedBox(height: 8),
                       Text(
                         _course?.description ?? '',
-                        style: TextStyle(fontSize: 16, color: Colors.grey[700], height: 1.5),
+                        style: TextStyle(
+                            fontSize: 16, color: Colors.grey[700], height: 1.5),
                       ),
                       SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: () {
-                          // Unpublish button action
-                          AnimatedSnackBar.material(
-                            'Course unpublished',              
-                            type: AnimatedSnackBarType.info, 
-                          ).show(context);
+                          ref
+                              .watch(courseControllerProvider)
+                              .unpublishCourse(widget.courseId);
                         },
                         child: Text('Unpublish Course'),
                       ),

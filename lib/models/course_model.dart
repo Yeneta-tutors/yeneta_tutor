@@ -12,6 +12,7 @@ class Course {
   String? thumbnail;
   double? rating;
   int? numRating;
+  bool isPublished;
   DateTime createdAt;
   DateTime updatedAt;
 
@@ -29,6 +30,7 @@ class Course {
     required this.thumbnail,
     required this.rating,
     required this.numRating,
+    required this.isPublished,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -49,6 +51,7 @@ class Course {
       'thumbnail': thumbnail,
       'rating': rating,
       'num_rating':numRating,
+      'is_published': isPublished,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -70,6 +73,7 @@ class Course {
       thumbnail: map['thumbnail'],
       rating: map['rating']?.toDouble(), 
       numRating: map['num_rating'] != null ? map['num_rating'] as int : null, 
+      isPublished: map['is_published'] ?? true,
       createdAt: DateTime.parse(map['created_at']),
       updatedAt: DateTime.parse(map['updated_at']),
     );

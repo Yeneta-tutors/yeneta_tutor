@@ -184,4 +184,10 @@ Future<List<UserModel>> getAllUsers() async {
   void deleteUser() {
     authRepository.deleteAccount();
   }
+
+  // block user by admin
+  void blockUser(String uid) {
+    authRepository.blockUser(uid);
+  }
+  
 }

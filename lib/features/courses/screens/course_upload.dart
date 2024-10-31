@@ -316,6 +316,7 @@ Future<void> _requestStoragePermission() async {
                       thumbnail: '', 
                       rating: 0.0,
                       numRating: 0,
+                      isPublished: true,
                       createdAt: DateTime.now(),
                       updatedAt: DateTime.now(),
                     );

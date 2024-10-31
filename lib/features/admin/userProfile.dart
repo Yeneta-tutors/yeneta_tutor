@@ -127,7 +127,9 @@ class UserProfile extends ConsumerWidget {
                             SizedBox(height: 20),
                             ElevatedButton(
                               onPressed: () {
-                                // Block user functionality
+                                ref
+                                    .watch(authControllerProvider)
+                                    .blockUser(userId);
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:

@@ -76,6 +76,7 @@ class CourseController {
         thumbnail: course.thumbnail,
         rating: course.rating,
         numRating: course.numRating,
+        isPublished: course.isPublished,
         createdAt: course.createdAt,
         updatedAt: course.updatedAt,
       );
@@ -190,6 +191,15 @@ class CourseController {
       await courseRepository.deleteCourse(courseId);
     } catch (e) {
       throw Exception('Failed to delete course: $e');
+    }
+  }
+
+  //unpublish a course by admin
+  Future<void> unpublishCourse(String courseId) async {
+    try {
+      await courseRepository.unpublishCourse(courseId);
+    } catch (e) {
+      throw Exception('Failed to unpublish course: $e');
     }
   }
 }

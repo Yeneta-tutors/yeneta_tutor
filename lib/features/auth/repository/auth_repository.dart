@@ -98,6 +98,7 @@ class AuthRepository {
           subject: subject,
           role: role,
           profileImage: photoUrl,
+          isBlocked: false,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
@@ -159,6 +160,13 @@ class AuthRepository {
           if (data != null) {
             UserModel userModel =
                 UserModel.fromMap(data as Map<String, dynamic>);
+
+          // Check if the user is blocked
+            if (userModel.isBlocked) {
+            showSnackBar(context, "You are blocked from logging in.");
+            await auth.signOut();
+            return;
+          }
 
             // Navigate to the appropriate home page based on user role
             if (userModel.role == UserRole.student) {
@@ -327,5 +335,15 @@ class AuthRepository {
     } catch (e) {
       throw Exception('Could not delete user: $e');
     }
+  }
+
+  //block user for admin
+  Future<void> blockUser(String uid) async {
+    try {
+      await firestore.collection('users').doc(uid).update({'is_blocked': true});
+    } catch (e) {
+      throw Exception('Failed to block user: $e');
+    }
+  
   }
 }

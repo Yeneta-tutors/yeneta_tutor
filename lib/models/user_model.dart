@@ -24,6 +24,7 @@ class UserModel {
   final String? graduationDepartment;
   final String? profileImage;
   final String? bio;
+  final bool isBlocked;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -43,6 +44,7 @@ class UserModel {
     this.graduationDepartment,
     this.profileImage,
     this.bio,
+    required this.isBlocked,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -64,6 +66,7 @@ class UserModel {
       'subject': subject,
       'profile_image': profileImage,
       'bio': bio,
+      'is_blocked': isBlocked,
       'created_at': createdAt,
       'updated_at': updatedAt,
     };
@@ -88,6 +91,7 @@ class UserModel {
       subject: map['subject'] ?? '',
       profileImage: map['profile_image'] ?? '',
       bio: map['bio'] ?? '',
+      isBlocked: map['is_blocked'] ?? false,
       createdAt: map['created_at'] is Timestamp
           ? (map['created_at'] as Timestamp).toDate()
           : DateTime.now(),
