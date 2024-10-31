@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yeneta_tutor/features/admin/addAdmin.dart';
 import 'package:yeneta_tutor/features/admin/dashboard.dart';
 import 'package:yeneta_tutor/features/admin/userManagement.dart';
 import 'package:yeneta_tutor/features/admin/contentManagement.dart';
@@ -38,7 +39,7 @@ class Sidebar extends StatelessWidget {
             // Navigator.push(context, MaterialPageRoute(builder: (context) => ReportsPage()));
           }),
           SidebarItem(title: 'Add Admin', icon: Icons.add, onTap: () {
-            // Navigator.push(context, MaterialPageRoute(builder: (context) => AddAdminPage()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => AddAdminPage()));
           }),
         ],
       ),
