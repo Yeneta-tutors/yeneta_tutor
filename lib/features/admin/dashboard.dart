@@ -367,8 +367,10 @@ class BarChartWidget extends ConsumerWidget {
         data: (weeklyTutors) {
           // Determine maxY based on the larger of the two values to set the y-axis scale
           final maxY = (weeklyStudents > weeklyTutors ? weeklyStudents : weeklyTutors).toDouble();
-          final interval = (maxY / 5).ceilToDouble(); // Setting interval to a fixed scale based on maxY
-
+          var interval = (maxY / 5).ceilToDouble();
+          if (interval == 0) {
+            interval = 1.0;
+          }
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
