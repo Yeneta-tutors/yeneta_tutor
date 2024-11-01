@@ -63,6 +63,9 @@ dependencies:
   flutter_dotenv: ^5.2.1
   rxdart: ^0.28.0
   animated_snack_bar: ^0.4.0
+  chat_gpt_sdk: ^3.1.2
+  material_buttonx: ^2.0.3
+  google_generative_ai: ^0.4.6
 
 dev_dependencies:
   flutter_test:
