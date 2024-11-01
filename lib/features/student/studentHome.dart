@@ -5,7 +5,7 @@ import 'package:yeneta_tutor/features/student/paymentsPage.dart';
 import 'package:yeneta_tutor/features/student/studentHomePageDemo.dart';
 import 'package:yeneta_tutor/features/student/studentProfile.dart';
 import 'package:yeneta_tutor/features/student/subscribedCourses.dart';
-import 'package:yeneta_tutor/features/chat/screens/chat_screen.dart';
+import 'package:yeneta_tutor/features/common/chat_screen.dart';
 
 
 class StudentHomePage extends ConsumerStatefulWidget {
@@ -22,7 +22,7 @@ class _StudentHomePageState extends ConsumerState<StudentHomePage> {
       StudentHomePageDemo(),
       SubscribedCourses(),  
       studentProfile(), 
-      ChatScreen(tutorId: '', studentId: ''), // Messages
+      ChatScreen(), // Messages
       PaymentHistoryPage(), // Earnings
     ];
   
