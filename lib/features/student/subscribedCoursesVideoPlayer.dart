@@ -8,7 +8,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/tutor/tutorProfileView.dart';
-import 'package:yeneta_tutor/features/chat/screens/chat_screen.dart';
+import 'package:yeneta_tutor/features/common/chat_screen.dart';
 import 'package:yeneta_tutor/features/courses/controller/course_controller.dart';
 import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
@@ -337,7 +337,7 @@ class _SubscribedCoursesVideoPlayer
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ChatScreen(tutorId: _course!.teacherId, studentId: studentId),
+                          builder: (context) => ChatScreen(),
                         ),
                       );
                     },
