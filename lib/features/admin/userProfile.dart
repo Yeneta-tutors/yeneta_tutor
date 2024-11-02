@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/admin/courseDetail.dart';
@@ -16,6 +17,7 @@ class UserProfile extends ConsumerWidget {
     final userStream = ref.watch(userDataAuthProvider);
     final courseController = ref.watch(courseControllerProvider);
     final subscriptionController = ref.watch(subscriptionControllerProvider);
+    final userStatistics = ref.watch(userStatisticsProvider);
 
     return Scaffold(
         backgroundColor: Colors.grey[200],
@@ -249,51 +251,82 @@ class UserProfile extends ConsumerWidget {
                     // Bar Chart Container
                     Expanded(
                       flex: 2,
-                      child: Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10,
-                              offset: Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Center(
-                                child:
-                                    Placeholder(), // Replace with actual chart widget
+                      child: userStatistics.when(
+                        data: (stats) {
+                          int totalUsers =
+                              stats.values.fold(0, (a, b) => a + b);
+
+                          return Column(
+                            children: [
+                              Text(
+                                'Users',
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                            ),
-                            SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                SubjectIndicator(
+                              SizedBox(height: 10),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 200,
+                                child: PieChart(
+                                  PieChartData(
+                                    sections: [
+                                      PieChartSectionData(
+                                        color: Colors.blue,
+                                        value: (stats[UserRole.student]! /
+                                                totalUsers) *
+                                            100, // Change to your dynamic value
+                                        title: '${stats[UserRole.student]}',
+                                        radius: 30,
+                                      ),
+                                      PieChartSectionData(
+                                        color: Colors.red,
+                                        value: (stats[UserRole.tutor]! /
+                                                totalUsers) *
+                                            100, // Change to your dynamic value
+                                        title: '${stats[UserRole.tutor]}',
+                                        radius: 30,
+                                      ),
+                                      PieChartSectionData(
+                                        color: Colors.green,
+                                        value: (stats[UserRole.admin]! /
+                                                totalUsers) *
+                                            100, // Change to your dynamic value
+                                        title: '${stats[UserRole.admin]}',
+                                        radius: 30,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  _buildIndicator(
                                     color: Colors.blue,
-                                    subject: 'Math',
-                                    count: 2),
-                                SubjectIndicator(
+                                    text: 'Student',
+                                    percentage:
+                                        '${((stats[UserRole.student]! / totalUsers) * 100).toStringAsFixed(1)}%',
+                                  ),
+                                  _buildIndicator(
+                                    color: Colors.red,
+                                    text: 'Tutor',
+                                    percentage:
+                                        '${((stats[UserRole.tutor]! / totalUsers) * 100).toStringAsFixed(1)}%',
+                                  ),
+                                  _buildIndicator(
                                     color: Colors.green,
-                                    subject: 'Physics',
-                                    count: 4),
-                                SubjectIndicator(
-                                    color: Colors.pink,
-                                    subject: 'Biology',
-                                    count: 2),
-                                SubjectIndicator(
-                                    color: Colors.orange,
-                                    subject: 'Chemistry',
-                                    count: 2),
-                              ],
-                            ),
-                          ],
-                        ),
+                                    text: 'Admin',
+                                    percentage:
+                                        '${((stats[UserRole.admin]! / totalUsers) * 100).toStringAsFixed(1)}%',
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
+                        loading: () => CircularProgressIndicator(),
+                        error: (err, stack) => Text('Error: $err'),
                       ),
                     ),
                   ],
@@ -306,269 +339,179 @@ class UserProfile extends ConsumerWidget {
   }
 }
 
-class CourseCard extends StatelessWidget {
-  final Course course; // Add this line
+Widget _buildIndicator(
+    {required Color color, required String text, required String percentage}) {
+  return Row(
+    children: [
+      Container(
+        width: 10,
+        height: 10,
+        color: color,
+      ),
+      SizedBox(width: 5),
+      Text('$text ($percentage)'),
+    ],
+  );
+}
 
-  CourseCard({required this.course}); // Add this line
+class CourseCard extends ConsumerWidget {
+  final Course course;
+
+  CourseCard({required this.course});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 300, // Fixed width
-      height: 350, // Fixed height
-      margin: EdgeInsets.all(8), // Margin around the card
-      decoration: BoxDecoration(
-        color: Colors.green[100], // Background color of the card
-        borderRadius: BorderRadius.circular(20), // Rounded corners
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            spreadRadius: 2,
-            blurRadius: 8,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top section for the course image
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-            child: Stack(
-              children: [
-                Image.asset(
-                  'images/yeneta_logo.jpg', // Replace with the course image
-                  width: double.infinity,
-                  height: 120,
-                  fit: BoxFit.cover,
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Fetch teacher's data
+    final teacherFuture =
+        ref.read(authControllerProvider).getUserData(course.teacherId);
+
+    return FutureBuilder(
+      future: teacherFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.hasData) {
+          final teacher = snapshot.data!;
+
+          return Container(
+            width: 300, // Fixed width
+            height: 350, // Fixed height
+            margin: EdgeInsets.all(8), // Margin around the card
+            decoration: BoxDecoration(
+              color: Colors.green[100], // Background color of the card
+              borderRadius: BorderRadius.circular(20), // Rounded corners
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  spreadRadius: 2,
+                  blurRadius: 8,
                 ),
-                Positioned(
-                  bottom: 10,
-                  left: 10,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      'Grade 11',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top section for the course image
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  child: Stack(
+                    children: [
+                      Image.asset(
+                        'images/yeneta_logo.jpg', // Replace with the course image
+                        width: double.infinity,
+                        height: 120,
+                        fit: BoxFit.cover,
                       ),
+                      Positioned(
+                        bottom: 10,
+                        left: 10,
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            'Grade ${course.grade}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 10,
+                        right: 10,
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            'Chapter ${course.chapter}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10),
+                // Course Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Text(
+                    course.title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                Positioned(
-                  bottom: 10,
-                  right: 10,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      'Chapter 2',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
+                SizedBox(height: 10),
+                // Tutor Info, Rating, and Price
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Row(
+                    children: [
+                      // Teacher Image
+                      CircleAvatar(
+                        backgroundImage: teacher.profileImage != null
+                            ? NetworkImage(teacher.profileImage!)
+                            : AssetImage('images/avatar_image.png')
+                                as ImageProvider,
+                        radius: 20,
                       ),
-                    ),
+                      SizedBox(width: 8),
+                      // Teacher Name and Rating
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            teacher.firstName,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text('Rating ${course.rating}')
+                          // Optional: Add rating or any other teacher-specific info here
+                        ],
+                      ),
+                      Spacer(),
+                      // Course Price
+                      Text(
+                        '${course.price} Birr',
+                        style: TextStyle(
+                          color: Colors.blue[800],
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-          SizedBox(height: 10),
-          // Course Title
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Text(
-              'Measurements',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
-          // Tutor Info, Rating, and Price
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Row(
-              children: [
-                // Tutor Image
-                CircleAvatar(
-                  backgroundImage: AssetImage(
-                      'images/avator_image.png'), // Replace with the tutor image
-                  radius: 20,
-                ),
-                SizedBox(width: 4),
-                // Tutor Name and Rating
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'John',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    // Row(
-                    //   children: [
-                    //     Icon(
-                    //       Icons.star,
-                    //       color: Colors.yellow[700],
-                    //       size: 18,
-                    //     ),
-                    //     SizedBox(width: 4),
-                    //     Text(
-                    //       '4.2',
-                    //       style: TextStyle(
-                    //         fontSize: 14,
-                    //         fontWeight: FontWeight.w500,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-                  ],
-                ),
-                Spacer(),
-                // Course Price
-                Text(
-                  '28 Birr',
-                  style: TextStyle(
-                    color: Colors.blue[800],
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+          );
+        }
+        return Center(child: Text('No teacher data available'));
+      },
     );
   }
 }
-
-// class CourseCard extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: EdgeInsets.all(8),
-//       decoration: BoxDecoration(
-//         color: Colors.green[100],
-//         borderRadius: BorderRadius.circular(16),
-//         boxShadow: [
-//           BoxShadow(
-//             color: Colors.black26,
-//             blurRadius: 10,
-//             offset: Offset(0, 5),
-//           ),
-//         ],
-//       ),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Stack(
-//             children: [
-//               // Course Thumbnail Image
-//               Container(
-//                 width: double.infinity,
-//                 height: MediaQuery.of(context).size.height * 0.15, // Adjust image height based on screen size
-//                 decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(16),
-//                   image: DecorationImage(
-//                     image: AssetImage('images/yeneta_logo.jpg'),
-//                     fit: BoxFit.cover,
-//                   ),
-//                 ),
-//               ),
-//               // Grade text at bottom-left corner of the image
-//               Positioned(
-//                 bottom: 8,
-//                 left: 8,
-//                 child: Container(
-//                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-//                   color: Colors.black.withOpacity(0.7),
-//                   child: Text(
-//                     'Grade 11',
-//                     style: TextStyle(color: Colors.white, fontSize: 12),
-//                   ),
-//                 ),
-//               ),
-//               // Chapter text at bottom-right corner of the image
-//               Positioned(
-//                 bottom: 8,
-//                 right: 8,
-//                 child: Container(
-//                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-//                   color: Colors.black.withOpacity(0.7),
-//                   child: Text(
-//                     'Chapter 2',
-//                     style: TextStyle(color: Colors.white, fontSize: 12),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//           SizedBox(height: 8),
-//           // Course title and details
-//           FittedBox(
-//             child: Text('Physics', style: TextStyle(fontWeight: FontWeight.bold)),
-//           ),
-//           FittedBox(
-//             child: Text('Measurements', style: TextStyle(color: Colors.grey)),
-//           ),
-//           SizedBox(height: 4),
-//           Row(
-//   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//   children: [
-//     Row(
-//       children: [
-//         CircleAvatar(
-//           radius: 12,
-//           backgroundImage: AssetImage('images/avator_image.png'),
-//         ),
-//         SizedBox(width: 8), // Space between avatar and text
-//         Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Row(
-//               children: [
-//                 Text('John', style: TextStyle(color: Colors.grey)), // Name
-//                 SizedBox(width: 25),
-//                 Row(
-//                   children: [
-//                     Icon(Icons.star, color: Colors.yellow, size: 16), // Star Icon
-//                     SizedBox(width: 2),
-//                     Text('4.5', style: TextStyle(color: Colors.grey)), // Rating number
-//                   ],
-//                 ),
-//               ],
-//             ),
-//           ],
-//         ),
-//       ],
-//     ),
-//     // Price aligned to the right
-//     Text('28 Birr', style: TextStyle(color: Colors.blue)),
-//   ],
-// )
-
-//         ],
-//       ),
-//     );
-//   }
-// }
 
 class SubjectIndicator extends StatelessWidget {
   final Color color;
