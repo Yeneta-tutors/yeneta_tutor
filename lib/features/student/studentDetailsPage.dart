@@ -240,9 +240,8 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage(_profilePic != null
-                        ? '$_profilePic'
-                        : 'images/yeneta_logo.jpg'),
+                    backgroundImage: NetworkImage(_profilePic ??
+                        'images/yeneta_logo.jpg'),
                   ),
                   SizedBox(width: 10),
                   Column(
@@ -317,8 +316,8 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_course?.subject ?? 'subject'),
-                      Text('Grade: ${_course?.grade ?? 'grade'} '),
+                      Text(_course?.subject ?? ''),
+                      Text('Grade: ${_course?.grade ?? ''} '),
                     ],
                   ),
                   Column(
