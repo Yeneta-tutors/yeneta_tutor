@@ -74,7 +74,7 @@ class SubscriptionController {
           amount: amount,
           currency: "ETB",
           txRef: txRef,
-          email: "ephremhabtmu@gmail.com",
+          email: "ephremhabtamu2015@gmail.com",
           onInAppPaymentSuccess: (successMsg) {
             Navigator.push(
               context,
