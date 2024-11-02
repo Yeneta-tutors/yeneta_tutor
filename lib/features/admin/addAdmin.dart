@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yeneta_tutor/features/admin/admin_sidebar.dart';
 import 'package:yeneta_tutor/features/admin/dashboard_provider.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
@@ -85,14 +86,41 @@ class _AddAdminPageState extends ConsumerState<AddAdminPage> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     final adimnCount = ref.watch(totalAdminsProvider);
+    final userStream = ref.watch(userDataAuthProvider);
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+        backgroundColor: Color.fromRGBO(243, 242, 247, 1),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        iconTheme:
+            IconThemeData(color: const Color.fromARGB(255, 255, 255, 255)),
+        title: Text(
+          'Add Admin',
+          style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255)),
+        ),
+        actions: [
+          userStream.when(
+            data: (user) => Row(
+              children: [
+                Text(
+                  user != null ? 'Hello, ${user.firstName}' : 'Hello, User',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(width: 10),
+                CircleAvatar(
+                  backgroundImage: user != null && user.profileImage != null
+                      ? NetworkImage(user.profileImage!)
+                      : AssetImage('images/avatar_image.png') as ImageProvider,
+                ),
+              ],
+            ),
+            loading: () => CircularProgressIndicator(),
+            error: (error, stack) => Text('Error: $error'),
+          ),
+        ],
+        backgroundColor: Color.fromRGBO(9, 19, 58, 1),
         elevation: 0,
-        title: Text('New Admin', style: TextStyle(color: Colors.black)),
-        centerTitle: true,
       ),
+      drawer: Sidebar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
