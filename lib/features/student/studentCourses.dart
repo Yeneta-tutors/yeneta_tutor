@@ -210,7 +210,7 @@ class _CoursesPageState extends ConsumerState<CoursesPage> {
                                           ),
                                           child: course.thumbnail != null &&
                                                   course.thumbnail!.isNotEmpty
-                                              ? Image.asset(
+                                              ? Image.network(
                                                   course.thumbnail!,
                                                   height: 120,
                                                   width: double.infinity,
