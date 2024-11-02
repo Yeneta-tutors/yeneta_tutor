@@ -76,8 +76,8 @@ class _UserManagementState extends ConsumerState<UserManagement>
                 ),
                 SizedBox(width: 10),
                 CircleAvatar(
-                  backgroundImage: user != null && user.profileImage != null
-                      ? NetworkImage(user.profileImage!)
+                  backgroundImage: user != null && user?.profileImage != null
+                      ? NetworkImage(user!.profileImage!)
                       : AssetImage('images/avatar_image.png') as ImageProvider,
                 ),
               ],
