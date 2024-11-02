@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/common/repositories/common_firebase_storage_repository.dart';
-import 'package:yeneta_tutor/features/admin/admin_sidebar.dart';
+import 'package:yeneta_tutor/features/admin/dashboard.dart';
+import 'package:yeneta_tutor/features/common/bannedUser.dart';
 import 'package:yeneta_tutor/features/tutor/tutorHomePage.dart';
 import 'package:yeneta_tutor/models/user_model.dart';
 import 'package:yeneta_tutor/features/student/studentHome.dart';
@@ -122,7 +123,7 @@ class AuthRepository {
           );
         } else if (role == UserRole.admin) {
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => Sidebar()));
+              context, MaterialPageRoute(builder: (context) => AdminDashboard()));
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -163,8 +164,11 @@ class AuthRepository {
 
           // Check if the user is blocked
             if (userModel.isBlocked) {
-            showSnackBar(context, "You are blocked from logging in.");
-            await auth.signOut();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => TemporaryBanPage()),
+            );           
+           await auth.signOut();
             return;
           }
 
@@ -185,7 +189,7 @@ class AuthRepository {
               );
             } else if (userModel.role == UserRole.admin) {
               Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (context) => Sidebar()));
+                  context, MaterialPageRoute(builder: (context) => AdminDashboard()));
             }
           } else {
             showSnackBar(context, "User document is null.");
