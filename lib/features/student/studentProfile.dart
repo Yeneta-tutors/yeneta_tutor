@@ -61,8 +61,8 @@ class studentProfile extends ConsumerWidget {
                   left: MediaQuery.of(context).size.width / 2 - 60,
                   child: CircleAvatar(
                     radius: 60,
-                    backgroundImage: user!.profileImage != null
-                        ? AssetImage(user.profileImage!)
+                    backgroundImage: user?.profileImage != null
+                        ? AssetImage(user!.profileImage!)
                         : AssetImage(
                             'images/yeneta_logo.jpg',
                           ),
@@ -72,7 +72,7 @@ class studentProfile extends ConsumerWidget {
             ),
             SizedBox(height: 80), // Padding between image and name
             Text(
-              user.firstName,
+              user!.firstName,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
