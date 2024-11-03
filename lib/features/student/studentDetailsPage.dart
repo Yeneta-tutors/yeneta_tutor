@@ -157,17 +157,21 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                           right: 0,
                           child: Column(
                             children: [
-                              Slider(
-                                value: _controller!.value.position.inSeconds
-                                    .toDouble(),
-                                min: 0,
-                                max: _controller!.value.duration.inSeconds
-                                    .toDouble(),
-                                onChanged: (value) {
-                                  _controller!
-                                      .seekTo(Duration(seconds: value.toInt()));
-                                },
-                              ),
+                              _controller != null &&
+                                      _controller!.value.isInitialized
+                                  ? Slider(
+                                      value: _controller!
+                                          .value.position.inSeconds
+                                          .toDouble(),
+                                      min: 0,
+                                      max: _controller!.value.duration.inSeconds
+                                          .toDouble(),
+                                      onChanged: (value) {
+                                        _controller!.seekTo(
+                                            Duration(seconds: value.toInt()));
+                                      },
+                                    )
+                                  : Center(child: CircularProgressIndicator()),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -209,15 +213,17 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                           : Icons.play_arrow,
                     ),
                     onPressed: () {
-                      setState(() {
-                        if (_controller!.value.isPlaying) {
-                          _controller!.pause();
-                        } else {
-                          _controller!.play();
-                        }
-                        _controlsVisible = true; // Show controls on play
-                        _resetControlsTimer();
-                      });
+                      if (_controller != null) {
+                        setState(() {
+                          if (_controller!.value.isPlaying) {
+                            _controller!.pause();
+                          } else {
+                            _controller!.play();
+                          }
+                          _controlsVisible = true; // Show controls on play
+                          _resetControlsTimer();
+                        });
+                      }
                     },
                   ),
                   IconButton(
@@ -240,8 +246,8 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage(_profilePic ??
-                        'images/yeneta_logo.jpg'),
+                    backgroundImage:
+                        NetworkImage(_profilePic ?? 'images/yeneta_logo.jpg'),
                   ),
                   SizedBox(width: 10),
                   Column(
@@ -287,10 +293,10 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                     },
                     child: Text('Subscribe'),
                     style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 9, 19, 58),
-                  foregroundColor: Colors.white, 
-                  textStyle: const TextStyle(fontSize: 14),
-                ),
+                      backgroundColor: const Color.fromARGB(255, 9, 19, 58),
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontSize: 14),
+                    ),
                   ),
                 ],
               ),
@@ -333,9 +339,11 @@ class _CourseDetailsPageState extends ConsumerState<CourseDetailsPage> {
                         direction: Axis.horizontal,
                       ),
                       FutureBuilder<int>(
-                        future: ref
-                            .read(subscriptionControllerProvider)
-                            .getTotalSubscribersForCourse(_course!.courseId),
+                        future: _course != null
+                            ? ref
+                                .read(subscriptionControllerProvider)
+                                .getTotalSubscribersForCourse(_course!.courseId)
+                            : Future.value(0),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
