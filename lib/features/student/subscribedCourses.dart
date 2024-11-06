@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yeneta_tutor/features/auth/controllers/auth_controller.dart';
 import 'package:yeneta_tutor/features/student/studentDetailsPage.dart';
+import 'package:yeneta_tutor/features/student/studentHomePageDemo.dart';
 import 'package:yeneta_tutor/features/student/subscribedCoursesVideoPlayer.dart';
 import 'package:yeneta_tutor/features/subscription/controllers/subscription_controller.dart';
 import 'package:yeneta_tutor/models/course_model.dart';
@@ -33,7 +34,12 @@ class SubscribedCourses extends ConsumerWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => StudentHomePageDemo(),
+              ),
+            );
           },
         ),
         title: Text(
@@ -162,7 +168,7 @@ class SubscribedCourses extends ConsumerWidget {
                                           ),
                                           child: course.thumbnail != null &&
                                                   course.thumbnail!.isNotEmpty
-                                              ? Image.asset(
+                                              ? Image.network(
                                                   course.thumbnail!,
                                                   height: 120,
                                                   width: double.infinity,
