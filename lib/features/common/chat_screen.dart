@@ -24,6 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final response = await model.generateContent(content);
     setState(() {
       _messages.add(Message(isUser: false, message: response.text?? "", date: DateTime.now()));
+      _userInput.clear();
     });
   }
   
